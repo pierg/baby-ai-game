@@ -101,7 +101,119 @@ color_defaults = [
     '#17becf'  # blue-teal
 ]
 
-def plotEntropyWithVisdom(tx,ty,name,game,viz,win,ylabel='entropy',xlabel='Number of Timesteps'):
+
+
+def plotActionRatioWithVisdom(timestep,actionRatio,name,game,viz,win,folder,actionDescription=None):
+    
+# =============================================================================
+#     Plot the action ratio
+# =============================================================================
+    #get the number of different actions possible
+    n_groups = len(actionDescription)
+
+    #get the names of the action ID
+    names=[0 for i in range(n_groups)]
+    for key,value in actionDescription.items():
+        names[value]=key 
+    
+    
+    fig=plt.figure()
+    
+    
+    for indexAction in range(n_groups):
+        plt.plot(timestep,actionRatio[indexAction],label=names[indexAction])
+        
+        
+    
+    plt.xlabel('Number of timestep')
+    plt.ylabel('ration Choice Agent/Choice Teacher')
+    plt.title('ratio of action choices -- -1 meaning Teacher never suggested this action')
+    
+    plt.legend()
+    
+    fig.savefig(os.path.join(folder,'actionRatio.png'))
+
+
+    plt.show()
+    plt.draw()
+
+    image = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+    image = image.reshape(fig.canvas.get_width_height()[::-1] + (3, ))
+    plt.close(fig)
+
+    # Show it in visdom
+    image = np.transpose(image, (2, 0, 1))
+    win['actionRatio']=viz.image(image,win['actionRatio'])
+    
+    
+    
+
+    return(win)
+    
+
+def plotStatsActionsWithVisdom(timestep,numberOfChoices_Agent,numberOfChoices_Teacher,name,game,viz,win,folder,actionDescription=None):
+    
+# =============================================================================
+#     Plot the action statistics
+# =============================================================================
+    #get the number of different actions possible
+    n_groups = len(actionDescription)
+
+    #get the names of the action ID
+    names=[0 for i in range(n_groups)]
+    for key,value in actionDescription.items():
+        names[value]=key 
+    
+   
+    
+    fig, ax = plt.subplots()
+    
+    index = np.arange(n_groups)
+    bar_width = 0.35
+    
+    opacity = 0.4
+    error_config = {'ecolor': '0.3'}  
+    
+    rects1 = ax.bar(index, numberOfChoices_Agent[-1], bar_width,
+                    alpha=opacity, color='b',
+                    error_kw=error_config,
+                    label='Agent Choices')
+    
+    rects2 = ax.bar(index + bar_width, numberOfChoices_Teacher[-1], bar_width,
+                    alpha=opacity, color='r',
+                     error_kw=error_config,
+                    label='Teacher Choices')
+    
+    ax.set_xlabel('Action ID')
+    ax.set_ylabel('Number of realisations - since the beginning of the game')
+    ax.set_title('Action Statistics')
+    ax.set_xticks(index + bar_width / 2)
+    ax.set_xticklabels(names)
+    ax.legend()
+    
+    fig.tight_layout()
+    fig.savefig(os.path.join(folder,'statsAction.png'))
+
+
+    plt.show()
+    plt.draw()
+
+    image = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+    image = image.reshape(fig.canvas.get_width_height()[::-1] + (3, ))
+    plt.close(fig)
+
+    # Show it in visdom
+    image = np.transpose(image, (2, 0, 1))
+    win['statsAction']=viz.image(image,win['statsAction'])
+    
+    
+    
+
+    return(win)
+    
+    
+
+def plotEntropyWithVisdom(tx,ty,name,game,viz,win,folder,ylabel='entropy',xlabel='Number of Timesteps'):
     fig = plt.figure()
     plt.plot(tx, ty, label="{}".format(name))
 
@@ -111,6 +223,8 @@ def plotEntropyWithVisdom(tx,ty,name,game,viz,win,ylabel='entropy',xlabel='Numbe
 
     plt.title(game)
     plt.legend(loc=4)
+    fig.savefig(os.path.join(folder,'entropy.png'))
+
     plt.show()
     plt.draw()
 
@@ -125,7 +239,7 @@ def plotEntropyWithVisdom(tx,ty,name,game,viz,win,ylabel='entropy',xlabel='Numbe
     
     
 def plotRewardsWithVisdom(timestep,meanReward,medianReward,minReward,maxReward,
-                          name,game,viz,win,ylabel='Rewards',xlabel='Number of Timesteps'):
+                          name,game,viz,win,folder,ylabel='Rewards',xlabel='Number of Timesteps'):
     fig = plt.figure()
     
     plt.plot(timestep,minReward,label='min reward',color='red')
@@ -148,6 +262,7 @@ def plotRewardsWithVisdom(timestep,meanReward,medianReward,minReward,maxReward,
 
     plt.title(game)
     plt.legend(loc=4)
+    fig.savefig(os.path.join(folder,'rewards.png'))
     plt.show()
     plt.draw()
 
@@ -162,7 +277,7 @@ def plotRewardsWithVisdom(timestep,meanReward,medianReward,minReward,maxReward,
     
     
 exclude=['updates','timestep','numberOfChoices_Teacher','numberOfChoices_Agent']
-def visdom_plot(viz, win, folder, game, name, bin_size=100, smooth=1,infoToSave=None):
+def visdom_plot(viz, win, folder, game, name, bin_size=100, smooth=1,infoToSave=None,actionDescription=None):
     
     
     timestep=infoToSave['timestep']
@@ -171,34 +286,21 @@ def visdom_plot(viz, win, folder, game, name, bin_size=100, smooth=1,infoToSave=
     minReward=infoToSave['minReward']
     maxReward=infoToSave['maxReward']
 
-    win=plotRewardsWithVisdom(timestep,meanReward,medianReward,minReward,maxReward,name,game,viz,win)    
+    win=plotRewardsWithVisdom(timestep,meanReward,medianReward,minReward,maxReward,name,game,viz,win,folder)    
     
-    
-    
+       
     entropy=infoToSave['entropy']
-    win=plotEntropyWithVisdom(timestep,entropy,name,game,viz,win)
+    win=plotEntropyWithVisdom(timestep,entropy,name,game,viz,win,folder)
     
-#    for key in iter(infoToSave):  
-#        if not key in exclude:
-#            ty=infoToSave[key]
-#            #print(key)
-#            #print('tx',tx)
-#            #print('ty',ty)
-#            output=plotWithVisdom(tx,ty,name,game,viz,key)
+    numberOfChoices_Teacher=infoToSave['numberOfChoices_Teacher']
+    numberOfChoices_Agent=infoToSave['numberOfChoices_Agent']
 
-
-    # Ugly hack to detect atari
-#    if game.find('NoFrameskip') > -1:
-#        plt.xticks([1e6, 2e6, 4e6, 6e6, 8e6, 10e6],
-#                   ["1M", "2M", "4M", "6M", "8M", "10M"])
-#        plt.xlim(0, 10e6)
-#    else:
-#        plt.xticks([1e5, 2e5, 4e5, 6e5, 8e5, 1e5],
-#                   ["0.1M", "0.2M", "0.4M", "0.6M", "0.8M", "1M"])
-#        plt.xlim(0, 1e6)
-
+    win=plotStatsActionsWithVisdom(timestep,numberOfChoices_Agent,numberOfChoices_Teacher,name,game,viz,win,folder,actionDescription=actionDescription)
     
+    actionRatio=infoToSave['actionRatio']
     
+    win=plotActionRatioWithVisdom(timestep,actionRatio,name,game,viz,win,folder,actionDescription=actionDescription)
+
     return (win)
 
 

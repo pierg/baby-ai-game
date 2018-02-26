@@ -58,7 +58,11 @@ def get_args():
     parser.add_argument('--recurrent-policy', action='store_true', default=True,
                         help='use a recurrent policy')
     parser.add_argument('--no-vis', action='store_true', default=False,
-                        help='disables visdom visualization')
+                        help='disables visdom visualization'),
+    parser.add_argument('--useMissionAdvice', default=2,
+                        help='False if not using teacher advices.Else, indicate the number of time steps when the agent uses the advice')
+    parser.add_argument('--useActionAdvice', default=False,
+                        help='False if not using teacher best actions.Else, indicate the number of time steps when the agent uses the action')
     args = parser.parse_args()
 
     args.cuda = not args.no_cuda and torch.cuda.is_available()

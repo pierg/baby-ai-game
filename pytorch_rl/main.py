@@ -12,6 +12,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.autograd import Variable
+import json
 
 from arguments import get_args
 from vec_env.dummy_vec_env import DummyVecEnv
@@ -22,6 +23,7 @@ from model import RecMLPPolicy, MLPPolicy, CNNPolicy
 from storage import RolloutStorage
 from visualize import visdom_plot
 import preProcess
+import pickle
 
 args = get_args()
 
@@ -35,12 +37,12 @@ torch.manual_seed(args.seed)
 if args.cuda:
     torch.cuda.manual_seed(args.seed)
 
-try:
-    os.makedirs(args.log_dir)
-except OSError:
-    files = glob.glob(os.path.join(args.log_dir, '*.monitor.csv'))
-    for f in files:
-        os.remove(f)
+#try:
+#    os.makedirs(args.log_dir)
+#except OSError:
+#    files = glob.glob(os.path.join(args.log_dir, '*.monitor.csv'))
+#    for f in files:
+#        os.remove(f)
 
 
 
@@ -49,6 +51,20 @@ def main():
     
     #to be deleted after debug
     global envs,obs
+    
+    experimentNumber=0
+    experimentFolder='Exp{}'.format(experimentNumber)
+    
+    save_path = os.path.join(args.save_dir, args.algo,experimentFolder)
+    while os.path.exists(save_path):
+        print('previous experiment ID used : ', experimentNumber)
+        experimentNumber+=1
+        experimentFolder='Exp{}'.format(experimentNumber)
+        save_path = os.path.join(args.save_dir, args.algo,experimentFolder)
+    print('saving results in ',save_path)
+        
+    
+
     
     infoToSave={'timestep':[],
           'FPS':[],
@@ -61,10 +77,10 @@ def main():
           'valueLoss':[],
           'actionLoss':[],
           'numberOfChoices_Teacher':[], 
-          'numberOfChoices_Agent':[] } 
-            #number of times the teacher selected this action as the best action
-            #number of times the agent choosed this action
-            #They are represented as an array of shape Nactions          
+          'numberOfChoices_Agent':[],
+          'actionRatio':[]}   #even if it is redundant, we decide to save the action ratios.
+                              #This could be optimized later
+                    
           
     print("#######")
     print("WARNING: All rewards are clipped or normalized so you need to use a monitor (see envs.py) or visdom plot to get true rewards")
@@ -85,11 +101,13 @@ def main():
         
         viz.text('testing the visdom env')
        
-        win = {'rewards':None,'entropy':None,'statsAction':None}
+        win = {'rewards':None,'entropy':None,'statsAction':None,'actionRatio':None}
 
-    envs = [make_env(args.env_name, args.seed, i, args.log_dir)
+    envs = [make_env(args.env_name, args.seed, i)
                 for i in range(args.num_processes)]
-
+    
+    actionDescription=False
+    
     if args.num_processes > 1:
         envs = SubprocVecEnv(envs)
     else:
@@ -114,7 +132,12 @@ def main():
         actor_critic = MLPPolicy(obs_numel, envs.action_space)
         
     numberOfActions=envs.action_space.n
-
+    
+    #print('before',  infoToSave['actionRatio'])
+    infoToSave['actionRatio']=[[] for i in range(numberOfActions)]
+    #print('after',  infoToSave['actionRatio'])
+    
+    
     # Maxime: log some info about the model and its size
     modelSize = 0
     for p in actor_critic.parameters():
@@ -249,7 +272,16 @@ def main():
             for actionID in envAction:
                 currentCount['numberOfChoices_Teacher'][int(actionID)]+=1
         
+        
         return(0)
+    
+    def updateRatioActions(currentRatio,actions_Agent, actions_Teacher):
+        #print(currentRatio)
+        for indexAction in range(numberOfActions):
+            if actions_Teacher[indexAction]!=0:
+                currentRatio[indexAction]+=[actions_Agent[indexAction]/actions_Teacher[indexAction]]
+            else:
+                currentRatio[indexAction]+=[-1]
         
             
         
@@ -279,29 +311,27 @@ def main():
     for j in range(num_updates):
         for step in range(args.num_steps):
             
-            if step%2==0:
-                useInfo=True
-            else:
-                useInfo=False
             
-            if step%2==0:
-                useTeachingMission=True
-            else:
-                useTeachingMission=False
+            #state the ratio of timesteps where the agent uses the info
+            #from the teacher
             
+            useAdviceFromTeacher=False
+            if not args.useMissionAdvice == False:
+                if step%args.useMissionAdvice==0:
+                    useAdviceFromTeacher=True          
             
-            
-            
-            #DEBUG
-            #useTeachingMission=False
-            #useInfo=False
+            useMissionFromTeacher=False
+            if not args.useActionAdvice == False:
+                if step%args.useActionAdvice==0:
+                    useMissionFromTeacher=True         
             
             
+           
             
             
             
             #preprocess the missions to be used by the model
-            if useInfo:
+            if useAdviceFromTeacher:
                 missionsVariable=getMissionsAsVariables(step)
             else:
                 missionsVariable=False
@@ -324,7 +354,7 @@ def main():
             
             # Obser reward and next obs
             #print('actions',cpu_actions)
-            if useTeachingMission:
+            if useMissionFromTeacher:
                 #print('use mission')
                 obsF, reward, done, info = envs.step(cpu_teaching_actions)
                 correctReward(reward,cpu_actions,cpu_teaching_actions)
@@ -333,6 +363,10 @@ def main():
             else:
                 obsF, reward, done, info = envs.step(cpu_actions)
             
+            
+            if actionDescription is False:
+                actionDescription=info[0]
+                
             ## get the image and mission observation from the observation dictionnary
             obs=np.array([preProcessor.preProcessImage(dico['image']) for dico in obsF])
             missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
@@ -368,7 +402,7 @@ def main():
             update_current_obs(obs,missions)
             rollouts.insert(step, current_obs, current_missions, states.data, action.data, action_log_prob.data, value.data, reward, masks)
 
-        if useInfo:
+        if useAdviceFromTeacher:
             missionsVariable=getMissionsAsVariables(-1)
         else:
             missionsVariable=False
@@ -466,7 +500,6 @@ def main():
 
         if j % args.save_interval == 0 and args.save_dir != "":
             #print('current advice',envs.s)
-            save_path = os.path.join(args.save_dir, args.algo)
             try:
                 os.makedirs(save_path)
             except OSError:
@@ -511,12 +544,17 @@ def main():
             infoToSave['numberOfChoices_Teacher']+=[currentCount['numberOfChoices_Teacher']]
             infoToSave['numberOfChoices_Agent']+=[currentCount['numberOfChoices_Agent']]
             
+            updateRatioActions(infoToSave['actionRatio'],currentCount['numberOfChoices_Agent'],currentCount['numberOfChoices_Teacher'])
+            
+            with open(os.path.join(save_path,'data.json'),'w') as fp:
+                fp.write(json.dumps(infoToSave))
+
             
         if args.vis and j % args.vis_interval == 0:
             try:
                 # Sometimes monitor doesn't properly flush the outputs
                 #if j>0:
-                win = visdom_plot(viz, win, args.log_dir, args.env_name, args.algo,infoToSave=infoToSave)
+                win = visdom_plot(viz, win, save_path, args.env_name, args.algo,infoToSave=infoToSave,actionDescription=actionDescription)
             except IOError:
                 pass
 

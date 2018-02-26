@@ -29,8 +29,8 @@ class Teacher(Wrapper):
                    'door':['open the door', 'toggle the door', 'open it', 'tire la chevillette et la bobinette cherra...']}
 
     
-        self.actionCorrespondance={'left':[0],'right':[1],'continue':[2],'key':[3],'door':[3], 'turn back':[1]}
-        
+        self.actionCorrespondance={'left':[0],'right':[1],'continue':[2],'key':[3],'door':[3], 'turn back':[1],'wait':[4]}
+        self.actionDescription={'left':0,'right':1,'continue':2,'toggle':3,'wait':4}
         
         self.bestActions=None
         self.previousReward=None
@@ -64,7 +64,7 @@ class Teacher(Wrapper):
         
         obs, reward, done, info = self.env.step(action)
         
-        
+        info=self.actionDescription
         if done:
             reward=self.previousReward+10
         else:
