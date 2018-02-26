@@ -63,6 +63,12 @@ def get_args():
                         help='False if not using teacher advices.Else, indicate the number of time steps when the agent uses the advice')
     parser.add_argument('--useActionAdvice', default=False,
                         help='False if not using teacher best actions.Else, indicate the number of time steps when the agent uses the action')
+    parser.add_argument('--load-dir', default='./trained_models/best/',
+                    help='directory to save agent logs (default: ./trained_models/)')
+    parser.add_argument('--expID', type=int, default=6,
+                    help='ID of the experiment to run')
+    
+    
     args = parser.parse_args()
 
     args.cuda = not args.no_cuda and torch.cuda.is_available()
