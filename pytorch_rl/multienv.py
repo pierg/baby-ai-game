@@ -196,12 +196,12 @@ class MultiEnvGraphing:
         if min_num_pts == 0:
             return
 
+        legend = sorted(self.env_data.keys())
         X = None
         Y = None
 
-        legend = []
-
-        for env_name, data in self.env_data.items():
+        for env_name in legend:
+            data = self.env_data[env_name]
             x_values = data['x_values']
             y_values = data['y_values']
 
@@ -221,8 +221,6 @@ class MultiEnvGraphing:
                 Y = y_values
             else:
                 Y = np.concatenate((Y, y_values), axis=1)
-
-            legend.append(env_name)
 
         self.plot = self.vis.line(
             #X = np.array(data['x_values']),

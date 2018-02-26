@@ -84,7 +84,7 @@ You can perform training using the A2C algorithm with:
 python3 pytorch_rl/main.py --env-name MiniGrid-Empty-6x6-v0 --no-vis --num-processes 48 --algo a2c
 ```
 
-In order to Use the teacher environment with pytorch_rl, use the following command : 
+In order to Use the teacher environment with pytorch_rl, use the following command :
 ```
 python3 pytorch_rl/main.py --env-name MultiRoom-Teacher --no-vis --num-processes 48 --algo a2c
 ```
@@ -94,9 +94,9 @@ the [gym_minigrid](https://github.com/maximecb/gym-minigrid) repository.
 
 ### Usage at MILA
 
-If you connect to the lab machines by ssh-ing, make sure to use `ssh -X` in order to see the game window. This will work even for a chain of ssh connections, as long as you use `ssh -X` at all intermediate steps. If you use screen, set `$DISPLAY` variable manually inside each of your screen terminals. You can find the right value for `$DISPLAY` by detaching from you screen first (`Ctrl+A+D`) and then running `echo $DISPLAY`. 
+If you connect to the lab machines by ssh-ing, make sure to use `ssh -X` in order to see the game window. This will work even for a chain of ssh connections, as long as you use `ssh -X` at all intermediate steps. If you use screen, set `$DISPLAY` variable manually inside each of your screen terminals. You can find the right value for `$DISPLAY` by detaching from you screen first (`Ctrl+A+D`) and then running `echo $DISPLAY`.
 
-The code does not work in conda, install everything with `pip install --user`. 
+The code does not work in conda, install everything with `pip3 install --user`.
 
 ## About this Project
 
@@ -127,7 +127,7 @@ gestures in combination with language may be key.
 
 ## Relevant Materials
 
-A work-in-progress review of related work can be found [here](https://www.overleaf.com/13480997qqsxybgstxhg#/52042269/)
+A work-in-progress review of related work can be found [here](https://www.overleaf.com/13480997qqsxybgstxhg#/52042269/).
 
 ### Agents and Language
 
