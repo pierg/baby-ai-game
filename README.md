@@ -1,4 +1,9 @@
 # SPECIFIC INSTRUCTIONS FOR THIS BRANCH #
+run the main script from the root folder to launch an experiment
+```
+python3 pytorch_rl/main.py --env-name MultiRoom-Teacher  --num-processes 48 --algo a2c
+```
+
 
 Here, you can play with the Teacher environment. It is a pseudo-human that computes at each timestep the best action the agent should do, and generates a random sentence that a real human would have given to the baby. 
 The observation is now a dictionnary : 
