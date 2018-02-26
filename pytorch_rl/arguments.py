@@ -59,9 +59,9 @@ def get_args():
                         help='use a recurrent policy')
     parser.add_argument('--no-vis', action='store_true', default=False,
                         help='disables visdom visualization'),
-    parser.add_argument('--useMissionAdvice', default=1,
+    parser.add_argument('--useMissionAdvice', type=int, default=1,
                         help='False if not using teacher advices.Else, indicate the number of time steps when the agent uses the advice')
-    parser.add_argument('--useActionAdvice', default=False,
+    parser.add_argument('--useActionAdvice', type=int,default=False,
                         help='False if not using teacher best actions.Else, indicate the number of time steps when the agent uses the action')
     parser.add_argument('--load-dir', default='./trained_models/best/',
                     help='directory to save agent logs (default: ./trained_models/)')

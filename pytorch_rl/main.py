@@ -215,7 +215,10 @@ def main():
 
     obs=np.array([preProcessor.preProcessImage(dico['image']) for dico in obsF])
     missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
-    bestActions=Variable(torch.stack( [ torch.Tensor(dico['bestActions']) for dico in obsF ] ))
+    bestActions=[dico['bestActions'] for dico in obsF ] 
+
+    
+    #bestActions=Variable(torch.stack( [ torch.Tensor(dico['bestActions']) for dico in obsF ] ))
     #print(missions)
     #print('missions size',missions.size())
     #print(len(obs[0]))
@@ -300,6 +303,12 @@ def main():
                 currentRatio[indexAction]+=[-1]
         
             
+    def forceTeacherMissions(bestActions):
+        output=[]
+        for envActions in bestActions:
+            value=np.random.choice(envActions)
+            output+=[value]
+        return(output)
         
         
         
@@ -320,7 +329,7 @@ def main():
     if args.cuda:
         current_obs = current_obs.cuda()
         current_missions=current_missions.cuda()
-        bestActions=bestActions.cuda()
+        #bestActions=bestActions.cuda()
         rollouts.cuda()
 
     start = time.time()
@@ -360,17 +369,22 @@ def main():
                 missions=missionsVariable
             )
             
-            updateNumberOfActions(currentCount, action.data, bestActions.data)
+            updateNumberOfActions(currentCount, action.data, bestActions)
             
             cpu_actions = action.data.squeeze(1).cpu().numpy()
             
-            cpu_teaching_actions=bestActions.data.squeeze(1).cpu().numpy()
+            
             
             
             
             # Obser reward and next obs
             #print('actions',cpu_actions)
             if useMissionFromTeacher:
+                cpu_teaching_actions=forceTeacherMissions(bestActions)
+                #cpu_teaching_actions=bestActions.data.squeeze(1).cpu().numpy()
+                #print('cpu teaching actions : ', cpu_teaching_actions)
+
+                
                 #print('use mission')
                 obsF, reward, done, info = envs.step(cpu_teaching_actions)
                 correctReward(reward,cpu_actions,cpu_teaching_actions)
@@ -386,13 +400,14 @@ def main():
             ## get the image and mission observation from the observation dictionnary
             obs=np.array([preProcessor.preProcessImage(dico['image']) for dico in obsF])
             missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
-            bestActions=Variable(torch.stack( [ torch.Tensor(dico['bestActions']) for dico in obsF ] ))
+            #bestActions=Variable(torch.stack( [ torch.Tensor(dico['bestActions']) for dico in obsF ] ))
+            bestActions=[dico['bestActions'] for dico in obsF ] 
+
             
             
             
-            
-            if args.cuda:
-                bestActions=bestActions.cuda()
+            #if args.cuda:
+             #   bestActions=bestActions.cuda()
 
 
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
