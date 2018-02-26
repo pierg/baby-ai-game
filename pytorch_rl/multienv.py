@@ -124,23 +124,26 @@ class MultiEnvGraphing:
 
         self.plot = None
 
+        self.num_updates = 0
+
     def process(self, infos):
         for info in infos:
             info = info['multi_env']
             env_name = info['env_name']
 
-            if 'episode_reward' not in info:
-                continue
+            if 'episode_reward' in info:
+                self.addDataPoint(
+                    env_name,
+                    info['episode_reward'],
+                    info['episode_steps']
+                )
 
-            self.addDataPoint(
-                env_name,
-                info['episode_reward'],
-                info['episode_steps']
-            )
+        self.num_updates += 1
+
+        if self.num_updates % 400 == 0:
+            self.genMultiGraph()
 
     def addDataPoint(self, env_name, episode_reward, episode_steps):
-        # FIXME: switch to total time steps instead
-
         data = self.env_data.setdefault(
             env_name,
             dict(
@@ -160,7 +163,8 @@ class MultiEnvGraphing:
         data['num_steps'] += episode_steps
 
         if data['num_episodes'] % 100 == 0:
-            data['x_values'].append(data['num_steps'])
+            #data['x_values'].append(data['num_steps'])
+            data['x_values'].append(data['num_episodes'])
             data['y_values'].append(data['running_avg'])
 
             data['plot'] = self.vis.line(
@@ -169,7 +173,7 @@ class MultiEnvGraphing:
                 opts = dict(
                     #title="Reward per episode",
                     title = env_name,
-                    xlabel='Total time steps',
+                    xlabel='Number of episodes',
                     ylabel='Reward per episode',
                     ytickmin=0,
                     ytickmax=1,
@@ -178,16 +182,64 @@ class MultiEnvGraphing:
                 win = data['plot']
             )
 
-"""
-opts.title : figure title
-opts.width : figure width
-opts.height : figure height
-opts.showlegend : show legend (true or false)
-legend=['Didnt', 'Update'],
-xtickmin=-50,
-xtickmax=50,
-xtickstep=0.5,
-ytickmin=-50,
-ytickmax=50,
-ytickstep=0.5,
-"""
+        return data
+
+    def genMultiGraph(self):
+        # Find out the size of the longest dataset
+        max_num_pts = 0
+        min_num_pts = 0
+        for env_name, data in self.env_data.items():
+            max_num_pts = max(max_num_pts, len(data['x_values']))
+            min_num_pts = min(max_num_pts, len(data['x_values']))
+
+        # If some environment has no data points yet, then wait
+        if min_num_pts == 0:
+            return
+
+        X = None
+        Y = None
+
+        legend = []
+
+        for env_name, data in self.env_data.items():
+            x_values = data['x_values']
+            y_values = data['y_values']
+
+            pad_len = max_num_pts - len(x_values)
+            x_values = np.pad(x_values, (0, pad_len), 'edge')
+            y_values = np.pad(y_values, (0, pad_len), 'edge')
+
+            x_values = x_values.reshape((max_num_pts, 1))
+            y_values = y_values.reshape((max_num_pts, 1))
+
+            if X is None:
+                X = x_values
+            else:
+                X = np.concatenate((X, x_values), axis=1)
+
+            if Y is None:
+                Y = y_values
+            else:
+                Y = np.concatenate((Y, y_values), axis=1)
+
+            legend.append(env_name)
+
+        self.plot = self.vis.line(
+            #X = np.array(data['x_values']),
+            #Y = np.array(data['y_values']),
+            X = X,
+            Y = Y,
+            opts = dict(
+                title = 'All Environments',
+                xlabel='Number of episodes',
+                ylabel='Reward per episode',
+                ytickmin=0,
+                ytickmax=1,
+                ytickstep=0.1,
+                legend=legend,
+                showlegend=True,
+                width=900,
+                height=500
+            ),
+            win = self.plot
+        )
