@@ -325,7 +325,9 @@ def main():
     # These variables are used to compute average rewards for all processes.
     episode_rewards = torch.zeros([args.num_processes, 1])
     final_rewards = torch.zeros([args.num_processes, 1])
-
+    
+    bestMeanRewards=final_rewards.mean()
+    
     if args.cuda:
         current_obs = current_obs.cuda()
         current_missions=current_missions.cuda()
@@ -387,7 +389,7 @@ def main():
                 
                 #print('use mission')
                 obsF, reward, done, info = envs.step(cpu_teaching_actions)
-                correctReward(reward,cpu_actions,cpu_teaching_actions)
+                #correctReward(reward,cpu_actions,cpu_teaching_actions)
                 #print('corrected reward', reward)
 
             else:
@@ -537,14 +539,18 @@ def main():
                 pass
 
             # A really ugly way to save a model to CPU
-            save_model = actor_critic
-            if args.cuda:
-                save_model = copy.deepcopy(actor_critic).cpu()
+            if bestMeanRewards<final_rewards.mean():
+                bestMeanRewards=final_rewards.mean()
+                save_model = actor_critic
+                if args.cuda:
+                    save_model = copy.deepcopy(actor_critic).cpu()
+    
+                save_model = [save_model,
+                                hasattr(envs, 'ob_rms') and envs.ob_rms or None]
+    
+                torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
 
-            save_model = [save_model,
-                            hasattr(envs, 'ob_rms') and envs.ob_rms or None]
 
-            torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
 
         if j % args.log_interval == 0:
             end = time.time()
