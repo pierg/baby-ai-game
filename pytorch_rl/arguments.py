@@ -67,7 +67,10 @@ def get_args():
                     help='directory to save agent logs (default: ./trained_models/)')
     parser.add_argument('--expID', type=int, default=6,
                     help='ID of the experiment to run')
-    
+    parser.add_argument('--serverVisdom', default='http://eos11',
+                        help='display server used for visdom, default eos11 on elisa2')
+    parser.add_argument('--portVisdom', type=int, default=24431,
+                    help='ID of the port used for Visdom, default 24431, CHANGE THIS VALUE BEFORE RUNNING THE main.py')
     
     args = parser.parse_args()
 

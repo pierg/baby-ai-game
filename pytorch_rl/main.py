@@ -111,7 +111,7 @@ def main():
 
         else:
             print('using visdom on a linux server')
-            viz = Visdom(server='http://eos11',port=24431,env='babyAIGame_Exp{}'.format(experimentNumber))
+            viz = Visdom(server=args.serverVisdom,port=args.portVisdom,env='babyAIGame_Exp{}'.format(experimentNumber))
         
         
         
