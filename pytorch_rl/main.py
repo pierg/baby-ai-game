@@ -177,7 +177,7 @@ def main():
     elif args.algo == 'acktr':
         optimizer = KFACOptimizer(actor_critic)
 
-    maxSizeOfMissionsSelected=200
+    maxSizeOfMissionsSelected=7
     rollouts = RolloutStorage(args.num_steps, args.num_processes, obs_shape, envs.action_space, actor_critic.state_size,maxSizeOfMissions=maxSizeOfMissionsSelected)
     current_obs = torch.zeros(args.num_processes, *obs_shape)
     
@@ -235,7 +235,7 @@ def main():
         
         #get the missions as ASCII codes
         if end is not False:
-            tmpMissions=rollouts.missions[step:end].view(-1,200)
+            tmpMissions=rollouts.missions[step:end].view(-1,maxSizeOfMissionsSelected)
             #convert them to pytorch tensors using the language model
             tmpMissions=preProcessor.adaptToTorchVariable(tmpMissions)
             #convert them as Variables
@@ -548,8 +548,17 @@ def main():
                 save_model = [save_model,
                                 hasattr(envs, 'ob_rms') and envs.ob_rms or None]
     
-                torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
+                torch.save(save_model, os.path.join(save_path,  "bestMeanModel.pt"))
+            
+            
+            save_model = actor_critic
+            if args.cuda:
+                save_model = copy.deepcopy(actor_critic).cpu()
 
+            save_model = [save_model,
+                            hasattr(envs, 'ob_rms') and envs.ob_rms or None]
+
+            torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
 
 
         if j % args.log_interval == 0:

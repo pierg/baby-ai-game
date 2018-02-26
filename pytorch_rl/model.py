@@ -53,7 +53,7 @@ class RecMLPPolicy(FFPolicy):
         self.p_fc2 = nn.Linear(64, 64)
         
          # models used to mix text and image inputs
-        self.adapt_1 = nn.Linear(4096,num_inputs)
+        self.adapt_1 = nn.Linear(7,num_inputs)
         self.adapt_2 = nn.Linear(num_inputs,64)
         self.adapt_3 = nn.Linear(2*64,64)
 

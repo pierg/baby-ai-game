@@ -18,6 +18,40 @@ class PreProcessor(object):
         sys.path=sys.path[1:]            
         print('language model loaded')
         
+        #used for the simple sentence embedding 
+        self.Dico={'continue':['continue',"go forward", 'go on', 'keep the same direction!', 'okay continue this way','advance one case'],
+                   'left':['go left','turn left', 'now go to the left', 'go to the left!...The other left!!!', 'go on your left'],
+                   'right':['go right', 'turn right', 'now go to the right', 'tous à Tribor !!', 'go on your right','good job! now go to the right'],
+                   'turn back': ['turn back','go backward','turn yourself', 'make a U turn', 'look behind you...' ],             
+                   'key':['take the key!', 'pick up the key', 'pick it up', 'take it', 'key !!!', 'catch the key','toggle the key'   ],
+                   'door':['open the door', 'toggle the door', 'open it', 'tire la chevillette et la bobinette cherra...']}
+
+        self.ActionReference={'çontinue':0,'left':1,'right':2, 'turn back':3, 'key':4, 'door':5,'other':6}
+        self.simpleDimensionEmbedding=7
+        
+    def simpleSentenceEmbedding(self, strings):
+        '''
+        implements an easy language model, the different senteces are embedded in a 1-hot vector
+        '''
+        listOfOneHotVectors=False
+        
+        originalMission='other'
+        for mission in strings:
+            tmp=torch.zeros(self.simpleDimensionEmbedding)
+            for key, value in self.Dico.items():    # for name, age in list.items():  (for Python 3.x)
+                if value == mission:
+                    originalMission=key
+            index=self.ActionReference[originalMission]
+            tmp[index]=1
+            if listOfOneHotVectors is not False:
+                listOfOneHotVectors=torch.cat([listOfOneHotVectors,tmp.unsqueeze(0)],dim=0)
+            else:
+                listOfOneHotVectors=tmp.unsqueeze(0)
+                
+        return(listOfOneHotVectors)
+        
+        
+        
         
     def preProcessImage(self,img):
         '''
@@ -42,7 +76,7 @@ class PreProcessor(object):
             originalMissions+=[self.stringDecoder(listOfAsciiCodes[i]) ]
         
         #using the specified language model
-        return(self.stringEncoder_LanguageModel(originalMissions))
+        return(self.simpleSentenceEmbedding(originalMissions))
       
         
     def stringEncoder_LanguageModel(self,string):
