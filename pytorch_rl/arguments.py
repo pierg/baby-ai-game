@@ -59,7 +59,7 @@ def get_args():
                         help='use a recurrent policy')
     parser.add_argument('--no-vis', action='store_true', default=False,
                         help='disables visdom visualization'),
-    parser.add_argument('--useMissionAdvice', default=2,
+    parser.add_argument('--useMissionAdvice', default=1,
                         help='False if not using teacher advices.Else, indicate the number of time steps when the agent uses the advice')
     parser.add_argument('--useActionAdvice', default=False,
                         help='False if not using teacher best actions.Else, indicate the number of time steps when the agent uses the action')
