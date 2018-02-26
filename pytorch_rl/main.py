@@ -62,6 +62,7 @@ def main():
         experimentFolder='Exp{}'.format(experimentNumber)
         save_path = os.path.join(args.save_dir, args.algo,experimentFolder)
     print('saving results in ',save_path)
+    os.makedirs(save_path)
         
     
 
@@ -87,19 +88,34 @@ def main():
     print("#######")
 
     os.environ['OMP_NUM_THREADS'] = '1'
+    
+    
+    descriptor=''
+    descriptor+='Experiment {} \n'.format(experimentNumber)
+    descriptor+="experience done on : {} at {}  \n".format(time.strftime("%d/%m/%Y"),time.strftime("%H:%M:%S"))
+    
+    for i in vars(args):
+            line_new = '{:>12}  {:>12} \n'.format(i, getattr(args,i))
+            descriptor+=line_new
+    fileInfo=os.path.join(save_path,'summary.txt')
+    f= open(fileInfo,"w")
+    f.write(descriptor)
+    f.close()
 
     if args.vis:
         from visdom import Visdom
         print('using VISDOM')
         if os.name=='nt':
             print('using visdom for testing on local windows machine')
-            viz = Visdom(env='babyAIGame',port=8097)
+            viz = Visdom(env='babyAIGame_Exp{}'.format(experimentNumber),port=8097)
 
         else:
             print('using visdom on a linux server')
-            viz = Visdom(server='http://eos11',port=24431,env='babyAIGame')
+            viz = Visdom(server='http://eos11',port=24431,env='babyAIGame_Exp{}'.format(experimentNumber))
         
-        viz.text('testing the visdom env')
+        
+        
+        viz.text(descriptor)
        
         win = {'rewards':None,'entropy':None,'statsAction':None,'actionRatio':None}
 
