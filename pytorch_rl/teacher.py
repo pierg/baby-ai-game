@@ -71,12 +71,18 @@ class Teacher(Wrapper):
             self.previousReward=reward
         
         #print(self.bestActions)
+        
         if action in self.bestActions:
             reward+=1
         else:
             reward-=1
         
-        
+        if 3 in self.bestActions :
+            if action in self.bestActions:
+                reward+=10
+            else:
+                reward-=10
+                
         advice=self.generateAdvice()[1]
         
 
@@ -105,6 +111,9 @@ class Teacher(Wrapper):
         
         actionID=self.actionCorrespondance[keyOfDic]
         self.bestActions=actionID
+        #if keyOfDic in ['key','door']:
+        #    print('text key ', keyOfDic,' ID ',actionID)
+        
         return(value[idx])
         
 
