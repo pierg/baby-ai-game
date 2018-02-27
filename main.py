@@ -359,7 +359,7 @@ def main(argv):
     env = gym.make(options.env_name)
 
     model = Model(
-        env.observation_space.shape,
+        env.observation_space.spaces['image'].shape,
         env.action_space.n
     )
 
