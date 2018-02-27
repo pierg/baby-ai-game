@@ -117,7 +117,7 @@ def plotActionRatioWithVisdom(timestep,actionRatio,name,game,viz,win,folder,acti
         names[value]=key 
     
     
-    fig=plt.figure()
+    fig, ax = plt.subplots()
     
     
     for indexAction in range(n_groups):
@@ -128,7 +128,8 @@ def plotActionRatioWithVisdom(timestep,actionRatio,name,game,viz,win,folder,acti
     plt.xlabel('Number of timestep')
     plt.ylabel('ration Choice Agent/Choice Teacher')
     plt.title('ratio of action choices -- -1 meaning Teacher never suggested this action')
-    
+    ax.set_ylim(-1.5,10)
+
     plt.legend()
     
     fig.savefig(os.path.join(folder,'actionRatio.png'))
@@ -308,3 +309,5 @@ if __name__ == "__main__":
     from visdom import Visdom
     viz = Visdom(server='http://eos11',port=24431)
     visdom_plot(viz, None, '/tmp/gym/', 'BreakOut', 'a2c', bin_size=100, smooth=1)
+
+
