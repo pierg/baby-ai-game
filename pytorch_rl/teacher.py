@@ -75,11 +75,11 @@ class Teacher(Wrapper):
         if action in self.bestActions:
             reward+=1
         else:
-            reward-=1
+            reward-=2
         
         if 3 in self.bestActions :
             if action in self.bestActions:
-                reward+=10
+                reward+=5
             else:
                 reward-=0
                 
