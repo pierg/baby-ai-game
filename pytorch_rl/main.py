@@ -335,10 +335,12 @@ def main():
         rollouts.cuda()
 
     start = time.time()
-   
+    entropy_offset=args.entropy_coef
     for j in range(num_updates):
         for step in range(args.num_steps):
             
+            totalTimeStep=(j + 1) * args.num_processes * args.num_steps
+            entropy_coef=entropy_offset + np.exp(-totalTimeStep/args.entropy_Temp)
            
             #state the ratio of timesteps where the agent uses the info
             #from the teacher
@@ -349,7 +351,8 @@ def main():
                     useAdviceFromTeacher=True          
             
             
-            useMissionFromTeacher=False            
+            useMissionFromTeacher=False  
+            print('argument useActionAdvice :',args.useActionAdvice)
             if not args.useActionAdvice == False:
                 if step%args.useActionAdvice==0:
                     useMissionFromTeacher=True         
@@ -488,7 +491,7 @@ def main():
                 optimizer.acc_stats = False
 
             optimizer.zero_grad()
-            (value_loss * args.value_loss_coef + action_loss - dist_entropy * args.entropy_coef).backward()
+            (value_loss * args.value_loss_coef + action_loss - dist_entropy * entropy_coef).backward()
 
             ## CLIP THE GRADIENT 
             if args.algo == 'a2c':
@@ -542,7 +545,7 @@ def main():
 
             # A really ugly way to save a model to CPU
             if bestMeanRewards<final_rewards.mean():
-                print('updating best model to save...'
+                print('updating best model to save...')
                 print('Previous best mean reward : ',bestMeanRewards, 'new : ',final_rewards.mean())
                 
                 bestMeanRewards=final_rewards.mean()
