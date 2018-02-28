@@ -335,10 +335,11 @@ def main():
         rollouts.cuda()
 
     start = time.time()
+   
     for j in range(num_updates):
         for step in range(args.num_steps):
             
-            
+           
             #state the ratio of timesteps where the agent uses the info
             #from the teacher
             
@@ -347,7 +348,8 @@ def main():
                 if step%args.useMissionAdvice==0:
                     useAdviceFromTeacher=True          
             
-            useMissionFromTeacher=False
+            
+            useMissionFromTeacher=False            
             if not args.useActionAdvice == False:
                 if step%args.useActionAdvice==0:
                     useMissionFromTeacher=True         
@@ -540,6 +542,9 @@ def main():
 
             # A really ugly way to save a model to CPU
             if bestMeanRewards<final_rewards.mean():
+                print('updating best model to save...'
+                print('Previous best mean reward : ',bestMeanRewards, 'new : ',final_rewards.mean())
+                
                 bestMeanRewards=final_rewards.mean()
                 save_model = actor_critic
                 if args.cuda:
@@ -547,7 +552,6 @@ def main():
     
                 save_model = [save_model,
                                 hasattr(envs, 'ob_rms') and envs.ob_rms or None]
-    
                 torch.save(save_model, os.path.join(save_path,  "bestMeanModel.pt"))
             
             
