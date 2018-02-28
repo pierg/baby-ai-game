@@ -352,7 +352,7 @@ def main():
             
             
             useMissionFromTeacher=False  
-            print('argument useActionAdvice :',args.useActionAdvice)
+            #print('argument useActionAdvice :',args.useActionAdvice)
             if not args.useActionAdvice == False:
                 if step%args.useActionAdvice==0:
                     useMissionFromTeacher=True         
@@ -581,7 +581,7 @@ def main():
                        value_loss.data[0], action_loss.data[0]))
             
             #print('final rewards',final_rewards.data)
-            #print('min reward', final_rewards.min())
+            #('min reward', final_rewards.min())
             #print('median reward ', final_rewards.median() )
             
             infoToSave['timestep']+=[total_num_steps]
