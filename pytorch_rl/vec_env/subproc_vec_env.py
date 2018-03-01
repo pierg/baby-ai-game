@@ -42,6 +42,7 @@ class SubprocVecEnv(VecEnv):
         """
         envs: list of gym environments to run in subprocesses
         """
+        self.envs=[fn() for fn in env_fns[0:1]]
         self.waiting = False
         self.closed = False
         nenvs = len(env_fns)

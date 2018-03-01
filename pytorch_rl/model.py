@@ -204,6 +204,61 @@ class MLPPolicy(FFPolicy):
         x = F.tanh(x)
 
         return value, x, states
+    
+
+class easyPolicy(FFPolicy):
+    def __init__(self, num_inputs, action_space):
+        super(easyPolicy, self).__init__()
+
+        self.action_space = action_space
+
+        
+        self.adapt_1 = nn.Linear(7,64)
+        self.adapt_2 = nn.Linear(7,1)
+
+        
+
+        if action_space.__class__.__name__ == "Discrete":
+            num_outputs = action_space.n
+            self.dist = Categorical(64, num_outputs)
+        elif action_space.__class__.__name__ == "Box":
+            num_outputs = action_space.shape[0]
+            self.dist = DiagGaussian(64, num_outputs)
+        else:
+            raise NotImplementedError
+
+        self.train()
+        self.reset_parameters()
+
+    @property
+    def state_size(self):
+        return 1
+
+    def reset_parameters(self):
+        self.apply(weights_init_mlp)
+
+        """
+        tanh_gain = nn.init.calculate_gain('tanh')
+        self.a_fc1.weight.data.mul_(tanh_gain)
+        self.a_fc2.weight.data.mul_(tanh_gain)
+        self.v_fc1.weight.data.mul_(tanh_gain)
+        self.v_fc2.weight.data.mul_(tanh_gain)
+        """
+
+        if self.dist.__class__.__name__ == "DiagGaussian":
+            self.dist.fc_mean.weight.data.mul_(0.01)
+
+    def forward(self, inputs, states, masks,missions=False):
+        batch_numel = reduce(operator.mul, inputs.size()[1:], 1)
+        inputs = inputs.view(-1, batch_numel)
+        
+        
+        x=F.tanh(self.adapt_1(missions))
+        value=F.tanh(self.adapt_2(missions))
+
+       
+
+        return value, x, states
 
 def weights_init_cnn(m):
     classname = m.__class__.__name__

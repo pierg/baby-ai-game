@@ -34,6 +34,8 @@ class Teacher(Wrapper):
         
         self.bestActions=None
         self.previousReward=None
+        self.penalty=1
+        self.bonus=1
         print('environment with Teacher created!')
         
         
@@ -73,13 +75,16 @@ class Teacher(Wrapper):
         #print(self.bestActions)
         
         if action in self.bestActions:
-            reward+=1
+            reward+=self.bonus
+            #self.bonus+=1e-3
         else:
-            reward-=1
+            reward-=self.penalty
+            #self.penalty+=1e-3
+            
         
         if 3 in self.bestActions :
             if action in self.bestActions:
-                reward+=0
+                reward+=10
             else:
                 reward-=0
                 

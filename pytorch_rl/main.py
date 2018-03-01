@@ -19,7 +19,7 @@ from vec_env.dummy_vec_env import DummyVecEnv
 from vec_env.subproc_vec_env import SubprocVecEnv
 from envs import make_env
 from kfac import KFACOptimizer
-from model import RecMLPPolicy, MLPPolicy, CNNPolicy
+from model import RecMLPPolicy, MLPPolicy, CNNPolicy,easyPolicy
 from storage import RolloutStorage
 from visualize import visdom_plot
 import preProcess
@@ -122,12 +122,18 @@ def main():
     envs = [make_env(args.env_name, args.seed, i)
                 for i in range(args.num_processes)]
     
+
+    
     actionDescription=False
     
     if args.num_processes > 1:
         envs = SubprocVecEnv(envs)
     else:
         envs = DummyVecEnv(envs)
+    
+    if args.vizTrain:
+
+        render_func = envs.envs[0].render
 
     # Maxime: commented this out because it very much changes the behavior
     # of the code for seemingly arbitrary reasons
@@ -147,6 +153,12 @@ def main():
     else:
         actor_critic = MLPPolicy(obs_numel, envs.action_space)
         
+    
+# =============================================================================
+#     DEBUG MODE
+# =============================================================================
+    print('using easy policy')
+    actor_critic=easyPolicy(obs_numel, envs.action_space)
     numberOfActions=envs.action_space.n
     
     #print('before',  infoToSave['actionRatio'])
@@ -339,9 +351,12 @@ def main():
     for j in range(num_updates):
         for step in range(args.num_steps):
             
-            totalTimeStep=(j + 1) * args.num_processes * args.num_steps
-            entropy_coef=entropy_offset + np.exp(-totalTimeStep/args.entropy_Temp)
-           
+            if not args.entropy_Temp is False:
+                #print('using entropy Annealing : 'args.entropy_Temp)
+                totalTimeStep=(j + 1) * args.num_processes * args.num_steps
+                entropy_coef=entropy_offset + np.exp(-totalTimeStep/args.entropy_Temp)
+            else:
+               entropy_coef=entropy_offset
             #state the ratio of timesteps where the agent uses the info
             #from the teacher
             
@@ -535,6 +550,9 @@ def main():
                     optimizer.step()
 
         rollouts.after_update()
+
+        if args.vizTrain:
+            renderer = render_func('human')
 
         if j % args.save_interval == 0 and args.save_dir != "":
             #print('current advice',envs.s)
