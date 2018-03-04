@@ -53,6 +53,10 @@ class AIGameWindow(QMainWindow):
         # Pointing and naming data
         self.pointingData = []
 
+        # Demonstration data
+        self.curDemo = None
+        self.demos = []
+
     def initUI(self):
         """Create and connect the UI elements"""
 
@@ -93,12 +97,6 @@ class AIGameWindow(QMainWindow):
         miniViewBox.addWidget(self.obsImgLabel)
         miniViewBox.addStretch(1)
 
-        self.missionBox = QTextEdit()
-        self.missionBox.setMinimumSize(500, 100)
-        self.missionBox.textChanged.connect(self.missionEdit)
-
-        buttonBox = self.createButtons()
-
         self.stepsLabel = QLabel()
         self.stepsLabel.setFrameStyle(QFrame.Panel | QFrame.Sunken)
         self.stepsLabel.setAlignment(Qt.AlignCenter)
@@ -112,14 +110,34 @@ class AIGameWindow(QMainWindow):
         stepsBox.addWidget(resetBtn)
         stepsBox.addStretch(1)
 
+        hline1 = QFrame()
+        hline1.setFrameShape(QFrame.HLine)
+        hline1.setFrameShadow(QFrame.Sunken)
+
+        teachBox = QHBoxLayout()
+        startDemoBtn = QPushButton("Start demo")
+        startDemoBtn.clicked.connect(self.startDemo)
+        endDemoBtn = QPushButton("End demo")
+        endDemoBtn.clicked.connect(self.endDemo)
+        teachBox.addWidget(startDemoBtn)
+        teachBox.addWidget(endDemoBtn)
+
         hline2 = QFrame()
         hline2.setFrameShape(QFrame.HLine)
         hline2.setFrameShadow(QFrame.Sunken)
+
+        self.missionBox = QTextEdit()
+        self.missionBox.setMinimumSize(500, 100)
+        self.missionBox.textChanged.connect(self.missionEdit)
+
+        buttonBox = self.createButtons()
 
         # Stack everything up in a vetical layout
         vbox = QVBoxLayout()
         vbox.addLayout(miniViewBox)
         vbox.addLayout(stepsBox)
+        vbox.addWidget(hline1)
+        vbox.addLayout(teachBox)
         vbox.addWidget(hline2)
         vbox.addWidget(QLabel("Mission"))
         vbox.addWidget(self.missionBox)
@@ -320,6 +338,47 @@ class AIGameWindow(QMainWindow):
         self.lastObs = obs
         self.showEnv(obs)
 
+    def stepEnv(self, action=None):
+        # If no manual action was specified by the user
+        if action == None:
+            action = selectAction(self.lastObs)
+
+        obs, reward, done, info = self.env.step(action)
+
+        self.showEnv(obs)
+        self.lastObs = obs
+
+        if done:
+            self.resetEnv()
+
+    def startDemo(self):
+        assert self.curDemo is None
+
+        mission = self.missionBox.toPlainText()
+        assert len(mission) > 0
+
+        env = self.env.unwrapped
+
+        self.curDemo = {
+            'mission': mission,
+            'startPos' : env.agentPos,
+            'startGrid': env.grid.copy()
+        }
+
+    def endDemo(self):
+        assert self.curDemo is not None
+
+        env = self.env.unwrapped
+
+        self.curDemo['endGrid'] = env.grid.copy()
+        self.curDemo['endPos'] = env.agentPos
+
+        self.demos.append(self.curDemo)
+        self.curDemo = None
+
+        # Clear the mission text
+        self.missionBox.setPlainText('')
+
     def showEnv(self, obs):
         unwrapped = self.env.unwrapped
 
@@ -339,19 +398,6 @@ class AIGameWindow(QMainWindow):
         # Set the steps remaining
         stepsRem = unwrapped.getStepsRemaining()
         self.stepsLabel.setText(str(stepsRem))
-
-    def stepEnv(self, action=None):
-        # If no manual action was specified by the user
-        if action == None:
-            action = selectAction(self.lastObs)
-
-        obs, reward, done, info = self.env.step(action)
-
-        self.showEnv(obs)
-        self.lastObs = obs
-
-        if done:
-            self.resetEnv()
 
 def main(argv):
     parser = OptionParser()
