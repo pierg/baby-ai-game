@@ -367,7 +367,7 @@ def main(argv):
     parser.add_option(
         "--env-name",
         help="gym environment to load",
-        default='MiniGrid-MultiRoom-N6-v0'
+        default='MiniGrid-Playground-v0'
     )
     (options, args) = parser.parse_args()
 
