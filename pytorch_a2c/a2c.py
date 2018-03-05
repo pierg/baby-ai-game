@@ -24,50 +24,23 @@ from .storage import RolloutStorage
 
 os.environ['OMP_NUM_THREADS'] = '1'
 
+def train(
+    args, # TODO: get rid of this argument
+    envs,
+    actor_critic,
+    num_updates,
+    num_processes=32
+):
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def main():
-    print("#######")
-    print("WARNING: All rewards are clipped or normalized so you need to use a monitor (see envs.py) or visdom plot to get true rewards")
-    print("#######")
-
-    envs = [make_env(args.env_name, args.seed, i) for i in range(args.num_processes)]
-    envs = SubprocVecEnv(envs)
 
     obs_shape = envs.observation_space.shape
-    obs_shape = (obs_shape[0] * args.num_stack, *obs_shape[1:])
     obs_numel = reduce(operator.mul, obs_shape, 1)
 
     assert envs.action_space.__class__.__name__ == "Discrete"
     action_shape = 1
 
-    actor_critic = Policy(obs_numel, envs.action_space)
 
-    # Maxime: log some info about the model and its size
-    modelSize = 0
-    for p in actor_critic.parameters():
-        pSize = reduce(operator.mul, p.size(), 1)
-        modelSize += pSize
-    print(str(actor_critic))
-    print('Total model size: %d' % modelSize)
+
 
     if args.cuda:
         actor_critic.cuda()
@@ -80,8 +53,6 @@ def main():
     def update_current_obs(obs):
         shape_dim0 = envs.observation_space.shape[0]
         obs = torch.from_numpy(obs).float()
-        if args.num_stack > 1:
-            current_obs[:, :-shape_dim0] = current_obs[:, shape_dim0:]
         current_obs[:, -shape_dim0:] = obs
 
     obs = envs.reset()
@@ -146,8 +117,8 @@ def main():
             Variable(rollouts.actions.view(-1, action_shape))
         )
 
-        values = values.view(args.num_steps, args.num_processes, 1)
-        action_log_probs = action_log_probs.view(args.num_steps, args.num_processes, 1)
+        values = values.view(args.num_steps, num_processes, 1)
+        action_log_probs = action_log_probs.view(args.num_steps, num_processes, 1)
 
         advantages = Variable(rollouts.returns[:-1]) - values
         value_loss = advantages.pow(2).mean()
@@ -190,6 +161,3 @@ def main():
                        final_rewards.min(),
                        final_rewards.max(), dist_entropy.data[0],
                        value_loss.data[0], action_loss.data[0]))
-
-if __name__ == "__main__":
-    main()

@@ -1,8 +1,10 @@
 import operator
 from functools import reduce
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 from .distributions import Categorical
 
 class FFPolicy(nn.Module):
@@ -31,14 +33,17 @@ def weights_init_mlp(m):
             m.bias.data.fill_(0)
 
 class Policy(FFPolicy):
-    def __init__(self, num_inputs, action_space):
+    def __init__(self, obs_space, action_space):
         super().__init__()
+
+        obs_shape = obs_space.shape
+        obs_numel = reduce(operator.mul, obs_shape, 1)
 
         self.action_space = action_space
         assert action_space.__class__.__name__ == "Discrete"
         num_outputs = action_space.n
 
-        self.fc1 = nn.Linear(num_inputs, 128)
+        self.fc1 = nn.Linear(obs_numel, 128)
         self.fc2 = nn.Linear(128, 128)
 
         # Input size, hidden state size

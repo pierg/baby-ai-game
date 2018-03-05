@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-import pytorch_a2c.a2c
+import time
+import operator
+from functools import reduce
+
 from pytorch_a2c.envs import make_env
 from pytorch_a2c.arguments import get_args
 from pytorch_a2c.vec_env.subproc_vec_env import SubprocVecEnv
-
-
-
-
+from pytorch_a2c.model import Policy
+from pytorch_a2c.a2c import train
 
 
 
@@ -24,34 +25,33 @@ def main():
 
     num_updates = int(args.num_frames) // args.num_steps // args.num_processes
 
-    """
-    torch.manual_seed(args.seed)
-    if args.cuda:
-        torch.cuda.manual_seed(args.seed)
-
-    try:
-        os.makedirs(args.log_dir)
-    except OSError:
-        files = glob.glob(os.path.join(args.log_dir, '*.monitor.csv'))
-        for f in files:
-            os.remove(f)
-    """
-
-
-
     envs = [make_env(args.env_name, args.seed, i) for i in range(args.num_processes)]
     envs = SubprocVecEnv(envs)
 
-    obs_shape = envs.observation_space.shape
-    obs_shape = (obs_shape[0] * args.num_stack, *obs_shape[1:])
-    obs_numel = reduce(operator.mul, obs_shape, 1)
+    policy = Policy(envs.observation_space, envs.action_space)
 
-    assert envs.action_space.__class__.__name__ == "Discrete"
-    action_shape = 1
+    # Maxime: log some info about the model and its size
+    modelSize = 0
+    for p in policy.parameters():
+        pSize = reduce(operator.mul, p.size(), 1)
+        modelSize += pSize
+    print(str(policy))
+    print('Total model size: %d' % modelSize)
 
-    actor_critic = Policy(obs_numel, envs.action_space)
 
 
+    st = time.time()
+    train(
+        args,
+        envs,
+        policy,
+        num_updates=1
+    )
+    et = time.time()
+
+    dt = et-st
+
+    print(dt)
 
 
     """

@@ -29,8 +29,6 @@ def get_args():
                         help='how many training CPU processes to use (default: 32)')
     parser.add_argument('--num-steps', type=int, default=5,
                         help='number of forward steps in A2C (default: 5)')
-    parser.add_argument('--num-stack', type=int, default=1,
-                        help='number of frames to stack (default: 1)')
     parser.add_argument('--log-interval', type=int, default=10,
                         help='log interval, one log per n updates (default: 10)')
     parser.add_argument('--save-interval', type=int, default=100,
