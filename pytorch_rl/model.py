@@ -3,7 +3,8 @@ from functools import reduce
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .distributions import Categorical
+from distributions import Categorical, DiagGaussian
+from utils import orthogonal
 
 class FFPolicy(nn.Module):
     def __init__(self):
@@ -65,8 +66,8 @@ class Policy(FFPolicy):
     def reset_parameters(self):
         self.apply(weights_init_mlp)
 
-        nn.init.orthogonal(self.gru.weight_ih.data)
-        nn.init.orthogonal(self.gru.weight_hh.data)
+        orthogonal(self.gru.weight_ih.data)
+        orthogonal(self.gru.weight_hh.data)
         self.gru.bias_ih.data.fill_(0)
         self.gru.bias_hh.data.fill_(0)
 

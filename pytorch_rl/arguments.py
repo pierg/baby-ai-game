@@ -5,6 +5,8 @@ import torch
 
 def get_args():
     parser = argparse.ArgumentParser(description='RL')
+    parser.add_argument('--algo', default='a2c',
+                        help='algorithm to use: a2c | ppo | acktr')
     parser.add_argument('--lr', type=float, default=7e-4,
                         help='learning rate (default: 7e-4)')
     parser.add_argument('--eps', type=float, default=1e-5,
@@ -29,6 +31,12 @@ def get_args():
                         help='how many training CPU processes to use (default: 32)')
     parser.add_argument('--num-steps', type=int, default=5,
                         help='number of forward steps in A2C (default: 5)')
+    parser.add_argument('--ppo-epoch', type=int, default=4,
+                        help='number of ppo epochs (default: 4)')
+    parser.add_argument('--num-mini-batch', type=int, default=32,
+                        help='number of batches for ppo (default: 32)')
+    parser.add_argument('--clip-param', type=float, default=0.2,
+                        help='ppo clip parameter (default: 0.2)')
     parser.add_argument('--num-stack', type=int, default=1,
                         help='number of frames to stack (default: 1)')
     parser.add_argument('--log-interval', type=int, default=10,

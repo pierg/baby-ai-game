@@ -17,6 +17,8 @@ import gym
 import gym_minigrid
 from gym_minigrid import minigrid
 
+from model.training import selectAction
+
 class ImgWidget(QLabel):
     """
     Widget to intercept clicks on the full image view
