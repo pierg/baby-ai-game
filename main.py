@@ -365,7 +365,12 @@ class AIGameWindow(QMainWindow):
             'startGrid': env.grid.copy()
         }
 
+        # Set the focus on the full render image
+        self.imgLabel.setFocus()
+
     def endDemo(self):
+        import pickle
+
         assert self.curDemo is not None
 
         env = self.env.unwrapped
@@ -378,6 +383,8 @@ class AIGameWindow(QMainWindow):
 
         # Clear the mission text
         self.missionBox.setPlainText('')
+
+        pickle.dump(self.demos, open('demos.p', 'wb'))
 
     def showEnv(self, obs):
         unwrapped = self.env.unwrapped
