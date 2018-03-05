@@ -51,13 +51,8 @@ Optionally, if you wish use the reinforcement learning code included
 under [/pytorch_rl](/pytorch_rl), you can install its dependencies as follows:
 
 ```
-cd pytorch_rl
-
 # PyTorch
 conda install pytorch torchvision -c soumith
-
-# Other requirements
-pip3 install -r requirements.txt
 ```
 
 Note: the pytorch_rl code is a custom fork of [this repository](https://github.com/ikostrikov/pytorch-a2c-ppo-acktr),
@@ -81,12 +76,12 @@ Basic reinforcement learning code is provided in the `pytorch_rl` subdirectory.
 You can perform training using the A2C algorithm with:
 
 ```
-python3 pytorch_rl/main.py --env-name MiniGrid-Empty-6x6-v0 --no-vis --num-processes 48 --algo a2c
+python3 pytorch_rl/main.py --env-name MiniGrid-Empty-6x6-v0 --no-vis --num-processes 48
 ```
 
-In order to Use the teacher environment with pytorch_rl, use the following command : 
+In order to Use the teacher environment with pytorch_rl, use the following command :
 ```
-python3 pytorch_rl/main.py --env-name MultiRoom-Teacher --no-vis --num-processes 48 --algo a2c
+python3 pytorch_rl/main.py --env-name MultiRoom-Teacher --no-vis --num-processes 48
 ```
 
 To see the available environments and their implementation, please have a look at
@@ -94,9 +89,9 @@ the [gym_minigrid](https://github.com/maximecb/gym-minigrid) repository.
 
 ### Usage at MILA
 
-If you connect to the lab machines by ssh-ing, make sure to use `ssh -X` in order to see the game window. This will work even for a chain of ssh connections, as long as you use `ssh -X` at all intermediate steps. If you use screen, set `$DISPLAY` variable manually inside each of your screen terminals. You can find the right value for `$DISPLAY` by detaching from you screen first (`Ctrl+A+D`) and then running `echo $DISPLAY`. 
+If you connect to the lab machines by ssh-ing, make sure to use `ssh -X` in order to see the game window. This will work even for a chain of ssh connections, as long as you use `ssh -X` at all intermediate steps. If you use screen, set `$DISPLAY` variable manually inside each of your screen terminals. You can find the right value for `$DISPLAY` by detaching from you screen first (`Ctrl+A+D`) and then running `echo $DISPLAY`.
 
-The code does not work in conda, install everything with `pip install --user`. 
+The code does not work in conda, install everything with `pip install --user`.
 
 ## About this Project
 

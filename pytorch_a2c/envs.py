@@ -9,7 +9,7 @@ try:
 except:
     pass
 
-def make_env(env_id, seed, rank, log_dir):
+def make_env(env_id, seed, rank):
     def _thunk():
         env = gym.make(env_id)
 
