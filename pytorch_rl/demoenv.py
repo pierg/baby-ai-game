@@ -12,7 +12,6 @@ class DemoEnv(MiniGridEnv):
         super().__init__(gridSize=19, maxSteps=50)
 
     def _genGrid(self, width, height):
-
         if self.epsCount % 200 == 0:
             #print('Loading demonstrations')
             self.demos = pickle.load(open('demos.p', 'rb'))
@@ -30,6 +29,8 @@ class DemoEnv(MiniGridEnv):
         self.endPos = demo['endPos']
 
         self.mission = demo['mission']
+
+        self.maxSteps = 4 * demo['numSteps']
 
         # TODO: adjust maxSteps
 

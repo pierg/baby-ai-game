@@ -351,6 +351,9 @@ class AIGameWindow(QMainWindow):
         if done:
             self.resetEnv()
 
+        if self.curDemo:
+            self.curDemo['numSteps'] += 1
+
     def startDemo(self):
         assert self.curDemo is None
 
@@ -362,7 +365,8 @@ class AIGameWindow(QMainWindow):
         self.curDemo = {
             'mission': mission,
             'startPos' : env.agentPos,
-            'startGrid': env.grid.copy()
+            'startGrid': env.grid.copy(),
+            'numSteps': 0
         }
 
         # Set the focus on the full render image
@@ -379,6 +383,7 @@ class AIGameWindow(QMainWindow):
         self.curDemo['endPos'] = env.agentPos
 
         self.demos.append(self.curDemo)
+        print('new demo with length %d, num demos: %d' % (self.curDemo['numSteps'], len(self.demos)))
         self.curDemo = None
 
         # Clear the mission text
