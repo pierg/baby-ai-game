@@ -22,7 +22,7 @@ from model import Policy
 from storage import RolloutStorage
 from visualize import visdom_plot
 
-from demoenv import MultiEnvGraphing
+from demoenv import DemoEnv, MultiEnvGraphing
 
 args = get_args()
 
@@ -55,9 +55,11 @@ def main():
         viz = Visdom()
         win = None
 
-    graphing = MultiEnvGraphing()
-
     envs = [make_env(args.env_name, args.seed, i, args.log_dir) for i in range(args.num_processes)]
+
+    testEnv = DemoEnv(testSet=True)
+
+    graphing = MultiEnvGraphing()
 
     if args.num_processes > 1:
         envs = SubprocVecEnv(envs)
