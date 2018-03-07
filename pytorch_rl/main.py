@@ -22,6 +22,8 @@ from model import Policy
 from storage import RolloutStorage
 from visualize import visdom_plot
 
+from demoenv import MultiEnvGraphing
+
 args = get_args()
 
 assert args.algo in ['a2c', 'ppo', 'acktr']
@@ -52,6 +54,8 @@ def main():
         from visdom import Visdom
         viz = Visdom()
         win = None
+
+    graphing = MultiEnvGraphing()
 
     envs = [make_env(args.env_name, args.seed, i, args.log_dir) for i in range(args.num_processes)]
 
@@ -126,6 +130,8 @@ def main():
             obs, reward, done, info = envs.step(cpu_actions)
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
             episode_rewards += reward
+
+            graphing.process(info)
 
             # If done then clean the history of observations.
             masks = torch.FloatTensor([[0.0] if done_ else [1.0] for done_ in done])

@@ -383,7 +383,11 @@ class AIGameWindow(QMainWindow):
         self.curDemo['endPos'] = env.agentPos
 
         self.demos.append(self.curDemo)
-        print('new demo with length %d, num demos: %d' % (self.curDemo['numSteps'], len(self.demos)))
+        print('new demo with length %d: "%s" (%d total demos)' % (
+            self.curDemo['numSteps'],
+            self.curDemo['mission'],
+            len(self.demos)
+        ))
         self.curDemo = None
 
         # Clear the mission text
