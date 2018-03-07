@@ -8,14 +8,17 @@ import gym_minigrid
 from gym_minigrid.minigrid import MiniGridEnv
 
 class DemoEnv(MiniGridEnv):
-    def __init__(self):
+    def __init__(self, testSet=False):
         self.epsCount = 0
+        self.testSet = testSet
         super().__init__(gridSize=19, maxSteps=50)
 
     def _genGrid(self, width, height):
         if self.epsCount % 200 == 0:
             #print('Loading demonstrations')
-            self.demos = pickle.load(open('demos.p', 'rb'))
+            demos = pickle.load(open('demos.p', 'rb'))
+            demos = filter(lambda d: d['testSet'] == self.testSet, demos)
+            self.demos = list(demos)
             num_demos = len(self.demos)
             print('num demos: %d' % num_demos)
 

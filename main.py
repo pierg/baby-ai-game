@@ -9,7 +9,7 @@ from optparse import OptionParser
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QInputDialog
-from PyQt5.QtWidgets import QLabel, QTextEdit, QFrame
+from PyQt5.QtWidgets import QLabel, QTextEdit, QFrame, QCheckBox
 from PyQt5.QtWidgets import QPushButton, QSlider, QHBoxLayout, QVBoxLayout
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QColor
 
@@ -115,10 +115,12 @@ class AIGameWindow(QMainWindow):
         hline1.setFrameShadow(QFrame.Sunken)
 
         teachBox = QHBoxLayout()
+        self.testSetBox = QCheckBox('Keep in test set', self)
         startDemoBtn = QPushButton("Start demo")
         startDemoBtn.clicked.connect(self.startDemo)
         endDemoBtn = QPushButton("End demo")
         endDemoBtn.clicked.connect(self.endDemo)
+        teachBox.addWidget(self.testSetBox)
         teachBox.addWidget(startDemoBtn)
         teachBox.addWidget(endDemoBtn)
 
@@ -383,6 +385,7 @@ class AIGameWindow(QMainWindow):
 
         self.curDemo['endGrid'] = env.grid.copy()
         self.curDemo['endPos'] = env.agentPos
+        self.curDemo['testSet'] = self.testSetBox.isChecked()
 
         self.demos.append(self.curDemo)
         print('new demo with length %d: "%s" (%d total demos)' % (
@@ -395,6 +398,9 @@ class AIGameWindow(QMainWindow):
         # Clear the mission text
         env.mission = ''
         self.missionBox.setPlainText('')
+
+        # Clear the test set box
+        self.testSetBox.setCheckState(False)
 
         pickle.dump(self.demos, open('demos.p', 'wb'))
 
