@@ -4,7 +4,8 @@ import os,sys,inspect
 
 
 class PreProcessor(object):
-    def __init__(self):
+    def __init__(self,
+                 maxSizeOfMissions):
         
         
         print(sys.path[0])
@@ -13,8 +14,8 @@ class PreProcessor(object):
         parentdir = os.path.dirname(currentdir)+'/model'
         sys.path.insert(0,parentdir) 
         print(sys.path[0])
-        import sentenceEmbedder
-        self.languageModel=sentenceEmbedder.Sentence2Vec()
+        #import sentenceEmbedder
+        #self.languageModel=sentenceEmbedder.Sentence2Vec()
         sys.path=sys.path[1:]            
         print('language model loaded')
         
@@ -26,8 +27,9 @@ class PreProcessor(object):
                    'key':['take the key!', 'pick up the key', 'pick it up', 'take it', 'key !!!', 'catch the key','toggle the key'   ],
                    'door':['open the door', 'toggle the door', 'open it', 'tire la chevillette et la bobinette cherra...']}
 
-        self.ActionReference={'çontinue':0,'left':1,'right':2, 'turn back':3, 'key':4, 'door':5,'other':6}
+        self.ActionReference={'continue':0,'left':1,'right':2, 'turn back':3, 'key':4, 'door':5,'other':6}
         self.simpleDimensionEmbedding=7
+        self.maxSizeOfMissions=maxSizeOfMissions
         
     def simpleSentenceEmbedding(self, strings):
         '''
@@ -38,11 +40,15 @@ class PreProcessor(object):
         originalMission='other'
         for mission in strings:
             tmp=torch.zeros(self.simpleDimensionEmbedding)
+            #print('mission from teacher :', mission,':')
+
             for key, value in self.Dico.items():    # for name, age in list.items():  (for Python 3.x)
-                if value == mission:
+                if mission in value:
                     originalMission=key
+                    #print('mission parent', originalMission)
             index=self.ActionReference[originalMission]
             tmp[index]=1
+            #print('sentence embedding', tmp)
             if listOfOneHotVectors is not False:
                 listOfOneHotVectors=torch.cat([listOfOneHotVectors,tmp.unsqueeze(0)],dim=0)
             else:
@@ -64,7 +70,7 @@ class PreProcessor(object):
         
         #return(img.transpose(2, 0, 1))
     
-    def adaptToTorchVariable(self, listOfAsciiCodes):
+    def Code2String(self, listOfAsciiCodes):
         '''
         This function is used when you choosed to encode your string messages in ASCII format
         And you want to convert it to a torch variable using your language model
@@ -76,7 +82,7 @@ class PreProcessor(object):
             originalMissions+=[self.stringDecoder(listOfAsciiCodes[i]) ]
         
         #using the specified language model
-        return(self.simpleSentenceEmbedding(originalMissions))
+        return(originalMissions)
       
         
     def stringEncoder_LanguageModel(self,string):
@@ -87,11 +93,11 @@ class PreProcessor(object):
     
     
     
-    def stringEncoder(self,string,maxSizeOfMissions=200):
+    def stringEncoder(self,string):
         ''' 
         encode a string using the ASCII encoding
         '''
-        code=np.zeros(maxSizeOfMissions)
+        code=np.zeros(self.maxSizeOfMissions)
         for i in range(len(string)):
             code[i]=ord(string[i])
         return(torch.from_numpy(code))

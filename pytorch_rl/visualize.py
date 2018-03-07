@@ -151,6 +151,41 @@ def plotActionRatioWithVisdom(timestep,actionRatio,name,game,viz,win,folder,acti
 
     return(win)
     
+def plotEntropyCoefWithVisdom(timestep,entropyCoef,name,game,viz,win,folder,actionDescription=None):
+    
+    
+    
+    fig, ax = plt.subplots()
+    
+    
+    plt.plot(timestep,entropyCoef)
+        
+        
+    
+    plt.xlabel('Number of timestep')
+    plt.ylabel('entropy coefficient')
+    plt.title('evolution of the entropy coefficient')
+
+    plt.legend()
+    
+    fig.savefig(os.path.join(folder,'entropyCoef.png'))
+
+
+    plt.show()
+    plt.draw()
+
+    image = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+    image = image.reshape(fig.canvas.get_width_height()[::-1] + (3, ))
+    plt.close(fig)
+
+    # Show it in visdom
+    image = np.transpose(image, (2, 0, 1))
+    win['entropyCoef']=viz.image(image,win['entropyCoef'])   
+    
+    
+
+    return(win)
+    
 
 def plotStatsActionsWithVisdom(timestep,numberOfChoices_Agent,numberOfChoices_Teacher,name,game,viz,win,folder,actionDescription=None):
     
@@ -286,21 +321,24 @@ def visdom_plot(viz, win, folder, game, name, bin_size=100, smooth=1,infoToSave=
     medianReward=infoToSave['medianReward']
     minReward=infoToSave['minReward']
     maxReward=infoToSave['maxReward']
-
     win=plotRewardsWithVisdom(timestep,meanReward,medianReward,minReward,maxReward,name,game,viz,win,folder)    
     
        
     entropy=infoToSave['entropy']
     win=plotEntropyWithVisdom(timestep,entropy,name,game,viz,win,folder)
     
+    
     numberOfChoices_Teacher=infoToSave['numberOfChoices_Teacher']
     numberOfChoices_Agent=infoToSave['numberOfChoices_Agent']
-
     win=plotStatsActionsWithVisdom(timestep,numberOfChoices_Agent,numberOfChoices_Teacher,name,game,viz,win,folder,actionDescription=actionDescription)
     
-    actionRatio=infoToSave['actionRatio']
     
+    actionRatio=infoToSave['actionRatio']    
     win=plotActionRatioWithVisdom(timestep,actionRatio,name,game,viz,win,folder,actionDescription=actionDescription)
+
+
+    entropyCoef=infoToSave['entropyCoef']
+    win=plotEntropyCoefWithVisdom(timestep,entropyCoef,name,game,viz,win,folder,actionDescription=actionDescription)
 
     return (win)
 

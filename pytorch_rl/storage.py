@@ -3,7 +3,7 @@ from torch.utils.data.sampler import BatchSampler, SubsetRandomSampler
 import preProcess
 
 class RolloutStorage(object):
-    def __init__(self, num_steps, num_processes, obs_shape, action_space, state_size,maxSizeOfMissions=200):
+    def __init__(self, num_steps, num_processes, obs_shape, action_space, state_size,maxSizeOfMissions):
         self.observations = torch.zeros(num_steps + 1, num_processes, *obs_shape)
         
         self.maxSizeOfMissions=maxSizeOfMissions

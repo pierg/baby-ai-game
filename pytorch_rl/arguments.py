@@ -3,13 +3,14 @@ import argparse
 import torch
 
 
+
 def get_args():
     parser = argparse.ArgumentParser(description='RL')
     parser.add_argument('--algo', default='a2c',
                         help='algorithm to use: a2c | ppo | acktr')
     parser.add_argument('--lr', type=float, default=7e-4,
                         help='learning rate (default: 7e-4)')
-    parser.add_argument('--eps', type=float, default=1e-4,
+    parser.add_argument('--eps', type=float, default=1e-5,
                         help='RMSprop optimizer epsilon (default: 1e-5)')
     parser.add_argument('--alpha', type=float, default=0.99,
                         help='RMSprop optimizer apha (default: 0.99)')
@@ -21,6 +22,8 @@ def get_args():
                         help='gae parameter (default: 0.95)')
     parser.add_argument('--entropy-coef', type=float, default=0.01,
                         help='entropy term coefficient (default: 0.01)')
+    parser.add_argument('--entropyOffset', type=float, default=0.01,
+                        help='entropy term offset (default: 0.01)')
     parser.add_argument('--entropy-Temp', type=float, default=False,
                         help='entropy Temperature coefficient (default: 20 000)')
     parser.add_argument('--value-loss-coef', type=float, default=0.5,
@@ -43,11 +46,11 @@ def get_args():
                         help='number of frames to stack (default: 1)')
     parser.add_argument('--log-interval', type=int, default=10,
                         help='log interval, one log per n updates (default: 10)')
-    parser.add_argument('--save-interval', type=int, default=100, #100
+    parser.add_argument('--save-interval', type=int, default=10, #100
                         help='save interval, one save per n updates (default: 10)')
     parser.add_argument('--vis-interval', type=int, default=100, #100
                         help='vis interval, one log per n updates (default: 100)')
-    parser.add_argument('--num-frames', type=int, default=10e15,
+    parser.add_argument('--num-frames', type=int, default=10e7,
                         help='number of frames to train (default: 10e6)')
     parser.add_argument('--env-name', default='MultiRoom-Teacher',
                         help='environment to train on (default: PongNoFrameskip-v4)')
@@ -55,9 +58,13 @@ def get_args():
                         help='directory to save agent logs (default: /tmp/gym)')
     parser.add_argument('--save-dir', default='./trained_models/',
                         help='directory to save agent logs (default: ./trained_models/)')
-    parser.add_argument('--no-cuda', action='store_true', default=False,
+   
+    
+    #make an automatic check for the cuda setting on the machine
+    useCuda=torch.cuda.is_available()    
+    parser.add_argument('--no-cuda', action='store_true', default=useCuda,
                         help='disables CUDA training')
-    parser.add_argument('--recurrent-policy', action='store_true', default=True,
+    parser.add_argument('--recurrent-policy', action='store_true', default=False,
                         help='use a recurrent policy')
     parser.add_argument('--no-vis', action='store_true', default=False,
                         help='disables visdom visualization'),
@@ -75,6 +82,10 @@ def get_args():
                     help='ID of the port used for Visdom, default 24431, CHANGE THIS VALUE BEFORE RUNNING THE main.py')
     parser.add_argument('--vizTrain', type=bool, default=False,
                     help='visualize the agent during the training')
+    parser.add_argument('--debug', type=bool, default=False,
+                    help='active debug mode')
+    parser.add_argument('--sentenceEmbeddingDimension', type=int, default=200,
+                    help='dimension of the vectors that embedds the missions')
     
     
     

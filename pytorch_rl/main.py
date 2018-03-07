@@ -49,9 +49,10 @@ if args.cuda:
 
 def main():
     
-    #to be deleted after debug
-    global envs,obs
     
+# =============================================================================
+#     Create an appropriate folder to store the experiment, info...
+# =============================================================================
     experimentNumber=0
     experimentFolder='Exp{}'.format(experimentNumber)
     
@@ -66,7 +67,9 @@ def main():
         
     
 
-    
+# =============================================================================
+#   Info about the experiment that wil be saved and plotted
+# =============================================================================
     infoToSave={'timestep':[],
           'FPS':[],
           'meanReward':[],
@@ -77,10 +80,12 @@ def main():
           'entropy':[],
           'valueLoss':[],
           'actionLoss':[],
+          #count the number of times an action has been selected by the agent or the teacher
           'numberOfChoices_Teacher':[], 
           'numberOfChoices_Agent':[],
-          'actionRatio':[]}   #even if it is redundant, we decide to save the action ratios.
-                              #This could be optimized later
+          #save the ratio of these previous numbers. Redundant but easier to track
+          'actionRatio':[],
+          'entropyCoef':[]}   
                     
           
     print("#######")
@@ -89,7 +94,9 @@ def main():
 
     os.environ['OMP_NUM_THREADS'] = '1'
     
-    
+# =============================================================================
+#     Generate a descriptor of the current experiment
+# =============================================================================
     descriptor=''
     descriptor+='Experiment {} \n'.format(experimentNumber)
     descriptor+="experience done on : {} at {}  \n".format(time.strftime("%d/%m/%Y"),time.strftime("%H:%M:%S"))
@@ -102,9 +109,13 @@ def main():
     f.write(descriptor)
     f.close()
 
+# =============================================================================
+#   Create Visdom environment
+# =============================================================================
     if args.vis:
         from visdom import Visdom
         print('using VISDOM')
+        #specific to local experiments on windows laptop [Simon]
         if os.name=='nt':
             print('using visdom for testing on local windows machine')
             viz = Visdom(env='babyAIGame_Exp{}'.format(experimentNumber),port=8097)
@@ -114,25 +125,35 @@ def main():
             viz = Visdom(server=args.serverVisdom,port=args.portVisdom,env='babyAIGame_Exp{}'.format(experimentNumber))
         
         
-        
+        #plot a summary of the experiment on visdom
         viz.text(descriptor)
-       
-        win = {'rewards':None,'entropy':None,'statsAction':None,'actionRatio':None}
+        #windows that will be plotted on visdom
+        win = {'rewards':None,'entropy':None,'statsAction':None,'actionRatio':None,'entropyCoef':None}
 
+
+# =============================================================================
+#   Create the different environments for the parallel training
+# =============================================================================
     envs = [make_env(args.env_name, args.seed, i)
                 for i in range(args.num_processes)]
     
 
-    
+    # dictionnary that describes the name of the actions in the environment
+    # it is represented as {'name of action':actionID}
     actionDescription=False
     
+# =============================================================================
+#   embedds the envs in order to share them with the threads
+# =============================================================================
     if args.num_processes > 1:
         envs = SubprocVecEnv(envs)
     else:
         envs = DummyVecEnv(envs)
     
+# =============================================================================
+#   decide wether to plot the render of the env at each time step or not
+# =============================================================================
     if args.vizTrain:
-
         render_func = envs.envs[0].render
 
     # Maxime: commented this out because it very much changes the behavior
@@ -140,27 +161,48 @@ def main():
     #if len(envs.observation_space.shape) == 1:
     #    envs = VecNormalize(envs)
 
+
+
+
     obs_shape = envs.observation_space.shape
     obs_shape = (obs_shape[0] * args.num_stack, *obs_shape[1:])
 
     obs_numel = reduce(operator.mul, obs_shape, 1)
+    
+# =============================================================================
+#     select the arcitecture for the actor-critic
+# =============================================================================
+    architecture='None'
 
     if len(obs_shape) == 3 and obs_numel > 1024:
         actor_critic = CNNPolicy(obs_shape[0], envs.action_space, args.recurrent_policy)
-        
+        architecture='CNN policy'
     elif args.recurrent_policy:
         actor_critic = RecMLPPolicy(obs_numel, envs.action_space)
+        architecture='Reccurent policy'
     else:
         actor_critic = MLPPolicy(obs_numel, envs.action_space)
+        architecture='MLP policy'
         
     
 # =============================================================================
 #     DEBUG MODE
 # =============================================================================
-    print('using easy policy')
-    actor_critic=easyPolicy(obs_numel, envs.action_space)
-    numberOfActions=envs.action_space.n
+    if args.debug:
+        print('using easy policy for debug')
+        actor_critic=easyPolicy(obs_numel, envs.action_space)
+        architecture='debug policy'
+        
+    #log the architecture info
+    print(architecture)
+    f= open(fileInfo,"a")
+    newLine='{:>12}  {:>12} \n'.format('architecture', architecture)
+    f.write(newLine)
+    f.close()
     
+    
+    #initialize the ratio counter
+    numberOfActions=envs.action_space.n
     #print('before',  infoToSave['actionRatio'])
     infoToSave['actionRatio']=[[] for i in range(numberOfActions)]
     #print('after',  infoToSave['actionRatio'])
@@ -174,14 +216,18 @@ def main():
     print(str(actor_critic))
     print('Total model size: %d' % modelSize)
 
+
+    #select the action space
     if envs.action_space.__class__.__name__ == "Discrete":
         action_shape = 1
     else:
         action_shape = envs.action_space.shape[0]
-
+    
+    #choose wether to use 
     if args.cuda:
         actor_critic.cuda()
 
+    #select RL algorithm
     if args.algo == 'a2c':
         optimizer = optim.RMSprop(actor_critic.parameters(), args.lr, eps=args.eps, alpha=args.alpha)
     elif args.algo == 'ppo':
@@ -189,20 +235,33 @@ def main():
     elif args.algo == 'acktr':
         optimizer = KFACOptimizer(actor_critic)
 
-    maxSizeOfMissionsSelected=7
+
+    #the missions are embedded into vectors of size :
+    maxSizeOfMissionsSelected=args.sentenceEmbeddingDimension
     rollouts = RolloutStorage(args.num_steps, args.num_processes, obs_shape, envs.action_space, actor_critic.state_size,maxSizeOfMissions=maxSizeOfMissionsSelected)
+    
+    #setup the current observations
     current_obs = torch.zeros(args.num_processes, *obs_shape)
     
-    preProcessor=preProcess.PreProcessor()
+# =============================================================================
+#     The Preprocessor allows to convert strings into ASCII codes that will be stored
+#   it also pre-process the images when the environment is not suited to this framweork
+#   it also computes sentence embeddings for the missions given as strings
+# =============================================================================
+    preProcessor=preProcess.PreProcessor(maxSizeOfMissionsSelected)
+    
+    #update the current missions from the teacher
     current_missions=torch.zeros(args.num_processes, maxSizeOfMissionsSelected)
 
-    
+    #temp variable used to compute the info['numberOfChoices...']
     currentCount={'numberOfChoices_Teacher':[0 for i in range(numberOfActions)],
                                              'numberOfChoices_Agent':[0 for i in range(numberOfActions)]}
 
     
-    
+    #as the training goes, the current_obs is updated
+    #take care, here obs means image, and obsFull={image, mission, bestActionID}
     def update_current_obs(obs,missions):
+        #global current_missions
         #print('top')
         shape_dim0 = envs.observation_space.shape[0]
         #img,txt = torch.from_numpy(np.stack(obs[:,0])).float(),np.stack(obs[:,1])
@@ -211,7 +270,8 @@ def main():
         if args.num_stack > 1:
             current_obs[:, :-shape_dim0] = current_obs[:, shape_dim0:]
         current_obs[:, -shape_dim0:] = images
-        current_missions = missions
+        current_missions[:,:] = missions
+
 
     obsF = envs.reset()
 #    print('init')
@@ -224,9 +284,18 @@ def main():
     #obsF,reward,done,info=envs.step(np.ones((args.num_processes)))
     #print('after 1 step')
     #print(obs)
-
+    
+    #reshape the image, if needed
     obs=np.array([preProcessor.preProcessImage(dico['image']) for dico in obsF])
+    
+    
+    
+    
+    #translate the string missions in vector of ASCII code
     missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
+    
+    #id of the best actions computed by the teacher, they are not given to the agent,
+    #but they are used to compute action statistics
     bestActions=[dico['bestActions'] for dico in obsF ] 
 
     
@@ -237,7 +306,7 @@ def main():
     #print(obs)
     
     
-    def getMissionsAsVariables(step,end=False):
+    def getMissionsAsVariables(step,end=False,volatile=False):
         '''
         Allow to convert from list of ASCII codes to pytorch Variables
         the argument step allows point-wise selection in the rollout
@@ -245,19 +314,25 @@ def main():
         missions[step:end]
         '''
         
-        #get the missions as ASCII codes
+
+        #get the missions as a minibatch
         if end is not False:
             tmpMissions=rollouts.missions[step:end].view(-1,maxSizeOfMissionsSelected)
-            #convert them to pytorch tensors using the language model
-            tmpMissions=preProcessor.adaptToTorchVariable(tmpMissions)
-            #convert them as Variables
-            missionsVariable=Variable(tmpMissions)       
+               
         else:
-            tmpMissions=rollouts.missions[step]
-            #convert them to pytorch tensors using the language model
-            tmpMissions=preProcessor.adaptToTorchVariable(tmpMissions)
-            #convert them as Variables
-            missionsVariable=Variable(tmpMissions,volatile=True)
+            tmpMissions=rollouts.missions[step]#.view(-1,maxSizeOfMissionsSelected)
+        
+        #here tmp missions is a list of ASCII codes
+        #for i in range(tmpMissions.size()[0]):
+        #    print('tmp missions', tmpMissions[i,0:10])
+        #we get the original strings
+        missionsAsStrings=preProcessor.Code2String(tmpMissions)
+        
+        #then use the language model of our choice
+        missionsEmbedded=preProcessor.simpleSentenceEmbedding(missionsAsStrings)
+
+        #convert them as Variables
+        missionsVariable=Variable(missionsEmbedded,volatile=volatile)
        
       
         
@@ -265,6 +340,8 @@ def main():
         if args.cuda:
             missionsVariable=missionsVariable.cuda()
         return(missionsVariable)
+        
+        
     
     def correctReward(reward, cpu_actions,cpu_teaching_actions):
         '''
@@ -307,6 +384,12 @@ def main():
         return(0)
     
     def updateRatioActions(currentRatio,actions_Agent, actions_Teacher):
+        '''
+        update the info['ratio'] value, using the previously computed 
+        numberOfActionsTeacher/Agent
+        
+        if numberOFActionsAgent=0, then ratio=-1
+        '''
         #print(currentRatio)
         for indexAction in range(numberOfActions):
             if actions_Teacher[indexAction]!=0:
@@ -316,6 +399,9 @@ def main():
         
             
     def forceTeacherMissions(bestActions):
+        '''
+        select the best action to take, among a pool of optimal actions computed by the teacher
+        '''
         output=[]
         for envActions in bestActions:
             value=np.random.choice(envActions)
@@ -325,19 +411,37 @@ def main():
         
         
         
-                
+    
 #    
 #    
     #envs.getText()
     #print(txt)
+    
+    #update the current image and missions as observations
     update_current_obs(obs,missions)
-
+    
+    
+    
+   # for i in range(2):
+    #    print('missions', missions[i,0:10])
+        
+    #for i in range(2):
+    #    print('current_mission', current_missions[i,0:10])
+    
     rollouts.observations[0].copy_(current_obs)
+    
+    
+    
+    
     rollouts.missions[0].copy_(current_missions)
+    #print('from rollout', rollouts.missions[0,0,0:10])
+    #print('from rollout', rollouts.missions[0,1,0:10])
+    #time.sleep(100)
     # These variables are used to compute average rewards for all processes.
     episode_rewards = torch.zeros([args.num_processes, 1])
     final_rewards = torch.zeros([args.num_processes, 1])
     
+    # allow to keep track of the model which had the best mean reward
     bestMeanRewards=final_rewards.mean()
     
     if args.cuda:
@@ -347,19 +451,35 @@ def main():
         rollouts.cuda()
 
     start = time.time()
-    entropy_offset=args.entropy_coef
+    
+    #coefficient used in the computation of the entropy term, in the loss function
+    entropy_offset=args.entropyOffset
+    
+    
+    
+# =============================================================================
+#   Beginning of the training
+# =============================================================================
     for j in range(num_updates):
-        for step in range(args.num_steps):
+        #performs a rollout of n steps
+        for step in range(args.num_steps):            
             
+            #compute the entropy coefficient for this timestep
+            #two posisbility, with or without annealing
             if not args.entropy_Temp is False:
                 #print('using entropy Annealing : 'args.entropy_Temp)
                 totalTimeStep=(j + 1) * args.num_processes * args.num_steps
                 entropy_coef=entropy_offset + np.exp(-totalTimeStep/args.entropy_Temp)
             else:
-               entropy_coef=entropy_offset
-            #state the ratio of timesteps where the agent uses the info
-            #from the teacher
+               entropy_coef=args.entropy_coef
+         
             
+            
+# =============================================================================
+#         here we define at which frequency we want to hear the advice of the teacher
+#           and at which frequency we allow the teacher to take control of the agent 
+#           in order to perform the optimal action
+# =============================================================================
             useAdviceFromTeacher=False
             if not args.useMissionAdvice == False:
                 if step%args.useMissionAdvice==0:
@@ -379,7 +499,7 @@ def main():
             
             #preprocess the missions to be used by the model
             if useAdviceFromTeacher:
-                missionsVariable=getMissionsAsVariables(step)
+                missionsVariable=getMissionsAsVariables(step,volatile=True)
             else:
                 missionsVariable=False
             
@@ -456,7 +576,7 @@ def main():
             rollouts.insert(step, current_obs, current_missions, states.data, action.data, action_log_prob.data, value.data, reward, masks)
 
         if useAdviceFromTeacher:
-            missionsVariable=getMissionsAsVariables(-1)
+            missionsVariable=getMissionsAsVariables(-1,volatile=True)
         else:
             missionsVariable=False
             
@@ -471,7 +591,7 @@ def main():
 
         if args.algo in ['a2c', 'acktr']:
             
-            missionsVariable=getMissionsAsVariables(0,end=-1)
+            missionsVariable=getMissionsAsVariables(0,end=-1,volatile=False)
             values, action_log_probs, dist_entropy, states = actor_critic.evaluate_actions(
                 Variable(rollouts.observations[:-1].view(-1, *obs_shape)),
                 Variable(rollouts.states[:-1].view(-1, actor_critic.state_size)),
@@ -609,6 +729,8 @@ def main():
             infoToSave['minReward']+=[final_rewards.min()]
             infoToSave['maxReward']+=[final_rewards.max()]
             infoToSave['entropy']+=[dist_entropy.data[0]]
+            infoToSave['entropyCoef']+=[entropy_coef]
+
             infoToSave['valueLoss']+=[value_loss.data[0]]
             infoToSave['actionLoss']+=[action_loss.data[0]]
             

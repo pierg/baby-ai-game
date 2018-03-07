@@ -213,8 +213,15 @@ class easyPolicy(FFPolicy):
         self.action_space = action_space
 
         
-        self.adapt_1 = nn.Linear(7,64)
-        self.adapt_2 = nn.Linear(7,1)
+        self.adapt_1 = nn.Linear(7,10)
+        self.adapt_2 = nn.Linear(10,30)
+        self.adapt_3 = nn.Linear(30,64)
+
+
+        self.adapt_4 = nn.Linear(7,5)
+        self.adapt_5 = nn.Linear(5,3)
+        self.adapt_6 = nn.Linear(3,1)
+
 
         
 
@@ -253,8 +260,14 @@ class easyPolicy(FFPolicy):
         inputs = inputs.view(-1, batch_numel)
         
         
-        x=F.tanh(self.adapt_1(missions))
-        value=F.tanh(self.adapt_2(missions))
+        x=F.relu(self.adapt_1(missions))
+        x=F.relu(self.adapt_2(x))
+        x=F.relu(self.adapt_3(x))
+        
+        
+        value=F.relu(self.adapt_4(missions))
+        value=F.relu(self.adapt_5(value))
+        value=F.relu(self.adapt_6(value))
 
        
 
