@@ -61,7 +61,7 @@ while True:
     # Observation, reward and next obs
     obs, reward, done, _ = env.step(cpu_actions)
 
-    time.sleep(0.15)
+    time.sleep(0.05)
 
     masks.fill_(0.0 if done else 1.0)
 

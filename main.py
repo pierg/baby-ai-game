@@ -362,6 +362,8 @@ class AIGameWindow(QMainWindow):
 
         env = self.env.unwrapped
 
+        env.mission = mission
+
         self.curDemo = {
             'mission': mission,
             'startPos' : env.agentPos,
@@ -391,6 +393,7 @@ class AIGameWindow(QMainWindow):
         self.curDemo = None
 
         # Clear the mission text
+        env.mission = ''
         self.missionBox.setPlainText('')
 
         pickle.dump(self.demos, open('demos.p', 'wb'))
