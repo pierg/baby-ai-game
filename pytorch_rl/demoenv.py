@@ -56,6 +56,8 @@ class DemoEnv(MiniGridEnv):
         # Store the current environment name in the info object
         info['multi_env'] = {}
         info['multi_env']['env_name'] = self.mission
+        if self.testSet:
+            info['multi_env']['env_name'] += ' (test set)'
 
         # If the episode is done, add the total reward for the episode to the info object
         if done:
