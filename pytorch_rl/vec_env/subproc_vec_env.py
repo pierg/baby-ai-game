@@ -6,9 +6,20 @@ def worker(remote, parent_remote, env_fn_wrapper):
     parent_remote.close()
     env = env_fn_wrapper.x()
     while True:
-        cmd, data = remote.recv()
+        commands = remote.recv()
+        cmd, data =commands[0],commands[1]
         if cmd == 'step':
-            ob, reward, done, info = env.step(data)
+            try:
+                observeReward=commands[2]
+                #print('using sent observeReward')
+            except:
+                #print('no third option in command')
+                observeReward=True
+            print('final ObsReward', observeReward)
+            env.observeReward=observeReward
+            env.setObserveReward(observeReward)
+            ob, reward, done, info = env.step(data)#,observeReward=False)
+            print('after step', env.observeReward)
             if done:
                 ob = env.reset()
             remote.send((ob, reward, done, info))
@@ -59,9 +70,9 @@ class SubprocVecEnv(VecEnv):
         observation_space, action_space = self.remotes[0].recv()
         VecEnv.__init__(self, len(env_fns), observation_space, action_space)
 
-    def step_async(self, actions):
+    def step_async(self, actions,observeReward):
         for remote, action in zip(self.remotes, actions):
-            remote.send(('step', action))
+            remote.send(('step', action,observeReward))
         self.waiting = True
 
     def step_wait(self):

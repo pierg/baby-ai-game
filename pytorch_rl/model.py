@@ -117,16 +117,17 @@ class RecMLPPolicy(FFPolicy):
         x = states = self.gru(x, states * masks)
         
         actions = self.a_fc1(x)
-        actions = F.tanh(actions)
+        actions = F.relu(actions)
         actions = self.a_fc2(actions)
-        #actions = F.tanh(actions)
+        actions = F.relu(actions)
         #actions = self.v_fc3(actions)
 
         value = self.v_fc1(x)
-        value = F.tanh(value)
+        value = F.relu(value)
         value = self.v_fc2(value)
-        value = F.tanh(value)
+        value = F.relu(value)
         value = self.v_fc3(value)
+        value = F.relu(value)
 
         return value, actions, states
 

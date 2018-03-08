@@ -7,7 +7,8 @@ import sys
 import teacher
 import gym_minigrid
 from baselines import bench
-
+import gym
+from gym import Wrapper
 
 def make_env(env_id, seed, rank):
     def _thunk():
@@ -34,7 +35,7 @@ def make_env(env_id, seed, rank):
 
     return _thunk
 
-class WrapPyTorch(gym.ObservationWrapper):
+class WrapPyTorch(Wrapper):
     def __init__(self, env=None):
         super(WrapPyTorch, self).__init__(env)
         obs_shape = self.observation_space.shape

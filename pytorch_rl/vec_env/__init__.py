@@ -23,7 +23,7 @@ class VecEnv(ABC):
         pass
 
     @abstractmethod
-    def step_async(self, actions):
+    def step_async(self, actions,observeReward=True):
         """
         Tell all the environments to start taking a step
         with the given actions.
@@ -54,8 +54,8 @@ class VecEnv(ABC):
         """
         pass
 
-    def step(self, actions):
-        self.step_async(actions)
+    def step(self, actions,observeReward):
+        self.step_async(actions,observeReward)
         return self.step_wait()
 
     def render(self):
@@ -69,8 +69,8 @@ class VecEnvWrapper(VecEnv):
             observation_space=observation_space or venv.observation_space,
             action_space=action_space or venv.action_space)
 
-    def step_async(self, actions):
-        self.venv.step_async(actions)
+    def step_async(self, actions,observeReward=True):
+        self.venv.step_async(actions,observeReward=True)
 
     @abstractmethod
     def reset(self):

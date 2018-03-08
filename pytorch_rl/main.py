@@ -54,7 +54,7 @@ def main():
 #     Create an appropriate folder to store the experiment, info...
 # =============================================================================
     experimentNumber=0
-    if not args.expName is None:
+    if not args.expName is False:
         experimentFolder=args.expName+'Exp{}'.format(experimentNumber)
     else:
         experimentFolder='Exp{}'.format(experimentNumber)
@@ -63,7 +63,7 @@ def main():
     while os.path.exists(save_path):
         print('previous experiment ID used : ', experimentNumber)
         experimentNumber+=1
-        if not args.expName is None:
+        if not args.expName is False:
              experimentFolder=args.expName+'Exp{}'.format(experimentNumber)
         else:
             experimentFolder='Exp{}'.format(experimentNumber)
@@ -497,17 +497,22 @@ def main():
 #           and at which frequency we allow the teacher to take control of the agent 
 #           in order to perform the optimal action
 # =============================================================================
+            #observe the reward form the teacher, +-1 if perform right action
+            observeReward=False
+            
             useAdviceFromTeacher=False
             if not args.useMissionAdvice == False:
                 if step%args.useMissionAdvice==0:
-                    useAdviceFromTeacher=True          
+                    useAdviceFromTeacher=True   
+                    observeReward=True
             
             
             useMissionFromTeacher=False  
             #print('argument useActionAdvice :',args.useActionAdvice)
             if not args.useActionAdvice == False:
                 if step%args.useActionAdvice==0:
-                    useMissionFromTeacher=True         
+                    useMissionFromTeacher=True 
+                    
             
                    
             
@@ -540,12 +545,12 @@ def main():
             #If the teacher takes control of the agent, we use the actions given
             if useMissionFromTeacher:
                 cpu_teaching_actions=forceTeacherMissions(bestActions)
-                obsF, reward, done, info = envs.step(cpu_teaching_actions)
+                obsF, reward, done, info = envs.step(cpu_teaching_actions,observeReward=True)
                 #correctReward(reward,cpu_actions,cpu_teaching_actions)
                 #print('corrected reward', reward)
             else:
                 #normal case, we use the actions computed by the agent
-                obsF, reward, done, info = envs.step(cpu_actions)
+                obsF, reward, done, info = envs.step(cpu_actions,observeReward=observeReward)
             
             
             #We require the env to give a description of the actions in the info dic
@@ -783,11 +788,8 @@ def main():
                 win = visdom_plot(viz, win, save_path, args.env_name, args.algo,infoToSave=infoToSave,actionDescription=actionDescription,numProcesses=args.num_processes)
             except IOError:
                 pass
-        
-            if not args.earlySuccess is None:
-                #early stopping if the env has been cracked 
-                if np.sum(current_envFinished) >=args.num_processes:
-                    numberOfSuccess+=1
+            
+            if not args.earlySuccess is False:
                 if numberOfSuccess>=args.earlySuccess:
                     print('end of the experiment')
                     print('the agent solved {} times the env'.format(np.sum(current_envFinished)))
@@ -797,7 +799,14 @@ def main():
                     f.close()
                     print(newLine)
                     return(0)
+            
         
+        if not args.earlySuccess is False:
+                #early stopping if the env has been cracked 
+            if np.sum(current_envFinished) >=args.num_processes:
+                numberOfSuccess+=1
+            
+    
 
 if __name__ == "__main__":
     main()

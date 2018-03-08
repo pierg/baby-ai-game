@@ -35,8 +35,12 @@ class Teacher(Wrapper):
         self.bestActions=None
         self.penalty=1
         self.bonus=1
+        self.observeReward=None
         print('environment with Teacher created!')
         
+        
+    def setObserveReward(self,observeReward):
+        self.observeReward=observeReward
         
     def close(self):
         super(Teacher, self)._close()
@@ -57,8 +61,8 @@ class Teacher(Wrapper):
         obs['bestActions']=self.bestActions
         return (obs)
 
-    
     def step(self, action):
+        print('yoooo', self.observeReward)
         """
         Called at every action, step
         """
