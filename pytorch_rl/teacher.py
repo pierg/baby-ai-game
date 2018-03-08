@@ -33,7 +33,6 @@ class Teacher(Wrapper):
         self.actionDescription={'left':0,'right':1,'continue':2,'toggle':3,'wait':4}
         
         self.bestActions=None
-        self.previousReward=None
         self.penalty=1
         self.bonus=1
         print('environment with Teacher created!')
@@ -66,11 +65,16 @@ class Teacher(Wrapper):
         
         obs, reward, done, info = self.env.step(action)
         
-        info=self.actionDescription
-        if done:
-            reward=self.previousReward+10
-        else:
-            self.previousReward=reward
+        info['actionDescription']=self.actionDescription
+        info['finished']=False
+
+        #ugly way to check if the agent has won the game
+        if done: 
+            if reward>800:
+                reward=10
+                info['finished']=True
+            else:
+                reward=-10
         
         #print(self.bestActions)
         

@@ -100,15 +100,15 @@ class RecMLPPolicy(FFPolicy):
         inputs = inputs.view(-1, batch_numel)
 
         x = self.p_fc1(inputs)
-        x = F.tanh(x)
+        x = F.relu(x)
         x = self.p_fc2(x)
-        x = F.tanh(x)
+        x = F.relu(x)
         
         if missions is not False:
-            missions=self.adapt_1(missions)
-            missions=self.adapt_2(missions)
+            missions=F.relu(self.adapt_1(missions))
+            missions=F.relu(self.adapt_2(missions))
             missions=torch.cat([missions, x],dim=1)
-            x= self.adapt_3(missions)
+            x= F.relu(self.adapt_3(missions))
 
         
 

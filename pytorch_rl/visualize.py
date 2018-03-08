@@ -185,6 +185,41 @@ def plotEntropyCoefWithVisdom(timestep,entropyCoef,name,game,viz,win,folder,acti
     
 
     return(win)
+
+def plotEnvFinishedWithVisdom(timestep,envFinished,numProcesses,name,game,viz,win,folder,actionDescription=None):
+    
+    
+    
+    fig, ax = plt.subplots()
+    
+    plt.plot(timestep,[numProcesses for i in range(len(timestep))],label='total number of envs')
+    plt.plot(timestep,envFinished,label='number of envs won')
+        
+        
+    
+    plt.xlabel('Number of timestep')
+    plt.ylabel('number of agents that won the game')
+    plt.title('evolution of the performance of the agents')
+
+    plt.legend()
+    
+    fig.savefig(os.path.join(folder,'envFinished.png'))
+
+
+    plt.show()
+    plt.draw()
+
+    image = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+    image = image.reshape(fig.canvas.get_width_height()[::-1] + (3, ))
+    plt.close(fig)
+
+    # Show it in visdom
+    image = np.transpose(image, (2, 0, 1))
+    win['envFinished']=viz.image(image,win['envFinished'])   
+    
+    
+
+    return(win)
     
 
 def plotStatsActionsWithVisdom(timestep,numberOfChoices_Agent,numberOfChoices_Teacher,name,game,viz,win,folder,actionDescription=None):
@@ -313,7 +348,7 @@ def plotRewardsWithVisdom(timestep,meanReward,medianReward,minReward,maxReward,
     
     
 exclude=['updates','timestep','numberOfChoices_Teacher','numberOfChoices_Agent']
-def visdom_plot(viz, win, folder, game, name, bin_size=100, smooth=1,infoToSave=None,actionDescription=None):
+def visdom_plot(viz, win, folder, game, name, numProcesses,bin_size=100, smooth=1,infoToSave=None,actionDescription=None):
     
     
     timestep=infoToSave['timestep']
@@ -339,6 +374,10 @@ def visdom_plot(viz, win, folder, game, name, bin_size=100, smooth=1,infoToSave=
 
     entropyCoef=infoToSave['entropyCoef']
     win=plotEntropyCoefWithVisdom(timestep,entropyCoef,name,game,viz,win,folder,actionDescription=actionDescription)
+
+
+    envFinished=infoToSave['envFinished']
+    win=plotEnvFinishedWithVisdom(timestep,envFinished,numProcesses,name,game,viz,win,folder,actionDescription=actionDescription)
 
     return (win)
 

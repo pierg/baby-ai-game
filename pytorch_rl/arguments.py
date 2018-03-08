@@ -8,6 +8,8 @@ def get_args():
     parser = argparse.ArgumentParser(description='RL')
     parser.add_argument('--algo', default='a2c',
                         help='algorithm to use: a2c | ppo | acktr')
+    parser.add_argument('--expName', default=None,
+                        help='name of the experiment. default BabyAI_Exp...')
     parser.add_argument('--lr', type=float, default=7e-4,
                         help='learning rate (default: 7e-4)')
     parser.add_argument('--eps', type=float, default=1e-5,
@@ -34,7 +36,7 @@ def get_args():
                         help='random seed (default: 1)')
     parser.add_argument('--num-processes', type=int, default=2,
                         help='how many training CPU processes to use (default: 32)')
-    parser.add_argument('--num-steps', type=int, default=1,
+    parser.add_argument('--num-steps', type=int, default=5,
                         help='number of forward steps in A2C (default: 5)')
     parser.add_argument('--ppo-epoch', type=int, default=4,
                         help='number of ppo epochs (default: 4)')
@@ -64,11 +66,11 @@ def get_args():
     useCuda=torch.cuda.is_available()    
     parser.add_argument('--no-cuda', action='store_true', default=useCuda,
                         help='disables CUDA training')
-    parser.add_argument('--recurrent-policy', action='store_true', default=False,
+    parser.add_argument('--recurrent-policy', action='store_true', default=True,
                         help='use a recurrent policy')
     parser.add_argument('--no-vis', action='store_true', default=False,
                         help='disables visdom visualization'),
-    parser.add_argument('--useMissionAdvice', type=int, default=1,
+    parser.add_argument('--useMissionAdvice', type=int, default=False,
                         help='False if not using teacher advices.Else, indicate the number of time steps when the agent uses the advice')
     parser.add_argument('--useActionAdvice', type=int,default=False,
                         help='False if not using teacher best actions.Else, indicate the number of time steps when the agent uses the action')
@@ -86,7 +88,8 @@ def get_args():
                     help='active debug mode')
     parser.add_argument('--sentenceEmbeddingDimension', type=int, default=200,
                     help='dimension of the vectors that embedds the missions')
-    
+    parser.add_argument('--earlySuccess', default=False,
+                    help='percentage of envs that must have succeeded in order to say that the agent cracked the env')
     
     
     args = parser.parse_args()

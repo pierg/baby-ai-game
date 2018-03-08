@@ -54,14 +54,22 @@ def main():
 #     Create an appropriate folder to store the experiment, info...
 # =============================================================================
     experimentNumber=0
-    experimentFolder='Exp{}'.format(experimentNumber)
+    if not args.expName is None:
+        experimentFolder=args.expName+'Exp{}'.format(experimentNumber)
+    else:
+        experimentFolder='Exp{}'.format(experimentNumber)
     
     save_path = os.path.join(args.save_dir, args.algo,experimentFolder)
     while os.path.exists(save_path):
         print('previous experiment ID used : ', experimentNumber)
         experimentNumber+=1
-        experimentFolder='Exp{}'.format(experimentNumber)
+        if not args.expName is None:
+             experimentFolder=args.expName+'Exp{}'.format(experimentNumber)
+        else:
+            experimentFolder='Exp{}'.format(experimentNumber)
         save_path = os.path.join(args.save_dir, args.algo,experimentFolder)
+        
+        
     print('saving results in ',save_path)
     os.makedirs(save_path)
         
@@ -85,7 +93,8 @@ def main():
           'numberOfChoices_Agent':[],
           #save the ratio of these previous numbers. Redundant but easier to track
           'actionRatio':[],
-          'entropyCoef':[]}   
+          'entropyCoef':[],
+          'envFinished':[]}   
                     
           
     print("#######")
@@ -98,7 +107,7 @@ def main():
 #     Generate a descriptor of the current experiment
 # =============================================================================
     descriptor=''
-    descriptor+='Experiment {} \n'.format(experimentNumber)
+    descriptor+='Experiment {} \n'.format(experimentFolder)
     descriptor+="experience done on : {} at {}  \n".format(time.strftime("%d/%m/%Y"),time.strftime("%H:%M:%S"))
     
     for i in vars(args):
@@ -118,17 +127,22 @@ def main():
         #specific to local experiments on windows laptop [Simon]
         if os.name=='nt':
             print('using visdom for testing on local windows machine')
-            viz = Visdom(env='babyAIGame_Exp{}'.format(experimentNumber),port=8097)
+            viz = Visdom(env=experimentFolder,port=8097)
 
         else:
             print('using visdom on a linux server')
-            viz = Visdom(server=args.serverVisdom,port=args.portVisdom,env='babyAIGame_Exp{}'.format(experimentNumber))
+            viz = Visdom(server=args.serverVisdom,port=args.portVisdom,env=experimentFolder)
         
         
         #plot a summary of the experiment on visdom
         viz.text(descriptor)
         #windows that will be plotted on visdom
-        win = {'rewards':None,'entropy':None,'statsAction':None,'actionRatio':None,'entropyCoef':None}
+        win = {'rewards':None,
+               'entropy':None,
+               'statsAction':None,
+               'actionRatio':None,
+               'entropyCoef':None,
+               'envFinished':None}
 
 
 # =============================================================================
@@ -200,6 +214,8 @@ def main():
     f.write(newLine)
     f.close()
     
+    #useful to compute the 'envFinished' counter
+    current_envFinished=np.zeros((args.num_processes))
     
     #initialize the ratio counter
     numberOfActions=envs.action_space.n
@@ -492,8 +508,7 @@ def main():
                 if step%args.useActionAdvice==0:
                     useMissionFromTeacher=True         
             
-            
-           
+                   
             
             
             
@@ -503,6 +518,7 @@ def main():
             else:
                 missionsVariable=False
             
+            
             # Sample actions
             value, action, action_log_prob, states = actor_critic.act(
                 Variable(rollouts.observations[step], volatile=True),
@@ -511,33 +527,31 @@ def main():
                 missions=missionsVariable
             )
             
+            #keep track of the numberOfActionAgent/Teacher
             updateNumberOfActions(currentCount, action.data, bestActions)
             
+            #put the actions in a convenient format
             cpu_actions = action.data.squeeze(1).cpu().numpy()
             
             
+                       
             
-            
-            
-            # Obser reward and next obs
-            #print('actions',cpu_actions)
+            #If the teacher takes control of the agent, we use the actions given
             if useMissionFromTeacher:
                 cpu_teaching_actions=forceTeacherMissions(bestActions)
-                #cpu_teaching_actions=bestActions.data.squeeze(1).cpu().numpy()
-                #print('cpu teaching actions : ', cpu_teaching_actions)
-
-                
-                #print('use mission')
                 obsF, reward, done, info = envs.step(cpu_teaching_actions)
                 #correctReward(reward,cpu_actions,cpu_teaching_actions)
                 #print('corrected reward', reward)
-
             else:
+                #normal case, we use the actions computed by the agent
                 obsF, reward, done, info = envs.step(cpu_actions)
             
             
+            #We require the env to give a description of the actions in the info dic
+            #Once we have gathered these info, this step is not mandatory anymore
             if actionDescription is False:
-                actionDescription=info[0]
+                actionDescription=info[0]['actionDescription']
+                
                 
             ## get the image and mission observation from the observation dictionnary
             obs=np.array([preProcessor.preProcessImage(dico['image']) for dico in obsF])
@@ -547,17 +561,31 @@ def main():
 
             
             
-            
-            #if args.cuda:
-             #   bestActions=bestActions.cuda()
-
-
+            #here the rewards are given as [rewardFromThread1, rewardFromThread2,...]
+            #we convert them in a pytorch tensor
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
+            
+            #keep track of the reward along an episode
             episode_rewards += reward
 
-            # If done then clean the history of observations.
+            # If done then clean the history of observations
             masks = torch.FloatTensor([[0.0] if done_ else [1.0] for done_ in done])
+            #while a thread i is not done, masks[i]=1
+            
+            #check which thread has finished
+            for i, done_ in enumerate(done):
+                if done_:
+                    if info[i]['finished']==True:
+                        current_envFinished[i]=1
+                    else:
+                        current_envFinished[i]=0
+                
+            
+            
             final_rewards *= masks
+            
+            #if thread i is done, final_reward[i]=episode_rewqrd
+            #else, final_reward[i]=0
             final_rewards += (1 - masks) * episode_rewards
             episode_rewards *= masks
 
@@ -739,6 +767,10 @@ def main():
             
             updateRatioActions(infoToSave['actionRatio'],currentCount['numberOfChoices_Agent'],currentCount['numberOfChoices_Teacher'])
             
+            
+            infoToSave['envFinished']+=[np.sum(current_envFinished)]
+
+            
             with open(os.path.join(save_path,'data.json'),'w') as fp:
                 fp.write(json.dumps(infoToSave))
 
@@ -747,9 +779,23 @@ def main():
             try:
                 # Sometimes monitor doesn't properly flush the outputs
                 #if j>0:
-                win = visdom_plot(viz, win, save_path, args.env_name, args.algo,infoToSave=infoToSave,actionDescription=actionDescription)
+                win = visdom_plot(viz, win, save_path, args.env_name, args.algo,infoToSave=infoToSave,actionDescription=actionDescription,numProcesses=args.num_processes)
             except IOError:
                 pass
+        
+            if args.earlySuccess:
+                #early stopping if the env has been cracked 
+                minEnvSolved=int(args.earlySuccess * args.num_processes)
+                if np.sum(current_envFinished) >=minEnvSolved:
+                    print('end of the experiment')
+                    print('the agent solved {} times the env'.format(np.sum(current_envFinished)))
+                    newLine="experience finished on : {} at {}  \n".format(time.strftime("%d/%m/%Y"),time.strftime("%H:%M:%S"))
+                    f= open(fileInfo,"a")
+                    f.write(newLine)
+                    f.close()
+                    print(newLine)
+                    return(0)
+        
 
 if __name__ == "__main__":
     main()
