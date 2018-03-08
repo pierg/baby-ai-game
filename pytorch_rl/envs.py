@@ -7,9 +7,9 @@ import gym_minigrid
 from gym_minigrid.wrappers import *
 from demoenv import DemoEnv
 
-def make_env(env_id, seed, rank, log_dir):
+def make_env(env_id, seed, rank, log_dir, testSet=False):
     def _thunk():
-        env = DemoEnv()
+        env = DemoEnv(testSet=testSet)
 
         #env = gym.make(env_id)
         #env.seed(seed + rank)

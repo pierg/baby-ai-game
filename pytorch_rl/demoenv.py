@@ -20,7 +20,7 @@ class DemoEnv(MiniGridEnv):
             demos = filter(lambda d: d['testSet'] == self.testSet, demos)
             self.demos = list(demos)
             num_demos = len(self.demos)
-            print('num demos: %d' % num_demos)
+            #print('num demos: %d' % num_demos)
 
         self.epsCount += 1
 
@@ -35,6 +35,7 @@ class DemoEnv(MiniGridEnv):
 
         self.mission = demo['mission']
 
+        self.testSet = demo['testSet']
         self.demoSteps = demo['numSteps']
         self.maxSteps = 4 * self.demoSteps
 
@@ -60,6 +61,7 @@ class DemoEnv(MiniGridEnv):
         if done:
             info['multi_env']['episode_reward'] = reward
             info['multi_env']['episode_steps'] = self.stepCount
+            info['multi_env']['test_set'] = self.testSet
 
         return obs, reward, done, info
 
@@ -97,7 +99,8 @@ class MultiEnvGraphing:
                 self.addDataPoint(
                     env_name,
                     info['episode_reward'],
-                    info['episode_steps']
+                    info['episode_steps'],
+                    info['test_set']
                 )
 
         self.num_updates += 1
@@ -105,7 +108,7 @@ class MultiEnvGraphing:
         if self.num_updates % 400 == 0:
             self.genMultiGraph()
 
-    def addDataPoint(self, env_name, episode_reward, episode_steps):
+    def addDataPoint(self, env_name, episode_reward, episode_steps, test_set):
         data = self.env_data.setdefault(
             env_name,
             dict(
@@ -124,7 +127,7 @@ class MultiEnvGraphing:
         data['num_episodes'] += 1
         data['num_steps'] += episode_steps
 
-        if data['num_episodes'] % 100 == 0:
+        if test_set or data['num_episodes'] % 100 == 0:
             #data['x_values'].append(data['num_steps'])
             data['x_values'].append(data['num_episodes'])
             data['y_values'].append(data['running_avg'])

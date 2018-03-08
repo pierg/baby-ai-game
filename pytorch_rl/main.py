@@ -22,7 +22,9 @@ from model import Policy
 from storage import RolloutStorage
 from visualize import visdom_plot
 
-from demoenv import DemoEnv, MultiEnvGraphing
+from demoenv import MultiEnvGraphing
+from demoenv import DemoEnv
+from gym_minigrid.wrappers import FlatObsWrapper
 
 args = get_args()
 
@@ -43,6 +45,34 @@ except OSError:
     for f in files:
         os.remove(f)
 
+def evalTestSet(env, actor_critic, graphing):
+    obs = env.reset()
+
+    obs = torch.from_numpy(obs).float().cuda()
+    obs = obs.unsqueeze(0).unsqueeze(0)
+
+    states = Variable(torch.zeros(1, actor_critic.state_size).cuda())
+    masks = torch.ones(1, 1).cuda()
+
+    while True:
+
+        value, action, action_log_prob, states = actor_critic.act(
+            Variable(obs, volatile=True),
+            states,
+            Variable(masks, volatile=True)
+        )
+        cpu_actions = action.data.squeeze(1).cpu().numpy()
+
+        # Obser reward and next obs
+        obs, reward, done, info = env.step(cpu_actions)
+        obs = torch.from_numpy(obs).float().cuda()
+        obs = obs.unsqueeze(0).unsqueeze(0)
+
+        if done:
+            #print('test episode done')
+            graphing.process([info])
+            break
+
 def main():
     print("#######")
     print("WARNING: All rewards are clipped or normalized so you need to use a monitor (see envs.py) or visdom plot to get true rewards")
@@ -57,14 +87,14 @@ def main():
 
     envs = [make_env(args.env_name, args.seed, i, args.log_dir) for i in range(args.num_processes)]
 
-    testEnv = DemoEnv(testSet=True)
-
     graphing = MultiEnvGraphing()
 
     if args.num_processes > 1:
         envs = SubprocVecEnv(envs)
     else:
         envs = DummyVecEnv(envs)
+
+    testEnv = FlatObsWrapper(DemoEnv(testSet=True))
 
     obs_shape = envs.observation_space.shape
     obs_shape = (obs_shape[0] * args.num_stack, *obs_shape[1:])
@@ -119,6 +149,9 @@ def main():
 
     start = time.time()
     for j in range(num_updates):
+        if j % 10 == 0:
+            evalTestSet(testEnv, actor_critic, graphing)
+
         for step in range(args.num_steps):
             # Sample actions
             value, action, action_log_prob, states = actor_critic.act(
