@@ -89,7 +89,7 @@ def get_args():
     parser.add_argument('--sentenceEmbeddingDimension', type=int, default=200,
                     help='dimension of the vectors that embedds the missions')
     parser.add_argument('--earlySuccess', default=5,
-                    help='percentage of envs that must have succeeded in order to say that the agent cracked the env')
+                    help='number of envs to be solved successively by the agent before declaring that the env has been cracked')
     
     
     args = parser.parse_args()
