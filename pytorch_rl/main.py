@@ -73,7 +73,8 @@ def main():
     print('saving results in ',save_path)
     os.makedirs(save_path)
         
-    
+    #number of times the agent has won all the envs 
+    numberOfSuccess=0
 
 # =============================================================================
 #   Info about the experiment that wil be saved and plotted
@@ -783,10 +784,11 @@ def main():
             except IOError:
                 pass
         
-            if args.earlySuccess:
+            if not args.earlySuccess is None:
                 #early stopping if the env has been cracked 
-                minEnvSolved=int(args.earlySuccess * args.num_processes)
-                if np.sum(current_envFinished) >=minEnvSolved:
+                if np.sum(current_envFinished) >=args.num_processes:
+                    numberOfSuccess+=1
+                if numberOfSuccess>=args.earlySuccess:
                     print('end of the experiment')
                     print('the agent solved {} times the env'.format(np.sum(current_envFinished)))
                     newLine="experience finished on : {} at {}  \n".format(time.strftime("%d/%m/%Y"),time.strftime("%H:%M:%S"))
