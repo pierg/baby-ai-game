@@ -18,7 +18,7 @@ args = get_args()
 env = make_env(args.env_name, args.seed, 0)
 env = DummyVecEnv([env])
 
-actor_critic, ob_rms = torch.load(os.path.join(args.load_dir,'Exp{}'.format(args.expID), args.env_name + ".pt"))
+actor_critic, ob_rms = torch.load(os.path.join(args.load_dir, args.nameExpToLoad, args.env_name + ".pt"))
 
 render_func = env.envs[0].render
 
@@ -27,8 +27,8 @@ obs_shape = (obs_shape[0] * args.num_stack, *obs_shape[1:])
 
 current_obs = torch.zeros(1, *obs_shape)
 
-preProcessor=preProcess.PreProcessor()
-maxSizeOfMissionsSelected=200
+maxSizeOfMissionsSelected=args.sentenceEmbeddingDimension
+preProcessor=preProcess.PreProcessor(maxSizeOfMissionsSelected)
 current_missions=torch.zeros(1, maxSizeOfMissionsSelected)
 
 states = torch.zeros(1, actor_critic.state_size)
@@ -58,14 +58,14 @@ render_func('human')
 
 obsF = env.reset()
 obs=np.array([preProcessor.preProcessImage(dico['image']) for dico in obsF])
-missions=[dico['mission'] for dico in obsF]
-missions=preProcessor.stringEncoder_LanguageModel(missions)
+missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
     
     
 update_current_obs(obs,missions)
 
 
 step=0
+allowObserveReward=False
   
 while True:
     useAdviceFromTeacher=False
@@ -79,10 +79,14 @@ while True:
     
     
     #preprocess the missions to be used by the model
-    if useAdviceFromTeacher:
-        missionsVariable=Variable(missions,volatile=True)
-    else:
-        missionsVariable=False
+    missionsAsStrings=preProcessor.Code2String(missions)
+    #print('missions', missionsAsStrings)
+    #then use the language model of our choice
+    missionsEmbedded=preProcessor.simpleSentenceEmbedding(missionsAsStrings)
+    #print('   ')
+    #convert them as Variables
+    missionsVariable=Variable(missionsEmbedded,volatile=True)
+       
         
                 
     value, action, _, states = actor_critic.act(
@@ -96,11 +100,14 @@ while True:
     cpu_actions = action.data.squeeze(1).cpu().numpy()
 
     # Observation, reward and next obs
-    obsF, reward, done, _ = env.step(cpu_actions)
+    obsF, reward, done, _ = env.step(cpu_actions,allowObserveReward)
     obs=np.array([preProcessor.preProcessImage(dico['image']) for dico in obsF])
-    missions=missions=[dico['mission'] for dico in obsF]
-    missions=preProcessor.stringEncoder_LanguageModel(missions)
-
+    
+    if useAdviceFromTeacher:
+        missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
+    else:
+        missions=torch.stack([preProcessor.stringEncoder('go to the goal') for dico in obsF])
+            
     bestActions=Variable(torch.stack( [ torch.Tensor(dico['bestActions']) for dico in obsF ] ))
             
 

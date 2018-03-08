@@ -475,8 +475,9 @@ def main():
     #coefficient used in the computation of the entropy term, in the loss function
     entropy_offset=args.entropyOffset
     
+    useMissionAdvice=args.useMissionAdvice
     
-    
+    entropyTime=0
 # =============================================================================
 #   Beginning of the training
 # =============================================================================
@@ -491,7 +492,8 @@ def main():
 
             if not args.entropy_Temp is False:
                 #print('using entropy Annealing : 'args.entropy_Temp)
-                entropy_coef=entropy_offset + np.exp(-totalTimeStep/args.entropy_Temp)
+                entropy_coef=entropy_offset + np.exp(-entropyTime/args.entropy_Temp)
+                entropyTime+=args.num_processes
             else:
                entropy_coef=args.entropy_coef
          
@@ -506,8 +508,8 @@ def main():
             observeReward=False
             
             useAdviceFromTeacher=False
-            if not args.useMissionAdvice == False:
-                if step%args.useMissionAdvice==0:
+            if not useMissionAdvice == False:
+                if step%useMissionAdvice==0:
                     useAdviceFromTeacher=True   
                     observeReward=True
                     interactionCounter+=args.num_processes
@@ -526,12 +528,13 @@ def main():
                    
             
             
-            
+            missionsVariable=getMissionsAsVariables(step,volatile=True)
+
             #preprocess the missions to be used by the model
-            if useAdviceFromTeacher:
-                missionsVariable=getMissionsAsVariables(step,volatile=True)
-            else:
-                missionsVariable=False
+#            if useAdviceFromTeacher:
+#                missionsVariable=getMissionsAsVariables(step,volatile=True)
+#            else:
+#                missionsVariable=False
             
             
             # Sample actions
@@ -832,8 +835,10 @@ def main():
                     
                     f.close()
                     print(newLine)
-                    return(0)
-            
+                    #return(0)
+                    useMissionAdvice+=1
+                    print('raising difficulty, useMissionAdvice',useMissionAdvice)
+                    entropyTime=0
         
         if not args.earlySuccess is False:
                 #early stopping if the env has been cracked 

@@ -9,7 +9,7 @@ class DummyVecEnv(VecEnv):
         self.ts = np.zeros(len(self.envs), dtype='int')        
         self.actions = None
 
-    def step_async(self, actions):
+    def step_async(self, actions,observeReward):
         self.actions = actions
 
     def step_wait(self):

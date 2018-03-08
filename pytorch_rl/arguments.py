@@ -74,7 +74,7 @@ def get_args():
                         help='False if not using teacher advices.Else, indicate the number of time steps when the agent uses the advice')
     parser.add_argument('--useActionAdvice', type=int,default=False,
                         help='False if not using teacher best actions.Else, indicate the number of time steps when the agent uses the action')
-    parser.add_argument('--load-dir', default='./trained_models/best/',
+    parser.add_argument('--load-dir', default='./trained_models/a2c/',
                     help='directory to save agent logs (default: ./trained_models/)')
     parser.add_argument('--expID', type=int, default=6,
                     help='ID of the experiment to run')
@@ -88,9 +88,10 @@ def get_args():
                     help='active debug mode')
     parser.add_argument('--sentenceEmbeddingDimension', type=int, default=200,
                     help='dimension of the vectors that embedds the missions')
-    parser.add_argument('--earlySuccess', default=5,
+    parser.add_argument('--earlySuccess', default=25,
                     help='number of envs to be solved successively by the agent before declaring that the env has been cracked')
-    
+    parser.add_argument('--nameExpToLoad', default='Exp0',
+                    help='name of the experiment you want to load')
     
     args = parser.parse_args()
 
