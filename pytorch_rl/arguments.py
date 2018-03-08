@@ -26,7 +26,7 @@ def get_args():
                         help='entropy term coefficient (default: 0.01)')
     parser.add_argument('--entropyOffset', type=float, default=0.01,
                         help='entropy term offset (default: 0.01)')
-    parser.add_argument('--entropy-Temp', type=float, default=False,
+    parser.add_argument('--entropy-Temp', type=float, default=10000,
                         help='entropy Temperature coefficient (default: 20 000)')
     parser.add_argument('--value-loss-coef', type=float, default=0.5,
                         help='value loss coefficient (default: 0.5)')

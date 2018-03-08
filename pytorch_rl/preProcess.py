@@ -53,7 +53,8 @@ class PreProcessor(object):
                 listOfOneHotVectors=torch.cat([listOfOneHotVectors,tmp.unsqueeze(0)],dim=0)
             else:
                 listOfOneHotVectors=tmp.unsqueeze(0)
-                
+            #print('selected keyword', originalMission)    
+
         return(listOfOneHotVectors)
         
         

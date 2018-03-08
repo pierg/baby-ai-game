@@ -15,11 +15,14 @@ def worker(remote, parent_remote, env_fn_wrapper):
             except:
                 #print('no third option in command')
                 observeReward=True
-            print('final ObsReward', observeReward)
-            env.observeReward=observeReward
-            env.setObserveReward(observeReward)
+            #print('final ObsReward', observeReward)
+            
+            
+            env.env.observeReward=observeReward
+            
             ob, reward, done, info = env.step(data)#,observeReward=False)
-            print('after step', env.observeReward)
+            
+            #print('after step', env.env.observeReward)
             if done:
                 ob = env.reset()
             remote.send((ob, reward, done, info))

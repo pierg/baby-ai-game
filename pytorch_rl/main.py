@@ -75,6 +75,9 @@ def main():
         
     #number of times the agent has won all the envs 
     numberOfSuccess=0
+    
+    #save the number of interactions required to solve the env
+    interactionCounter=0
 
 # =============================================================================
 #   Info about the experiment that wil be saved and plotted
@@ -344,10 +347,10 @@ def main():
         #    print('tmp missions', tmpMissions[i,0:10])
         #we get the original strings
         missionsAsStrings=preProcessor.Code2String(tmpMissions)
-        
+        #print('missions', missionsAsStrings)
         #then use the language model of our choice
         missionsEmbedded=preProcessor.simpleSentenceEmbedding(missionsAsStrings)
-
+        #print('   ')
         #convert them as Variables
         missionsVariable=Variable(missionsEmbedded,volatile=volatile)
        
@@ -483,9 +486,11 @@ def main():
             
             #compute the entropy coefficient for this timestep
             #two posisbility, with or without annealing
+            totalTimeStep=(j + 1) * args.num_processes * args.num_steps
+            #print(step)
+
             if not args.entropy_Temp is False:
                 #print('using entropy Annealing : 'args.entropy_Temp)
-                totalTimeStep=(j + 1) * args.num_processes * args.num_steps
                 entropy_coef=entropy_offset + np.exp(-totalTimeStep/args.entropy_Temp)
             else:
                entropy_coef=args.entropy_coef
@@ -505,6 +510,8 @@ def main():
                 if step%args.useMissionAdvice==0:
                     useAdviceFromTeacher=True   
                     observeReward=True
+                    interactionCounter+=args.num_processes
+                    #print(interactionCounter)
             
             
             useMissionFromTeacher=False  
@@ -512,6 +519,8 @@ def main():
             if not args.useActionAdvice == False:
                 if step%args.useActionAdvice==0:
                     useMissionFromTeacher=True 
+                    interactionCounter+=args.num_processes
+                    #print(interactionCounter)
                     
             
                    
@@ -541,18 +550,19 @@ def main():
             
             
                        
-            
+            #print('   ')
             #If the teacher takes control of the agent, we use the actions given
             if useMissionFromTeacher:
                 cpu_teaching_actions=forceTeacherMissions(bestActions)
+                #print('from main : observe reward True')
                 obsF, reward, done, info = envs.step(cpu_teaching_actions,observeReward=True)
                 #correctReward(reward,cpu_actions,cpu_teaching_actions)
                 #print('corrected reward', reward)
             else:
                 #normal case, we use the actions computed by the agent
+                #print('form main, observe reward',observeReward)
                 obsF, reward, done, info = envs.step(cpu_actions,observeReward=observeReward)
-            
-            
+            #print('   ')
             #We require the env to give a description of the actions in the info dic
             #Once we have gathered these info, this step is not mandatory anymore
             if actionDescription is False:
@@ -561,7 +571,12 @@ def main():
                 
             ## get the image and mission observation from the observation dictionnary
             obs=np.array([preProcessor.preProcessImage(dico['image']) for dico in obsF])
-            missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
+            if useAdviceFromTeacher:
+                missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
+            else:
+                missions=torch.stack([preProcessor.stringEncoder('go to the goal') for dico in obsF])
+            
+            
             #bestActions=Variable(torch.stack( [ torch.Tensor(dico['bestActions']) for dico in obsF ] ))
             bestActions=[dico['bestActions'] for dico in obsF ] 
 
@@ -609,10 +624,13 @@ def main():
             update_current_obs(obs,missions)
             rollouts.insert(step, current_obs, current_missions, states.data, action.data, action_log_prob.data, value.data, reward, masks)
 
-        if useAdviceFromTeacher:
+
             missionsVariable=getMissionsAsVariables(-1,volatile=True)
-        else:
-            missionsVariable=False
+
+#        if useAdviceFromTeacher:
+#            missionsVariable=getMissionsAsVariables(-1,volatile=True)
+#        else:
+#            missionsVariable=False
             
         next_value = actor_critic(
             Variable(rollouts.observations[-1], volatile=True),
@@ -792,10 +810,26 @@ def main():
             if not args.earlySuccess is False:
                 if numberOfSuccess>=args.earlySuccess:
                     print('end of the experiment')
-                    print('the agent solved {} times the env'.format(np.sum(current_envFinished)))
-                    newLine="experience finished on : {} at {}  \n".format(time.strftime("%d/%m/%Y"),time.strftime("%H:%M:%S"))
+                    print('the agent solved {} times the env'.format(numberOfSuccess))
+
                     f= open(fileInfo,"a")
+                    
+                    #save the number of timeSteps required
+                    total_num_steps = (j + 1) * args.num_processes * args.num_steps
+                    newLine='experience done in {} timeSteps \n'.format(total_num_steps)
+                    print(newLine)
                     f.write(newLine)
+                    
+                    newLine='experience required {} interactions \n'.format(interactionCounter)
+                    print(newLine)
+                    f.write(newLine)
+                    
+                    
+                    #save the date of end
+                    newLine="experience finished on : {} at {}  \n".format(time.strftime("%d/%m/%Y"),time.strftime("%H:%M:%S"))
+                    f.write(newLine)
+                    
+                    
                     f.close()
                     print(newLine)
                     return(0)
@@ -805,7 +839,8 @@ def main():
                 #early stopping if the env has been cracked 
             if np.sum(current_envFinished) >=args.num_processes:
                 numberOfSuccess+=1
-            
+            else:
+                numberOfSuccess=0
     
 
 if __name__ == "__main__":
