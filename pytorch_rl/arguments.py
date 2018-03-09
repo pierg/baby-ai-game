@@ -88,7 +88,7 @@ def get_args():
                     help='active debug mode')
     parser.add_argument('--sentenceEmbeddingDimension', type=int, default=200,
                     help='dimension of the vectors that embedds the missions')
-    parser.add_argument('--earlySuccess', default=25,
+    parser.add_argument('--earlySuccess', default=50,
                     help='number of envs to be solved successively by the agent before declaring that the env has been cracked')
     parser.add_argument('--nameExpToLoad', default='Exp0',
                     help='name of the experiment you want to load')

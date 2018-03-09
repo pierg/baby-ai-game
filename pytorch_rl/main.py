@@ -312,8 +312,8 @@ def main():
     
     
     #translate the string missions in vector of ASCII code
-    missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
-    
+    #missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
+    missions=torch.stack([preProcessor.stringEncoder('go to the green square') for dico in obsF])
     #id of the best actions computed by the teacher, they are not given to the agent,
     #but they are used to compute action statistics
     bestActions=[dico['bestActions'] for dico in obsF ] 
@@ -574,11 +574,12 @@ def main():
                 
             ## get the image and mission observation from the observation dictionnary
             obs=np.array([preProcessor.preProcessImage(dico['image']) for dico in obsF])
-            if useAdviceFromTeacher:
-                missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
-            else:
-                missions=torch.stack([preProcessor.stringEncoder('go to the goal') for dico in obsF])
-            
+#            if useAdviceFromTeacher:
+#                missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
+#            else:
+#                missions=torch.stack([preProcessor.stringEncoder('go to the goal') for dico in obsF])
+            missions=torch.stack([preProcessor.stringEncoder('go to the green square') for dico in obsF])
+
             
             #bestActions=Variable(torch.stack( [ torch.Tensor(dico['bestActions']) for dico in obsF ] ))
             bestActions=[dico['bestActions'] for dico in obsF ] 

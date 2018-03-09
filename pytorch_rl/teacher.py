@@ -82,23 +82,23 @@ class Teacher(Wrapper):
         
         #print(self.bestActions)
         
-        if self.observeReward:           
-            if action in self.bestActions:
-                reward+=self.bonus
-                #self.bonus+=1e-3
-            else:
-                reward-=self.penalty
+#        if self.observeReward:           
+#            if action in self.bestActions:
+#                reward+=self.bonus
+#                #self.bonus+=1e-3
+#            else:
+#                reward-=self.penalty
                 #self.penalty+=1e-3
         
        # print('from step, observe reward : ',self.observeReward)
         
        
        #try to force the action toggle to be selected, abandonned
-#        if 3 in self.bestActions :
-#            if action in self.bestActions:
-#                reward+=0
-#            else:
-#                reward-=0
+        if 3 in self.bestActions :
+            if action in self.bestActions:
+                reward+=1
+            else:
+                reward-=1
                 
         advice=self.generateAdvice()[1]
         
