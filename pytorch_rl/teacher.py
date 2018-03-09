@@ -38,6 +38,7 @@ class Teacher(Wrapper):
         self.bonus=1
         self.observeReward=None
         self.subtaskAchieved=0
+        self.facingDoor=False
         print('environment with Teacher created!')
         
         
@@ -74,6 +75,8 @@ class Teacher(Wrapper):
         
         info['actionDescription']=self.actionDescription
         info['finished']=False
+        info['doorMet']=0
+        info['doorOpened']=0
 
         #ugly way to check if the agent has won the game
         if done: 
@@ -103,14 +106,17 @@ class Teacher(Wrapper):
 
         if 3 in self.bestActions :
             #print('door met')
+            info['doorMet']=1
             if action in self.bestActions:
                 reward=10
-                self.subtaskAchieved+=1
+                self.subtaskAchieved+=1        
+                info['doorOpened']=1
+
                 #print('door opened!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
                 #print('reward given : ', reward)
 
             else:
-                reward=1
+                reward=0
                 #print('door met but not opened ......')
             #time.sleep(1)
 
@@ -240,6 +246,7 @@ class Teacher(Wrapper):
         diff=(obj-currentDir)%4
         if diff==0:
             return((True,''))
+            self.facingDoor=True
         elif diff==1:
             return((False,self.chooseExpression("right")))
         elif diff==2:

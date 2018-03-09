@@ -18,6 +18,7 @@ args = get_args()
 env = make_env(args.env_name, args.seed, 0)
 env = DummyVecEnv([env])
 
+
 actor_critic, ob_rms = torch.load(os.path.join(args.load_dir, args.nameExpToLoad, args.env_name + ".pt"))
 
 render_func = env.envs[0].render

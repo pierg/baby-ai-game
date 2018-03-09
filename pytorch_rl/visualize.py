@@ -220,6 +220,41 @@ def plotEnvFinishedWithVisdom(timestep,envFinished,numProcesses,name,game,viz,wi
     
 
     return(win)
+
+def plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,name,game,viz,win,folder,actionDescription=None):
+    
+    
+    
+    fig, ax = plt.subplots()
+    
+    plt.plot(timestep,doorMet,label='number of doors met')
+    plt.plot(timestep,doorOpened,label='number of doors opened')
+        
+        
+    
+    plt.xlabel('Number of timestep')
+    plt.ylabel('door stats')
+    plt.title('doors met / doors opened')
+
+    plt.legend()
+    
+    fig.savefig(os.path.join(folder,'statsDoor.png'))
+
+
+    plt.show()
+    plt.draw()
+
+    image = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+    image = image.reshape(fig.canvas.get_width_height()[::-1] + (3, ))
+    plt.close(fig)
+
+    # Show it in visdom
+    image = np.transpose(image, (2, 0, 1))
+    win['statsDoor']=viz.image(image,win['statsDoor'])   
+    
+    
+
+    return(win)
     
 
 def plotStatsActionsWithVisdom(timestep,numberOfChoices_Agent,numberOfChoices_Teacher,name,game,viz,win,folder,actionDescription=None):
@@ -378,6 +413,10 @@ def visdom_plot(viz, win, folder, game, name, numProcesses,bin_size=100, smooth=
 
     envFinished=infoToSave['envFinished']
     win=plotEnvFinishedWithVisdom(timestep,envFinished,numProcesses,name,game,viz,win,folder,actionDescription=actionDescription)
+
+    doorMet=infoToSave['doorMet']
+    doorOpened=infoToSave['doorOpened']
+    win=plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,name,game,viz,win,folder,actionDescription=actionDescription)
 
     return (win)
 

@@ -98,7 +98,9 @@ def main():
           #save the ratio of these previous numbers. Redundant but easier to track
           'actionRatio':[],
           'entropyCoef':[],
-          'envFinished':[]}   
+          'envFinished':[],
+          'doorMet':[],
+          'doorOpened':[]}   
                     
           
     print("#######")
@@ -146,7 +148,8 @@ def main():
                'statsAction':None,
                'actionRatio':None,
                'entropyCoef':None,
-               'envFinished':None}
+               'envFinished':None,
+               'statsDoor':None}
 
 
 # =============================================================================
@@ -220,6 +223,8 @@ def main():
     
     #useful to compute the 'envFinished' counter
     current_envFinished=np.zeros((args.num_processes))
+    current_doorMet=np.zeros((args.num_processes))
+    current_doorOpened=np.zeros((args.num_processes))
     
     #initialize the ratio counter
     numberOfActions=envs.action_space.n
@@ -485,6 +490,9 @@ def main():
         #performs a rollout of n steps
         for step in range(args.num_steps):            
             
+            
+            
+            
             #compute the entropy coefficient for this timestep
             #two posisbility, with or without annealing
             totalTimeStep=(j + 1) * args.num_processes * args.num_steps
@@ -603,7 +611,14 @@ def main():
                     if info[i]['finished']==True:
                         current_envFinished[i]=1
                     else:
-                        current_envFinished[i]=0
+                        current_envFinished[i]=0                    
+                    current_doorMet[i]=0
+                    current_doorOpened[i]=0
+                    
+            for i,infoDic in enumerate(info):
+                current_doorOpened[i]+=infoDic['doorOpened']
+                current_doorMet[i]+=infoDic['doorMet']
+                   
                 
             
             
@@ -797,6 +812,8 @@ def main():
             
             
             infoToSave['envFinished']+=[np.sum(current_envFinished)]
+            infoToSave['doorMet']+=[np.sum(current_doorMet)]
+            infoToSave['doorOpened']+=[np.sum(current_doorOpened)]
 
             
             with open(os.path.join(save_path,'data.json'),'w') as fp:
@@ -835,7 +852,7 @@ def main():
                     
                     
                     f.close()
-                    return(0)
+                    #return(0)
                     #useMissionAdvice+=1
                     #print('raising difficulty, useMissionAdvice',useMissionAdvice)
                     #entropyTime=0
