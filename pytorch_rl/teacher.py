@@ -39,6 +39,7 @@ class Teacher(Wrapper):
         self.observeReward=None
         self.subtaskAchieved=0
         self.facingDoor=False
+        self.stepCount=0
         print('environment with Teacher created!')
         
         
@@ -63,9 +64,11 @@ class Teacher(Wrapper):
         obs['mission']=self.generateAdvice()[1]
         obs['bestActions']=self.bestActions
         self.subtaskAchieved=0
+        self.stepCount=0
         return (obs)
 
     def step(self, action):
+        self.stepCount+=1
         #print('inside step', self.observeReward)
         """
         Called at every action, step
@@ -83,8 +86,9 @@ class Teacher(Wrapper):
             if reward>800:
                 reward=50
                 info['finished']=True
-            else:
-                reward=-50
+            #else:
+            #    reward=-50
+            reward+=-5+self.subtaskAchieved
         
         #print(self.bestActions)
         
@@ -109,7 +113,7 @@ class Teacher(Wrapper):
             info['doorMet']=1
             if action in self.bestActions:
                 
-                reward=(self.subtaskAchieved+1)*1
+                reward+=(self.subtaskAchieved+1)*1
                 self.subtaskAchieved+=1        
                 info['doorOpened']=1
 
@@ -117,13 +121,13 @@ class Teacher(Wrapper):
                 #print('reward given : ', reward)
 
             else:
-                reward=0
+                reward+=0
                 #reward=-5+self.subtaskAchieved
                 #print('door met but not opened ......')
             #time.sleep(1)
 
         else:
-            reward=0
+            reward+=0
             #reward=-5+self.subtaskAchieved
               
         #print('action Agent ', action)
