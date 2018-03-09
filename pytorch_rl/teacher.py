@@ -6,6 +6,7 @@ from gym import Wrapper
 import numpy as np
 import sys
 import os
+import time
 #directory=os.getcwd()
 #directory=directory+'/gym_aigame/envs'
 #if not directory in sys.path:
@@ -96,16 +97,30 @@ class Teacher(Wrapper):
         
        
        #try to force the action toggle to be selected, abandonned
+       
+       
+        print('action Teacher ', self.bestActions)
+
         if 3 in self.bestActions :
+            print('door met')
             if action in self.bestActions:
                 reward=10
                 self.subtaskAchieved+=1
-                print('door opened!')
+                print('door opened!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+                print('reward given : ', reward)
+
             else:
-                reward=0
+                reward=5
+                print('door met but not opened ......')
+            #time.sleep(1)
+
         else:
-            reward=-1+self.subtaskAchieved/5
-                
+            reward=-1+self.subtaskAchieved
+              
+        print('action Agent ', action)
+        print('reward given : ', reward)
+        
+        print(' ')
         advice=self.generateAdvice()[1]
         
 

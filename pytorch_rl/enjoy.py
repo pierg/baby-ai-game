@@ -58,7 +58,7 @@ render_func('human')
 
 obsF = env.reset()
 obs=np.array([preProcessor.preProcessImage(dico['image']) for dico in obsF])
-missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
+missions=torch.stack([preProcessor.stringEncoder('go to the green square') for dico in obsF])
     
     
 update_current_obs(obs,missions)
@@ -80,9 +80,11 @@ while True:
     
     #preprocess the missions to be used by the model
     missionsAsStrings=preProcessor.Code2String(missions)
+    print('mission',missionsAsStrings)
     #print('missions', missionsAsStrings)
     #then use the language model of our choice
     missionsEmbedded=preProcessor.simpleSentenceEmbedding(missionsAsStrings)
+    print('embedding:', missionsEmbedded)
     #print('   ')
     #convert them as Variables
     missionsVariable=Variable(missionsEmbedded,volatile=True)
@@ -103,11 +105,12 @@ while True:
     obsF, reward, done, _ = env.step(cpu_actions,allowObserveReward)
     obs=np.array([preProcessor.preProcessImage(dico['image']) for dico in obsF])
     
-    if useAdviceFromTeacher:
-        missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
-    else:
-        missions=torch.stack([preProcessor.stringEncoder('go to the goal') for dico in obsF])
-            
+#    if useAdviceFromTeacher:
+#        missions=torch.stack([preProcessor.stringEncoder(dico['mission']) for dico in obsF])
+#    else:
+#        missions=torch.stack([preProcessor.stringEncoder('go to the goal') for dico in obsF])
+    missions=torch.stack([preProcessor.stringEncoder('go to the green square') for dico in obsF])
+
     bestActions=Variable(torch.stack( [ torch.Tensor(dico['bestActions']) for dico in obsF ] ))
             
 

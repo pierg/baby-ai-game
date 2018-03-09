@@ -824,9 +824,9 @@ def main():
                     print(newLine)
                     f.write(newLine)
                     
-                    newLine='experience required {} interactions \n'.format(interactionCounter)
-                    print(newLine)
-                    f.write(newLine)
+                    #newLine='experience required {} interactions \n'.format(interactionCounter)
+                    #print(newLine)
+                    #f.write(newLine)
                     
                     
                     #save the date of end
@@ -835,11 +835,10 @@ def main():
                     
                     
                     f.close()
-                    print(newLine)
-                    #return(0)
-                    useMissionAdvice+=1
-                    print('raising difficulty, useMissionAdvice',useMissionAdvice)
-                    entropyTime=0
+                    return(0)
+                    #useMissionAdvice+=1
+                    #print('raising difficulty, useMissionAdvice',useMissionAdvice)
+                    #entropyTime=0
         
         if not args.earlySuccess is False:
                 #early stopping if the env has been cracked 

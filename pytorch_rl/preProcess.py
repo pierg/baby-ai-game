@@ -38,6 +38,7 @@ class PreProcessor(object):
         listOfOneHotVectors=False
         
         originalMission='other'
+        #print('missions from the Teacher', strings)
         for mission in strings:
             tmp=torch.zeros(self.simpleDimensionEmbedding)
             #print('mission from teacher :', mission,':')
