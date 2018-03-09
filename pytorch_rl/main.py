@@ -149,7 +149,8 @@ def main():
                'actionRatio':None,
                'entropyCoef':None,
                'envFinished':None,
-               'statsDoor':None}
+               'doorOpened':None,
+               'doorMet':None}
 
 
 # =============================================================================

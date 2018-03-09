@@ -81,10 +81,10 @@ class Teacher(Wrapper):
         #ugly way to check if the agent has won the game
         if done: 
             if reward>800:
-                reward=10
+                reward=50
                 info['finished']=True
             else:
-                reward=-10
+                reward=-50
         
         #print(self.bestActions)
         
@@ -108,7 +108,7 @@ class Teacher(Wrapper):
             #print('door met')
             info['doorMet']=1
             if action in self.bestActions:
-                reward=10
+                reward=(self.subtaskAchieved+1)*10
                 self.subtaskAchieved+=1        
                 info['doorOpened']=1
 

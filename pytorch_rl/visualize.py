@@ -228,17 +228,16 @@ def plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,name,game,viz,win,folder
     fig, ax = plt.subplots()
     
     plt.plot(timestep,doorMet,label='number of doors met')
-    plt.plot(timestep,doorOpened,label='number of doors opened')
         
         
     
     plt.xlabel('Number of timestep')
     plt.ylabel('door stats')
-    plt.title('doors met / doors opened')
+    plt.title('doors met ')
 
     plt.legend()
     
-    fig.savefig(os.path.join(folder,'statsDoor.png'))
+    fig.savefig(os.path.join(folder,'doorMet.png'))
 
 
     plt.show()
@@ -250,7 +249,33 @@ def plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,name,game,viz,win,folder
 
     # Show it in visdom
     image = np.transpose(image, (2, 0, 1))
-    win['statsDoor']=viz.image(image,win['statsDoor'])   
+    win['doorMet']=viz.image(image,win['doorMet'])   
+    
+    fig, ax = plt.subplots()
+    
+    plt.plot(timestep,doorOpened,label='number of doors opened')
+        
+        
+    
+    plt.xlabel('Number of timestep')
+    plt.ylabel('door stats')
+    plt.title('doors opened')
+
+    plt.legend()
+    
+    fig.savefig(os.path.join(folder,'doorOpened.png'))
+
+
+    plt.show()
+    plt.draw()
+
+    image = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+    image = image.reshape(fig.canvas.get_width_height()[::-1] + (3, ))
+    plt.close(fig)
+
+    # Show it in visdom
+    image = np.transpose(image, (2, 0, 1))
+    win['doorOpened']=viz.image(image,win['doorOpened'])   
     
     
 
