@@ -116,7 +116,7 @@ class Teacher(Wrapper):
                 #print('reward given : ', reward)
 
             else:
-                reward=0
+                reward=-5+self.subtaskAchieved
                 #print('door met but not opened ......')
             #time.sleep(1)
 

@@ -221,7 +221,7 @@ def plotEnvFinishedWithVisdom(timestep,envFinished,numProcesses,name,game,viz,wi
 
     return(win)
 
-def plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,name,game,viz,win,folder,actionDescription=None):
+def plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,maxDoorOpened,maxDoorMet,name,game,viz,win,folder,actionDescription=None):
     
     
     
@@ -251,6 +251,8 @@ def plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,name,game,viz,win,folder
     image = np.transpose(image, (2, 0, 1))
     win['doorMet']=viz.image(image,win['doorMet'])   
     
+    
+    
     fig, ax = plt.subplots()
     
     plt.plot(timestep,doorOpened,label='number of doors opened')
@@ -276,6 +278,38 @@ def plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,name,game,viz,win,folder
     # Show it in visdom
     image = np.transpose(image, (2, 0, 1))
     win['doorOpened']=viz.image(image,win['doorOpened'])   
+    
+    
+    
+    
+    
+    fig, ax = plt.subplots()
+    
+    plt.plot(timestep,maxDoorMet,label='number of doors met')
+    plt.plot(timestep,maxDoorOpened,label='number of doors opened')
+        
+        
+    
+    plt.xlabel('Number of timestep')
+    plt.ylabel('door stats')
+    plt.title('evolution of the best success')
+
+    plt.legend()
+    
+    fig.savefig(os.path.join(folder,'maxDoorOpened.png'))
+
+
+    plt.show()
+    plt.draw()
+
+    image = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+    image = image.reshape(fig.canvas.get_width_height()[::-1] + (3, ))
+    plt.close(fig)
+
+    # Show it in visdom
+    image = np.transpose(image, (2, 0, 1))
+    win['maxDoorOpened']=viz.image(image,win['maxDoorOpened'])   
+    
     
     
 
@@ -441,7 +475,10 @@ def visdom_plot(viz, win, folder, game, name, numProcesses,bin_size=100, smooth=
 
     doorMet=infoToSave['doorMet']
     doorOpened=infoToSave['doorOpened']
-    win=plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,name,game,viz,win,folder,actionDescription=actionDescription)
+    maxDoorOpened=infoToSave['maxDoorOpened']
+    maxDoorMet=infoToSave['maxDoorMet']
+
+    win=plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,maxDoorOpened,maxDoorMet,name,game,viz,win,folder,actionDescription=actionDescription)
 
     return (win)
 

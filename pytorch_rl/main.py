@@ -100,7 +100,9 @@ def main():
           'entropyCoef':[],
           'envFinished':[],
           'doorMet':[],
-          'doorOpened':[]}   
+          'doorOpened':[],
+          'maxDoorOpened':[],
+          'maxDoorMet':[]}   
                     
           
     print("#######")
@@ -150,7 +152,8 @@ def main():
                'entropyCoef':None,
                'envFinished':None,
                'doorOpened':None,
-               'doorMet':None}
+               'doorMet':None,
+               'maxDoorOpened':None}
 
 
 # =============================================================================
@@ -815,6 +818,13 @@ def main():
             infoToSave['envFinished']+=[np.sum(current_envFinished)]
             infoToSave['doorMet']+=[np.sum(current_doorMet)]
             infoToSave['doorOpened']+=[np.sum(current_doorOpened)]
+            
+            idxModel=np.argmax(current_doorOpened)
+            infoToSave['maxDoorOpened']+=[current_doorOpened[idxModel]]
+            infoToSave['maxDoorMet']+=[current_doorMet[idxModel]]
+
+            
+
 
             
             with open(os.path.join(save_path,'data.json'),'w') as fp:
