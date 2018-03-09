@@ -285,7 +285,6 @@ def plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,maxDoorOpened,maxDoorMet
     
     fig, ax = plt.subplots()
     
-    plt.plot(timestep,maxDoorMet,label='number of doors met')
     plt.plot(timestep,maxDoorOpened,label='number of doors opened')
         
         
@@ -308,7 +307,33 @@ def plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,maxDoorOpened,maxDoorMet
 
     # Show it in visdom
     image = np.transpose(image, (2, 0, 1))
-    win['maxDoorOpened']=viz.image(image,win['maxDoorOpened'])   
+    win['maxDoorOpened']=viz.image(image,win['maxDoorOpened'])  
+    
+    fig, ax = plt.subplots()
+    
+    plt.plot(timestep,maxDoorMet,label='number of doors met')
+        
+        
+    
+    plt.xlabel('Number of timestep')
+    plt.ylabel('door stats')
+    plt.title('evolution of the best success')
+
+    plt.legend()
+    
+    fig.savefig(os.path.join(folder,'maxDoorMet.png'))
+
+
+    plt.show()
+    plt.draw()
+
+    image = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+    image = image.reshape(fig.canvas.get_width_height()[::-1] + (3, ))
+    plt.close(fig)
+
+    # Show it in visdom
+    image = np.transpose(image, (2, 0, 1))
+    win['maxDoorMet']=viz.image(image,win['maxDoorMet'])  
     
     
     

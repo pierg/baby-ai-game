@@ -153,7 +153,8 @@ def main():
                'envFinished':None,
                'doorOpened':None,
                'doorMet':None,
-               'maxDoorOpened':None}
+               'maxDoorOpened':None,
+               'maxDoorMet':None}
 
 
 # =============================================================================
