@@ -96,11 +96,11 @@ class Teacher(Wrapper):
        #try to force the action toggle to be selected, abandonned
         if 3 in self.bestActions :
             if action in self.bestActions:
-                reward+=10
+                reward=10
             else:
-                reward+=0
+                reward=0
         else:
-            reward-=1
+            reward=-1
                 
         advice=self.generateAdvice()[1]
         
