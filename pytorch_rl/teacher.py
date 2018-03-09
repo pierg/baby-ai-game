@@ -100,7 +100,7 @@ class Teacher(Wrapper):
             else:
                 reward=-1
         else:
-            reward=-1
+            reward=-2
                 
         advice=self.generateAdvice()[1]
         
