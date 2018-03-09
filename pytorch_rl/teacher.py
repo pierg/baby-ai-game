@@ -102,25 +102,25 @@ class Teacher(Wrapper):
         print('action Teacher ', self.bestActions)
 
         if 3 in self.bestActions :
-            print('door met')
+            #print('door met')
             if action in self.bestActions:
                 reward=10
                 self.subtaskAchieved+=1
-                print('door opened!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-                print('reward given : ', reward)
+                #print('door opened!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+                #print('reward given : ', reward)
 
             else:
                 reward=5
-                print('door met but not opened ......')
+                #print('door met but not opened ......')
             #time.sleep(1)
 
         else:
-            reward=-1+self.subtaskAchieved
+            reward=-5+self.subtaskAchieved
               
-        print('action Agent ', action)
-        print('reward given : ', reward)
+        #print('action Agent ', action)
+        #print('reward given : ', reward)
         
-        print(' ')
+        #print(' ')
         advice=self.generateAdvice()[1]
         
 
