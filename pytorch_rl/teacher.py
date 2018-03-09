@@ -36,6 +36,7 @@ class Teacher(Wrapper):
         self.penalty=1
         self.bonus=1
         self.observeReward=None
+        self.subtaskAchieved=0
         print('environment with Teacher created!')
         
         
@@ -59,6 +60,7 @@ class Teacher(Wrapper):
             
         obs['mission']=self.generateAdvice()[1]
         obs['bestActions']=self.bestActions
+        self.subtaskAchieved=0
         return (obs)
 
     def step(self, action):
@@ -97,10 +99,12 @@ class Teacher(Wrapper):
         if 3 in self.bestActions :
             if action in self.bestActions:
                 reward=10
+                self.subtaskAchieved+=1
+                print('door opened!')
             else:
                 reward=0
         else:
-            reward=-1
+            reward=-1+self.subtaskAchieved/5
                 
         advice=self.generateAdvice()[1]
         
