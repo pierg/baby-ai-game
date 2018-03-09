@@ -99,7 +99,7 @@ class Teacher(Wrapper):
        #try to force the action toggle to be selected, abandonned
        
        
-        print('action Teacher ', self.bestActions)
+        #print('action Teacher ', self.bestActions)
 
         if 3 in self.bestActions :
             #print('door met')
@@ -110,7 +110,7 @@ class Teacher(Wrapper):
                 #print('reward given : ', reward)
 
             else:
-                reward=5
+                reward=1
                 #print('door met but not opened ......')
             #time.sleep(1)
 

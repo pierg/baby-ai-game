@@ -51,6 +51,21 @@ class RecMLPPolicy(FFPolicy):
 
         self.p_fc1 = nn.Linear(num_inputs, 64)
         self.p_fc2 = nn.Linear(64, 64)
+        self.p_fc3 = nn.Linear(64, 32)
+        
+        self.conv1_3= nn.Conv2d(3,32,3)
+        self.conv2_3= nn.Conv2d(32,32,3)
+        self.conv3_3= nn.Conv2d(32,32,3)
+        
+        self.conv1_2= nn.Conv2d(3,4,2)
+        self.conv2_2= nn.Conv2d(4,8,2)
+        self.conv3_2= nn.Conv2d(8,16,2)
+        self.conv4_2= nn.Conv2d(16,32,2)
+        self.conv5_2= nn.Conv2d(32,32,2)
+        self.conv6_2= nn.Conv2d(32,32,2)
+        
+        self.conv1_4= nn.Conv2d(3,32,4)
+        self.conv2_4= nn.Conv2d(32,32,4)
         
          # models used to mix text and image inputs
         self.adapt_1 = nn.Linear(7,num_inputs)
@@ -67,10 +82,13 @@ class RecMLPPolicy(FFPolicy):
         self.a_fc2 = nn.Linear(64, 64)
         #self.a_fc3 = nn.Linear(32, action_space.n)
         
-       
+        self.preGru = nn.Linear(128, 64)
+
 
         # Input size, hidden size
         self.gru = nn.GRUCell(64, 64)
+        
+        self.postGru = nn.Linear(64, 64)
 
         self.dist = Categorical(64, num_outputs)
 
@@ -97,24 +115,55 @@ class RecMLPPolicy(FFPolicy):
 
     def forward(self, inputs, states, masks, missions=False):
         batch_numel = reduce(operator.mul, inputs.size()[1:], 1)
-        inputs = inputs.view(-1, batch_numel)
-
-        x = self.p_fc1(inputs)
-        x = F.relu(x)
-        x = self.p_fc2(x)
-        x = F.relu(x)
+        inputForMLP = inputs.view(-1, batch_numel)
         
-        if missions is not False:
-            missions=F.relu(self.adapt_1(missions))
-            missions=F.relu(self.adapt_2(missions))
-            missions=torch.cat([missions, x],dim=1)
-            x= F.relu(self.adapt_3(missions))
-
+        c0 = F.relu(self.p_fc1(inputForMLP))
+        c0 = F.relu(self.p_fc2(c0))
+        c0 = F.relu(self.p_fc3(c0))
         
+        
+        c2 = F.relu(self.conv1_2(inputs))
+        c2 = F.relu(self.conv2_2(c2))
+        c2 = F.relu(self.conv3_2(c2))
+        c2 = F.relu(self.conv4_2(c2))
+        c2 = F.relu(self.conv5_2(c2))
+        c2 = F.relu(self.conv6_2(c2))
+        c2=c2.view(-1,32)
+        
+        
+        c3 = F.relu(self.conv1_3(inputs))
+        c3 = F.relu(self.conv2_3(c3))
+        c3 = F.relu(self.conv3_3(c3))
+        c3=c3.view(-1,32)
+        
+        c4 = F.relu(self.conv1_4(inputs))
+        c4 = F.relu(self.conv2_4(c4))
+        c4=c4.view(-1,32)
+        
+        #print('c2', c2.size())
+        #print('c3', c3.size())
+        #print('c4', c4.size())
+        
+        x=torch.cat([c0,c2, c3, c4],dim=1)
+
+        #print('concat', x.size())
+        #x= F.relu(self.adapt_3(missions))
+
+       
+        
+#        if missions is not False:
+#            missions=F.relu(self.adapt_1(missions))
+#            missions=F.relu(self.adapt_2(missions))
+#            missions=torch.cat([missions, x],dim=1)
+#            x= F.relu(self.adapt_3(missions))
+
+        x=F.relu(self.preGru(x))
 
         assert inputs.size(0) == states.size(0)
+        x=self.gru(x, states * masks)
+        x = states = self.postGru(x)
         
-        x = states = self.gru(x, states * masks)
+        #x = states = self.gru(x, states * masks)
         
         actions = self.a_fc1(x)
         actions = F.relu(actions)
