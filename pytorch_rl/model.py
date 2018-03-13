@@ -44,28 +44,30 @@ def weights_init_mlp(m):
 class RecMLPPolicy(FFPolicy):
     def __init__(self, num_inputs, action_space):
         super(RecMLPPolicy, self).__init__()
-
+        
+        self.state_size=256
+        
         self.action_space = action_space
         assert action_space.__class__.__name__ == "Discrete"
         num_outputs = action_space.n
 
         self.p_fc1 = nn.Linear(num_inputs, 64)
         self.p_fc2 = nn.Linear(64, 64)
-        self.p_fc3 = nn.Linear(64, 32)
+        self.p_fc3 = nn.Linear(64, 64)
         
         self.conv1_3= nn.Conv2d(3,32,3)
-        self.conv2_3= nn.Conv2d(32,32,3)
-        self.conv3_3= nn.Conv2d(32,32,3)
+        self.conv2_3= nn.Conv2d(32,64,3)
+        self.conv3_3= nn.Conv2d(64,64,3)
         
         self.conv1_2= nn.Conv2d(3,4,2)
         self.conv2_2= nn.Conv2d(4,8,2)
         self.conv3_2= nn.Conv2d(8,16,2)
         self.conv4_2= nn.Conv2d(16,32,2)
-        self.conv5_2= nn.Conv2d(32,32,2)
-        self.conv6_2= nn.Conv2d(32,32,2)
+        self.conv5_2= nn.Conv2d(32,64,2)
+        self.conv6_2= nn.Conv2d(64,64,2)
         
         self.conv1_4= nn.Conv2d(3,32,4)
-        self.conv2_4= nn.Conv2d(32,32,4)
+        self.conv2_4= nn.Conv2d(32,64,4)
         
          # models used to mix text and image inputs
         self.adapt_1 = nn.Linear(7,num_inputs)
@@ -74,39 +76,41 @@ class RecMLPPolicy(FFPolicy):
 
 
 
-        self.v_fc1 = nn.Linear(64, 32)
-        self.v_fc2 = nn.Linear(32, 16)
-        self.v_fc3 = nn.Linear(16, 8)
-        self.v_fc4 = nn.Linear(8, 1)
+        self.v_fc1 = nn.Linear(self.state_size, 256)
+        self.v_fc2 = nn.Linear(256, 128)
+        self.v_fc3 = nn.Linear(128, 64)
+        self.v_fc4 = nn.Linear(64, 1)
         
-        self.a_fc1 = nn.Linear(64, 96)
-        self.a_fc2 = nn.Linear(96, 128)
-        self.a_fc3 = nn.Linear(128, 96)
-        self.a_fc4 = nn.Linear(96, 64)
+        self.a_fc1 = nn.Linear(self.state_size, 256)
+        self.a_fc2 = nn.Linear(256, 128)
+        self.a_fc3 = nn.Linear(128, 64)
+        self.a_fc4 = nn.Linear(64, 64)
         #self.a_fc3 = nn.Linear(32, action_space.n)
         
-        self.preGru1 = nn.Linear(128, 96)
-        self.preGru2 = nn.Linear(96, 64)
-        self.preGru3 = nn.Linear(64, 64)
+        self.preGru1 = nn.Linear(4*64, 256)
+        self.preGru2 = nn.Linear(256, 512)
+
+        #self.preGru2 = nn.Linear(96, 64)
+        #self.preGru3 = nn.Linear(64, 64)
 
 
 
         # Input size, hidden size
-        self.gru = nn.GRUCell(64, 64)
+        self.gru = nn.GRUCell(512, self.state_size)
         
-        self.postGru = nn.Linear(64, 64)
+        self.postGru = nn.Linear(self.state_size, self.state_size)
 
         self.dist = Categorical(64, num_outputs)
 
         self.train()
         self.reset_parameters()
 
-    @property
-    def state_size(self):
+    #@property
+    #def state_size(self):
         """
         Size of the recurrent state of the model (propagated between steps
         """
-        return 64
+     #   return (self.state_size)
 
     def reset_parameters(self):
         self.apply(weights_init_mlp)
@@ -134,17 +138,19 @@ class RecMLPPolicy(FFPolicy):
         c2 = F.relu(self.conv4_2(c2))
         c2 = F.relu(self.conv5_2(c2))
         c2 = F.relu(self.conv6_2(c2))
-        c2=c2.view(-1,32)
+
+        c2=c2.view(-1,64)
+        
         
         
         c3 = F.relu(self.conv1_3(inputs))
         c3 = F.relu(self.conv2_3(c3))
         c3 = F.relu(self.conv3_3(c3))
-        c3=c3.view(-1,32)
+        c3=c3.view(-1,64)
         
         c4 = F.relu(self.conv1_4(inputs))
         c4 = F.relu(self.conv2_4(c4))
-        c4=c4.view(-1,32)
+        c4=c4.view(-1,64)
         
         #print('c2', c2.size())
         #print('c3', c3.size())
@@ -165,11 +171,13 @@ class RecMLPPolicy(FFPolicy):
 
         x=F.relu(self.preGru1(x))
         x=F.relu(self.preGru2(x))
-        x=F.relu(self.preGru3(x))
+
+        #x=F.relu(self.preGru2(x))
+        #x=F.relu(self.preGru3(x))
 
         assert inputs.size(0) == states.size(0)
-        x=self.gru(x, states * masks)
-        x = states = self.postGru(x)
+        x= states = self.gru(x, states * masks)
+        x =self.postGru(x)
         
         #x = states = self.gru(x, states * masks)
         

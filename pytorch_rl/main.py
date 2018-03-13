@@ -569,9 +569,9 @@ def main():
             #print('   ')
             #If the teacher takes control of the agent, we use the actions given
             if useMissionFromTeacher:
-                cpu_teaching_actions=forceTeacherMissions(bestActions)
+                cpu_actions=forceTeacherMissions(bestActions)
                 #print('from main : observe reward True')
-                obsF, reward, done, info = envs.step(cpu_teaching_actions,observeReward=True)
+                obsF, reward, done, info = envs.step(cpu_actions,observeReward=True)
                 #correctReward(reward,cpu_actions,cpu_teaching_actions)
                 #print('corrected reward', reward)
             else:
