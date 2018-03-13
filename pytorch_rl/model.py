@@ -46,7 +46,7 @@ class UpSampled(FFPolicy):
     def __init__(self, num_inputs, action_space):
         super(UpSampled, self).__init__()
         
-        self.state_size=512
+        self.state_size=256
         self.upSample=nn.Upsample(scale_factor=5, mode='nearest') 
 
         
@@ -55,12 +55,12 @@ class UpSampled(FFPolicy):
         num_outputs = action_space.n
 
         
-        self.conv1_3= nn.Conv2d(3,32,3)
-        self.conv2_3= nn.Conv2d(32,64,3)
-        self.conv3_3= nn.Conv2d(64,128,3,stride=2)
-        self.conv4_3= nn.Conv2d(128,256,3,stride=2)
-        self.conv5_3= nn.Conv2d(256,256,3,stride=2)
-        self.conv6_3= nn.Conv2d(256,256,3)
+        self.conv1_3= nn.Conv2d(3,8,3)
+        self.conv2_3= nn.Conv2d(8,16,3)
+        self.conv3_3= nn.Conv2d(16,32,3,stride=2)
+        self.conv4_3= nn.Conv2d(32,64,3,stride=2)
+        self.conv5_3= nn.Conv2d(64,128,3,stride=2)
+        self.conv6_3= nn.Conv2d(128,256,3)
 
 
        
