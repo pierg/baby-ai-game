@@ -66,7 +66,7 @@ def get_args():
     useCuda=torch.cuda.is_available()    
     parser.add_argument('--no-cuda', action='store_true', default=useCuda,
                         help='disables CUDA training')
-    parser.add_argument('--recurrent-policy', action='store_true', default=True,
+    parser.add_argument('--recurrent-policy', action='store_true', default=False,
                         help='use a recurrent policy')
     parser.add_argument('--no-vis', action='store_true', default=False,
                         help='disables visdom visualization'),
@@ -92,6 +92,9 @@ def get_args():
                     help='number of envs to be solved successively by the agent before declaring that the env has been cracked')
     parser.add_argument('--nameExpToLoad', default='Exp0',
                     help='name of the experiment you want to load')
+    parser.add_argument('--upsamplePolicy', default=True,
+                    help='name of the experiment you want to load')
+    
     
     args = parser.parse_args()
 

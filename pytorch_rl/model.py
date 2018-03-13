@@ -40,6 +40,121 @@ def weights_init_mlp(m):
         m.weight.data *= 1 / torch.sqrt(m.weight.data.pow(2).sum(1, keepdim=True))
         if m.bias is not None:
             m.bias.data.fill_(0)
+            
+            
+class UpSampled(FFPolicy):
+    def __init__(self, num_inputs, action_space):
+        super(UpSampled, self).__init__()
+        
+        self.state_size=512
+        self.upSample=nn.Upsample(scale_factor=5, mode='nearest') 
+
+        
+        self.action_space = action_space
+        assert action_space.__class__.__name__ == "Discrete"
+        num_outputs = action_space.n
+
+        
+        self.conv1_3= nn.Conv2d(3,32,3)
+        self.conv2_3= nn.Conv2d(32,64,3)
+        self.conv3_3= nn.Conv2d(64,128,3)
+        self.conv4_3= nn.Conv2d(128,256,3)
+        self.conv5_3= nn.Conv2d(256,256,3)
+        self.conv5_3= nn.Conv2d(256,256,3,stride=2)
+        self.conv6_3= nn.Conv2d(256,256,3,stride=2)
+        self.conv7_3= nn.Conv2d(256,512,3,stride=2)
+        self.conv8_3= nn.Conv2d(512,512,2,stride=2)
+
+
+       
+        
+
+        self.v_fc1 = nn.Linear(self.state_size, 256)
+        self.v_fc2 = nn.Linear(256, 128)
+        self.v_fc3 = nn.Linear(128, 64)
+        self.v_fc4 = nn.Linear(64, 1)
+        
+        self.a_fc1 = nn.Linear(self.state_size, 256)
+        self.a_fc2 = nn.Linear(256, 128)
+        self.a_fc3 = nn.Linear(128, 64)
+        self.a_fc4 = nn.Linear(64, 64)
+        #self.a_fc3 = nn.Linear(32, action_space.n)
+        
+        
+
+        #self.preGru2 = nn.Linear(96, 64)
+        #self.preGru3 = nn.Linear(64, 64)
+
+
+
+        # Input size, hidden size
+        self.gru = nn.GRUCell(512, self.state_size)
+        
+        self.postGru = nn.Linear(self.state_size, self.state_size)
+
+        self.dist = Categorical(64, num_outputs)
+
+        self.train()
+        self.reset_parameters()
+
+    #@property
+    #def state_size(self):
+        """
+        Size of the recurrent state of the model (propagated between steps
+        """
+     #   return (self.state_size)
+
+    def reset_parameters(self):
+        self.apply(weights_init_mlp)
+
+        orthogonal(self.gru.weight_ih.data)
+        orthogonal(self.gru.weight_hh.data)
+        self.gru.bias_ih.data.fill_(0)
+        self.gru.bias_hh.data.fill_(0)
+
+        if self.dist.__class__.__name__ == "DiagGaussian":
+            self.dist.fc_mean.weight.data.mul_(0.01)
+
+    def forward(self, inputs, states, masks, missions=False):
+        inputs=self.upSample(inputs)
+        
+        
+        
+        
+        
+        c3 = F.relu(self.conv1_3(inputs))
+        c3 = F.relu(self.conv2_3(c3))
+        c3 = F.relu(self.conv3_3(c3))
+        c3 = F.relu(self.conv4_3(c3))
+        c3 = F.relu(self.conv5_3(c3))
+        c3 = F.relu(self.conv6_3(c3))
+        c3 = F.relu(self.conv7_3(c3))
+        c3 = F.relu(self.conv8_3(c3))
+
+        
+        x=c3.view(-1,512)
+        
+        
+
+        assert inputs.size(0) == states.size(0)
+        x= states = self.gru(x, states * masks)
+        x =self.postGru(x)
+        
+        #x = states = self.gru(x, states * masks)
+        
+        actions = F.relu(self.a_fc1(x))
+        actions = F.relu(self.a_fc2(actions))
+        actions = F.relu(self.a_fc3(actions))
+        actions = F.relu(self.a_fc4(actions))
+        
+
+        value = F.relu(self.v_fc1(x))
+        value = F.relu(self.v_fc2(value))
+        value = F.relu(self.v_fc3(value))
+        value = F.relu(self.v_fc4(value))
+
+
+        return value, actions, states
 
 class RecMLPPolicy(FFPolicy):
     def __init__(self, num_inputs, action_space):
@@ -150,7 +265,7 @@ class RecMLPPolicy(FFPolicy):
         
         c4 = F.relu(self.conv1_4(inputs))
         c4 = F.relu(self.conv2_4(c4))
-        c4=c4.view(-1,64)
+        c4=c4.view(-1,64 )
         
         #print('c2', c2.size())
         #print('c3', c3.size())

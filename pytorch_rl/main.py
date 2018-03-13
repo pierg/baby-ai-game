@@ -19,7 +19,7 @@ from vec_env.dummy_vec_env import DummyVecEnv
 from vec_env.subproc_vec_env import SubprocVecEnv
 from envs import make_env
 from kfac import KFACOptimizer
-from model import RecMLPPolicy, MLPPolicy, CNNPolicy,easyPolicy
+from model import RecMLPPolicy, MLPPolicy, CNNPolicy,easyPolicy, UpSampled
 from storage import RolloutStorage
 from visualize import visdom_plot
 import preProcess
@@ -206,6 +206,9 @@ def main():
     elif args.recurrent_policy:
         actor_critic = RecMLPPolicy(obs_numel, envs.action_space)
         architecture='Reccurent policy'
+    elif args.upsamplePolicy:
+        actor_critic = UpSampled(obs_numel, envs.action_space)
+        architecture='Upsampled policy'
     else:
         actor_critic = MLPPolicy(obs_numel, envs.action_space)
         architecture='MLP policy'
