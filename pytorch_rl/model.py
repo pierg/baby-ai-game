@@ -74,12 +74,15 @@ class RecMLPPolicy(FFPolicy):
 
 
 
-        self.v_fc1 = nn.Linear(64, 64)
-        self.v_fc2 = nn.Linear(64, 32)
-        self.v_fc3 = nn.Linear(32, 1)
+        self.v_fc1 = nn.Linear(64, 32)
+        self.v_fc2 = nn.Linear(32, 16)
+        self.v_fc3 = nn.Linear(16, 8)
+        self.v_fc4 = nn.Linear(8, 1)
         
-        self.a_fc1 = nn.Linear(64, 64)
-        self.a_fc2 = nn.Linear(64, 64)
+        self.a_fc1 = nn.Linear(64, 96)
+        self.a_fc2 = nn.Linear(96, 128)
+        self.a_fc3 = nn.Linear(128, 96)
+        self.a_fc4 = nn.Linear(96, 64)
         #self.a_fc3 = nn.Linear(32, action_space.n)
         
         self.preGru1 = nn.Linear(128, 96)
@@ -170,18 +173,17 @@ class RecMLPPolicy(FFPolicy):
         
         #x = states = self.gru(x, states * masks)
         
-        actions = self.a_fc1(x)
-        actions = F.relu(actions)
-        actions = self.a_fc2(actions)
-        actions = F.relu(actions)
-        #actions = self.v_fc3(actions)
+        actions = F.relu(self.a_fc1(x))
+        actions = F.relu(self.a_fc2(actions))
+        actions = F.relu(self.a_fc3(actions))
+        actions = F.relu(self.a_fc4(actions))
+        
 
-        value = self.v_fc1(x)
-        value = F.relu(value)
-        value = self.v_fc2(value)
-        value = F.relu(value)
-        value = self.v_fc3(value)
-        value = F.relu(value)
+        value = F.relu(self.v_fc1(x))
+        value = F.relu(self.v_fc2(value))
+        value = F.relu(self.v_fc3(value))
+        value = F.relu(self.v_fc4(value))
+
 
         return value, actions, states
 
