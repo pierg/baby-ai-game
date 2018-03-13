@@ -113,7 +113,7 @@ class Teacher(Wrapper):
             info['doorMet']=1
             if action in self.bestActions:
                 
-                reward+=(self.subtaskAchieved+1)*1
+                reward+=(self.subtaskAchieved+1)*10
                 self.subtaskAchieved+=1        
                 info['doorOpened']=1
 
@@ -121,13 +121,13 @@ class Teacher(Wrapper):
                 #print('reward given : ', reward)
 
             else:
-                reward+=0
+                reward+=-1
                 #reward=-5+self.subtaskAchieved
                 #print('door met but not opened ......')
             #time.sleep(1)
 
         else:
-            reward+=0
+            reward+=-1
             #reward=-5+self.subtaskAchieved
               
         #print('action Agent ', action)

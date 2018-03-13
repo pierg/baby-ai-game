@@ -13,6 +13,7 @@ import numpy as np
 from scipy.signal import medfilt
 matplotlib.rcParams.update({'font.size': 8})
 
+plotStatsDoor=False
 
 def smooth_reward_curve(x, y):
     # Halfwidth of our smoothing convolution
@@ -119,6 +120,20 @@ def plotActionRatioWithVisdom(timestep,actionRatio,name,game,viz,win,folder,acti
     
     fig, ax = plt.subplots()
     
+    localWin =viz.line(
+       Y=np.column_stack([actionRatio[indexAction] for indexAction in range(n_groups)]),
+       X=np.column_stack([timestep for indexAction in range(n_groups)]),
+        opts=dict(
+            showlegend=True,
+            width=600,
+            height=600,
+            xlabel='Timestep',
+            ylabel='ration of the actions, NactionAgent/NactionTeacher',
+            title='evolution of the ratios of selected actions',
+            legend=[names[indexAction] for indexAction in range(n_groups)],
+        ),win=win['actionRatio']
+)
+    
     
     for indexAction in range(n_groups):
         plt.plot(timestep,actionRatio[indexAction],label=names[indexAction])
@@ -143,8 +158,8 @@ def plotActionRatioWithVisdom(timestep,actionRatio,name,game,viz,win,folder,acti
     plt.close(fig)
 
     # Show it in visdom
-    image = np.transpose(image, (2, 0, 1))
-    win['actionRatio']=viz.image(image,win['actionRatio'])
+    #image = np.transpose(image, (2, 0, 1))
+    win['actionRatio']=localWin
     
     
     
@@ -159,6 +174,20 @@ def plotEntropyCoefWithVisdom(timestep,entropyCoef,name,game,viz,win,folder,acti
     
     
     plt.plot(timestep,entropyCoef)
+    
+    localWin =viz.line(
+       Y=np.array(entropyCoef),
+       X=np.array(timestep),
+        opts=dict(
+            showlegend=True,
+            width=600,
+            height=600,
+            xlabel='Timestep',
+            ylabel='entropy coefficient',
+            title='evolution of the enctropy coefficient',
+            legend=['entropyCoef'],
+        ),win=win['entropyCoef']
+)
         
         
     
@@ -180,7 +209,7 @@ def plotEntropyCoefWithVisdom(timestep,entropyCoef,name,game,viz,win,folder,acti
 
     # Show it in visdom
     image = np.transpose(image, (2, 0, 1))
-    win['entropyCoef']=viz.image(image,win['entropyCoef'])   
+    win['entropyCoef']=localWin
     
     
 
@@ -191,6 +220,24 @@ def plotEnvFinishedWithVisdom(timestep,envFinished,numProcesses,name,game,viz,wi
     
     
     fig, ax = plt.subplots()
+    
+    y1=[numProcesses for i in range(len(timestep))]
+    
+    localWin =viz.line(
+       Y=np.column_stack([y1, envFinished]),
+       X=np.column_stack([timestep, timestep]),
+        opts=dict(
+            showlegend=True,
+            width=600,
+            height=600,
+            xlabel='Timestep',
+            ylabel='number of envs that won the game',
+            title='evolution of the success of the envs',
+            legend=['total number of agents', 'winning agents'],
+        ),win=win['envFinished']
+)
+    
+    
     
     plt.plot(timestep,[numProcesses for i in range(len(timestep))],label='total number of envs')
     plt.plot(timestep,envFinished,label='number of envs won')
@@ -215,7 +262,7 @@ def plotEnvFinishedWithVisdom(timestep,envFinished,numProcesses,name,game,viz,wi
 
     # Show it in visdom
     image = np.transpose(image, (2, 0, 1))
-    win['envFinished']=viz.image(image,win['envFinished'])   
+    win['envFinished']=localWin
     
     
 
@@ -225,10 +272,31 @@ def plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,maxDoorOpened,maxDoorMet
     
     
     
+    
+# =============================================================================
+#     Plot the total number of doors met
+# =============================================================================
     fig, ax = plt.subplots()
     
     plt.plot(timestep,doorMet,label='number of doors met')
+
+    #X=np.array(doorMet)
+    #print('shape', X.shape)
+    localWin =viz.bar(
+       X=np.column_stack(doorMet),
+        opts=dict(
+            rownames=[str(i) for i in timestep],
+
+            width=600,
+            height=600,
+            xlabel='Timestep',
+            ylabel='number of doors met in the game',
+            title='evolution of the number of doors met',
+        ),win=win['doorMet']
+)
+           
         
+      
         
     
     plt.xlabel('Number of timestep')
@@ -249,14 +317,31 @@ def plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,maxDoorOpened,maxDoorMet
 
     # Show it in visdom
     image = np.transpose(image, (2, 0, 1))
-    win['doorMet']=viz.image(image,win['doorMet'])   
+    win['doorMet']=localWin 
     
     
     
+    
+# =============================================================================
+#     Plot the total number of doors opened
+# =============================================================================
     fig, ax = plt.subplots()
     
     plt.plot(timestep,doorOpened,label='number of doors opened')
-        
+    
+    
+    localWin =viz.bar(
+   X=np.column_stack(doorOpened),
+    opts=dict(
+        rownames=[str(i) for i in timestep],
+
+        width=600,
+        height=600,
+        xlabel='Timestep',
+        ylabel='number of doors opened in the game',
+        title='evolution of the number of doors opened',
+    ),win=win['doorOpened']
+)    
         
     
     plt.xlabel('Number of timestep')
@@ -277,16 +362,34 @@ def plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,maxDoorOpened,maxDoorMet
 
     # Show it in visdom
     image = np.transpose(image, (2, 0, 1))
-    win['doorOpened']=viz.image(image,win['doorOpened'])   
+    win['doorOpened']=localWin
     
     
     
     
+# =============================================================================
+#  Plot the same stats for the best agent
+#    
+#    Number of doors opened
+# =============================================================================
     
     fig, ax = plt.subplots()
     
     plt.plot(timestep,maxDoorOpened,label='number of doors opened')
-        
+    localWin =viz.bar(
+   X=np.column_stack(maxDoorOpened),
+    opts=dict(
+        rownames=[str(i) for i in timestep],
+
+        width=600,
+        height=600,
+        xlabel='Timestep',
+        ylabel=' number of doors opened in the game for the best env',
+        title='evolution of the success of the best env --- doors opened',
+        color='red'
+    ),win=win['maxDoorOpened']
+)    
+            
         
     
     plt.xlabel('Number of timestep')
@@ -307,12 +410,30 @@ def plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,maxDoorOpened,maxDoorMet
 
     # Show it in visdom
     image = np.transpose(image, (2, 0, 1))
-    win['maxDoorOpened']=viz.image(image,win['maxDoorOpened'])  
+    win['maxDoorOpened']=localWin
     
+    
+    
+# =============================================================================
+#     Number of doors met for the bet env
+# =============================================================================
     fig, ax = plt.subplots()
     
     plt.plot(timestep,maxDoorMet,label='number of doors met')
-        
+    localWin =viz.bar(
+   X=np.column_stack(maxDoorMet),
+    opts=dict(
+        rownames=[str(i) for i in timestep],
+
+        width=600,
+        height=600,
+        xlabel='Timestep',
+        ylabel=' number of doors met in the game for the best env',
+        title='evolution of the success of the best env --- doors met',
+        color='red'
+
+    ),win=win['maxDoorMet']
+)        
         
     
     plt.xlabel('Number of timestep')
@@ -333,7 +454,7 @@ def plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,maxDoorOpened,maxDoorMet
 
     # Show it in visdom
     image = np.transpose(image, (2, 0, 1))
-    win['maxDoorMet']=viz.image(image,win['maxDoorMet'])  
+    win['maxDoorMet']=localWin 
     
     
     
@@ -405,7 +526,21 @@ def plotStatsActionsWithVisdom(timestep,numberOfChoices_Agent,numberOfChoices_Te
 
 def plotEntropyWithVisdom(tx,ty,name,game,viz,win,folder,ylabel='entropy',xlabel='Number of Timesteps'):
     fig = plt.figure()
-    plt.plot(tx, ty, label="{}".format(name))
+    plt.plot(tx, ty, label="entropy of the action distribution")
+    localWin =viz.line(
+       Y=np.array(ty),
+       X=np.array(tx),
+        opts=dict(
+            showlegend=True,
+            width=600,
+            height=600,
+            xlabel='Timestep',
+            ylabel='entropy',
+            title='evolution of the entropy',
+            legend=['emtropy'],
+        ),win=win['entropy']
+)
+
 
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
@@ -424,7 +559,7 @@ def plotEntropyWithVisdom(tx,ty,name,game,viz,win,folder,ylabel='entropy',xlabel
 
     # Show it in visdom
     image = np.transpose(image, (2, 0, 1))
-    win['entropy']=viz.image(image,win['entropy'])
+    win['entropy']=localWin
     return(win)
     
     
@@ -442,6 +577,22 @@ def plotRewardsWithVisdom(timestep,meanReward,medianReward,minReward,maxReward,
 
     plt.plot(timestep,meanReward,label='mean reward',color='green')
     plt.plot(timestep,medianReward,label='median reward',color='yellow')
+    
+    
+    localWin =viz.line(
+       Y=np.column_stack([minReward,maxReward,meanReward,medianReward]),
+       X=np.column_stack([timestep for i in range(4)]),
+        opts=dict(
+            showlegend=True,
+            width=600,
+            height=600,
+            xlabel='Timestep',
+            ylabel='reward',
+            title='evolution of the rewards',
+            legend=['minReward', 'maxReward', 'meanReward', 'medianReward'],
+        ),win=win['rewards']
+)
+
 
 
 
@@ -462,13 +613,13 @@ def plotRewardsWithVisdom(timestep,meanReward,medianReward,minReward,maxReward,
 
     # Show it in visdom
     image = np.transpose(image, (2, 0, 1))
-    win['rewards']=viz.image(image,win=win['rewards'])
+    win['rewards']=localWin
     return(win)
     
     
 exclude=['updates','timestep','numberOfChoices_Teacher','numberOfChoices_Agent']
 def visdom_plot(viz, win, folder, game, name, numProcesses,bin_size=100, smooth=1,infoToSave=None,actionDescription=None):
-    
+    global plotStatsDoor
     
     timestep=infoToSave['timestep']
     meanReward=infoToSave['meanReward']
@@ -503,8 +654,12 @@ def visdom_plot(viz, win, folder, game, name, numProcesses,bin_size=100, smooth=
     maxDoorOpened=infoToSave['maxDoorOpened']
     maxDoorMet=infoToSave['maxDoorMet']
 
-    win=plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,maxDoorOpened,maxDoorMet,name,game,viz,win,folder,actionDescription=actionDescription)
-
+    if plotStatsDoor:
+        win=plotStatsDoorWithVisdom(timestep,doorMet,doorOpened,maxDoorOpened,maxDoorMet,name,game,viz,win,folder,actionDescription=actionDescription)
+    else:
+        plotStatsDoor=True
+        
+        
     return (win)
 
 
@@ -512,5 +667,4 @@ if __name__ == "__main__":
     from visdom import Visdom
     viz = Visdom(server='http://eos11',port=24431)
     visdom_plot(viz, None, '/tmp/gym/', 'BreakOut', 'a2c', bin_size=100, smooth=1)
-
 

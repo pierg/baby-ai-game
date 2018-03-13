@@ -82,7 +82,10 @@ class RecMLPPolicy(FFPolicy):
         self.a_fc2 = nn.Linear(64, 64)
         #self.a_fc3 = nn.Linear(32, action_space.n)
         
-        self.preGru = nn.Linear(128, 64)
+        self.preGru1 = nn.Linear(128, 96)
+        self.preGru2 = nn.Linear(96, 64)
+        self.preGru3 = nn.Linear(64, 64)
+
 
 
         # Input size, hidden size
@@ -157,7 +160,9 @@ class RecMLPPolicy(FFPolicy):
 #            missions=torch.cat([missions, x],dim=1)
 #            x= F.relu(self.adapt_3(missions))
 
-        x=F.relu(self.preGru(x))
+        x=F.relu(self.preGru1(x))
+        x=F.relu(self.preGru2(x))
+        x=F.relu(self.preGru3(x))
 
         assert inputs.size(0) == states.size(0)
         x=self.gru(x, states * masks)

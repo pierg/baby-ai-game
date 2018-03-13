@@ -6,7 +6,6 @@ import sys
 
 import teacher
 import gym_minigrid
-from baselines import bench
 import gym
 from gym import Wrapper
 
