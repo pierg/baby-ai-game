@@ -57,13 +57,10 @@ class UpSampled(FFPolicy):
         
         self.conv1_3= nn.Conv2d(3,32,3)
         self.conv2_3= nn.Conv2d(32,64,3)
-        self.conv3_3= nn.Conv2d(64,128,3)
-        self.conv4_3= nn.Conv2d(128,256,3)
-        self.conv5_3= nn.Conv2d(256,256,3)
+        self.conv3_3= nn.Conv2d(64,128,3,stride=2)
+        self.conv4_3= nn.Conv2d(128,256,3,stride=2)
         self.conv5_3= nn.Conv2d(256,256,3,stride=2)
-        self.conv6_3= nn.Conv2d(256,256,3,stride=2)
-        self.conv7_3= nn.Conv2d(256,512,3,stride=2)
-        self.conv8_3= nn.Conv2d(512,512,2,stride=2)
+        self.conv6_3= nn.Conv2d(256,256,3)
 
 
        
@@ -88,7 +85,7 @@ class UpSampled(FFPolicy):
 
 
         # Input size, hidden size
-        self.gru = nn.GRUCell(512, self.state_size)
+        self.gru = nn.GRUCell(256, self.state_size)
         
         self.postGru = nn.Linear(self.state_size, self.state_size)
 
@@ -128,11 +125,10 @@ class UpSampled(FFPolicy):
         c3 = F.relu(self.conv4_3(c3))
         c3 = F.relu(self.conv5_3(c3))
         c3 = F.relu(self.conv6_3(c3))
-        c3 = F.relu(self.conv7_3(c3))
-        c3 = F.relu(self.conv8_3(c3))
+        
 
         
-        x=c3.view(-1,512)
+        x=c3.view(-1,256)
         
         
 

@@ -112,8 +112,8 @@ class Teacher(Wrapper):
             #print('door met')
             info['doorMet']=1
             if action in self.bestActions:
-                
-                reward+=(self.subtaskAchieved+1)*1
+                reward=10
+                #reward+=(self.subtaskAchieved+1)*1
                 self.subtaskAchieved+=1        
                 info['doorOpened']=1
                 done=True
