@@ -55,7 +55,7 @@ class Teacher(Wrapper):
         Called at the start of an episode
         """
         
-    
+        #np.random.seed(1)
         obs = self.env.reset(**kwargs)
         
         if not isinstance(obs, dict):
@@ -105,30 +105,49 @@ class Teacher(Wrapper):
        
        #try to force the action toggle to be selected, abandonned
        
-       
+       #check if a door is met/open
+        if 3 in self.bestActions:
+           #print('door met')
+           info['doorMet']=1
+           if action in self.bestActions:
+               info['doorOpened']=1
+               self.subtaskAchieved+=1
+               
+               
         #print('action Teacher ', self.bestActions)
-
-        if 3 in self.bestActions :
-            #print('door met')
-            info['doorMet']=1
-            if action in self.bestActions:
-                reward=10
-                #reward+=(self.subtaskAchieved+1)*1
-                self.subtaskAchieved+=1        
-                info['doorOpened']=1
-                done=True
-
-                #print('door opened!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-                #print('reward given : ', reward)
-
+        if not self.observeReward is True:
+            if 3 in self.bestActions :
+                #print('door met')
+                if action in self.bestActions:
+                    reward+=50
+                    #reward+=(self.subtaskAchieved+1)*1
+                    self.subtaskAchieved+=1  
+                    #early stopping
+                    done=True
+                    
+    
+                    #print('door opened!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+                    #print('reward given : ', reward)
+    
+                else:
+                    reward+=-1
+                    #reward=-5+self.subtaskAchieved
+                    #print('door met but not opened ......')
+                #time.sleep(1)
+                
             else:
-                reward+=-0.1
-                #reward=-5+self.subtaskAchieved
-                #print('door met but not opened ......')
-            #time.sleep(1)
-
+                reward+=-1
+                
+                
+                
         else:
-            reward+=-0.1
+            
+            if action in self.bestActions:
+                reward+=1    
+                
+            else:
+                reward+=-1
+            
             #reward=-5+self.subtaskAchieved
               
         #print('action Agent ', action)
@@ -147,7 +166,7 @@ class Teacher(Wrapper):
         }        
 
         #print('best action ', self.bestActions)
-
+        
         return obs, reward, done, info
 
     

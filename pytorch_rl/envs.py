@@ -9,17 +9,16 @@ import gym_minigrid
 import gym
 from gym import Wrapper
 
-def make_env(env_id, seed, rank):
+def make_env(env_id, seed, rank,useTeacher):
     def _thunk():
         
-        if env_id=='MultiRoom-Teacher':
-            print('creation...')
-            env=gym.make('MiniGrid-MultiRoom-N6-v0')
+        env=gym.make(env_id)
+        if useTeacher:            
             print('adding Teacher...')
             env=teacher.Teacher(env)
             print('done!')
         else:
-            env = gym.make(env_id)
+            print('no Teacher')
 
         env.seed(seed + rank)
         #if log_dir is not None:
@@ -34,7 +33,7 @@ def make_env(env_id, seed, rank):
 
     return _thunk
 
-class WrapPyTorch(Wrapper):
+class WrapPyTorch(gym.ObservationWrapper):
     def __init__(self, env=None):
         super(WrapPyTorch, self).__init__(env)
         obs_shape = self.observation_space.shape

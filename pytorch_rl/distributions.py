@@ -20,6 +20,7 @@ class Categorical(nn.Module):
         x = self(x)
 
         probs = F.softmax(x, dim=1)
+        #print(probs.data.numpy())
         if deterministic is False:
             action = probs.multinomial(1)
         else:

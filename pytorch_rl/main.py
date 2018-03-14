@@ -19,7 +19,7 @@ from vec_env.dummy_vec_env import DummyVecEnv
 from vec_env.subproc_vec_env import SubprocVecEnv
 from envs import make_env
 from kfac import KFACOptimizer
-from model import RecMLPPolicy, MLPPolicy, CNNPolicy,easyPolicy, UpSampled
+from model import RecMLPPolicy, MLPPolicy, CNNPolicy,easyPolicy, UpSampled,MixPolicy
 from storage import RolloutStorage
 from visualize import visdom_plot
 import preProcess
@@ -28,8 +28,8 @@ import pickle
 args = get_args()
 
 assert args.algo in ['a2c', 'ppo', 'acktr']
-if args.recurrent_policy:
-    assert args.algo in ['a2c', 'ppo'], 'Recurrent policy is not implemented for ACKTR'
+#if args.recurrent_policy:
+#    assert args.algo in ['a2c', 'ppo'], 'Recurrent policy is not implemented for ACKTR'
 
 num_updates = int(args.num_frames) // args.num_steps // args.num_processes
 
@@ -143,7 +143,7 @@ def main():
         
         
         #plot a summary of the experiment on visdom
-        viz.text(descriptor)
+        winForDescriptor=viz.text(descriptor)
         #windows that will be plotted on visdom
         win = {'rewards':None,
                'entropy':None,
@@ -160,7 +160,7 @@ def main():
 # =============================================================================
 #   Create the different environments for the parallel training
 # =============================================================================
-    envs = [make_env(args.env_name, args.seed, i)
+    envs = [make_env(args.env_name, args.seed, i,args.Teacher)
                 for i in range(args.num_processes)]
     
 
@@ -200,19 +200,26 @@ def main():
 # =============================================================================
     architecture='None'
 
-    if len(obs_shape) == 3 and obs_numel > 1024:
-        actor_critic = CNNPolicy(obs_shape[0], envs.action_space, args.recurrent_policy)
-        architecture='CNN policy'
-    elif args.recurrent_policy:
+    if args.policyID=='CNNPolicy':
+        actor_critic = CNNPolicy(obs_shape[0], envs.action_space, use_gru=True)
+        architecture='CNN Policy'
+        
+    elif args.policyID=='RecMLPPolicy':
         actor_critic = RecMLPPolicy(obs_numel, envs.action_space)
-        architecture='Reccurent policy'
-    elif args.upsamplePolicy:
+        architecture='Reccurent MLP policy'
+        
+    elif args.policyID=='UpSampled':
         actor_critic = UpSampled(obs_numel, envs.action_space)
         architecture='Upsampled policy'
-    else:
+    elif args.policyID=='MLPPolicy':
         actor_critic = MLPPolicy(obs_numel, envs.action_space)
         architecture='MLP policy'
-        
+    elif args.policyID=='MixPolicy':
+        actor_critic = MixPolicy(obs_numel, envs.action_space)
+        architecture='Mix policy'
+    else:
+        print('no architecture corresponding to :', args.policyID)
+        return(0)       
     
 # =============================================================================
 #     DEBUG MODE
@@ -248,6 +255,13 @@ def main():
         modelSize += pSize
     print(str(actor_critic))
     print('Total model size: %d' % modelSize)
+    
+    f= open(fileInfo,"w")
+    f.write('model size : {} \n'.format(modelSize))
+    f.close()
+    
+    descriptor+='model size : {} \n'.format(modelSize)
+    viz.text(descriptor,win=winForDescriptor)
 
 
     #select the action space
@@ -543,9 +557,10 @@ def main():
             
                    
             
-            
-            missionsVariable=getMissionsAsVariables(step,volatile=True)
-
+            if useAdviceFromTeacher:
+                missionsVariable=getMissionsAsVariables(step,volatile=True)
+            else:
+                missionsVariable=False
             #preprocess the missions to be used by the model
 #            if useAdviceFromTeacher:
 #                missionsVariable=getMissionsAsVariables(step,volatile=True)
@@ -572,15 +587,16 @@ def main():
             #print('   ')
             #If the teacher takes control of the agent, we use the actions given
             if useMissionFromTeacher:
+                print('inside', totalTimeStep)
                 cpu_actions=forceTeacherMissions(bestActions)
                 #print('from main : observe reward True')
-                obsF, reward, done, info = envs.step(cpu_actions,observeReward=True)
+                obsF, reward, done, info = envs.step(cpu_actions,observeReward=args.observeReward)
                 #correctReward(reward,cpu_actions,cpu_teaching_actions)
                 #print('corrected reward', reward)
             else:
                 #normal case, we use the actions computed by the agent
                 #print('form main, observe reward',observeReward)
-                obsF, reward, done, info = envs.step(cpu_actions,observeReward=observeReward)
+                obsF, reward, done, info = envs.step(cpu_actions,observeReward=args.observeReward)
             #print('   ')
             #We require the env to give a description of the actions in the info dic
             #Once we have gathered these info, this step is not mandatory anymore

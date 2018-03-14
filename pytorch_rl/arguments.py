@@ -24,7 +24,7 @@ def get_args():
                         help='gae parameter (default: 0.95)')
     parser.add_argument('--entropy-coef', type=float, default=0.01,
                         help='entropy term coefficient (default: 0.01)')
-    parser.add_argument('--entropyOffset', type=float, default=0.01,
+    parser.add_argument('--entropyOffset', type=float, default=0.1,
                         help='entropy term offset (default: 0.01)')
     parser.add_argument('--entropy-Temp', type=float, default=10000,
                         help='entropy Temperature coefficient (default: 20 000)')
@@ -54,7 +54,7 @@ def get_args():
                         help='vis interval, one log per n updates (default: 100)')
     parser.add_argument('--num-frames', type=int, default=10e7,
                         help='number of frames to train (default: 10e6)')
-    parser.add_argument('--env-name', default='MultiRoom-Teacher',
+    parser.add_argument('--env-name', default='MiniGrid-MultiRoom-N6-v0',
                         help='environment to train on (default: PongNoFrameskip-v4)')
     parser.add_argument('--log-dir', default='/tmp/gym/',
                         help='directory to save agent logs (default: /tmp/gym)')
@@ -66,8 +66,7 @@ def get_args():
     useCuda=torch.cuda.is_available()    
     parser.add_argument('--no-cuda', action='store_true', default=useCuda,
                         help='disables CUDA training')
-    parser.add_argument('--recurrent-policy', action='store_true', default=False,
-                        help='use a recurrent policy')
+    
     parser.add_argument('--no-vis', action='store_true', default=False,
                         help='disables visdom visualization'),
     parser.add_argument('--useMissionAdvice', type=int, default=False,
@@ -92,8 +91,12 @@ def get_args():
                     help='number of envs to be solved successively by the agent before declaring that the env has been cracked')
     parser.add_argument('--nameExpToLoad', default='Exp0',
                     help='name of the experiment you want to load')
-    parser.add_argument('--upsamplePolicy', default=True,
-                    help='name of the experiment you want to load')
+    parser.add_argument('--policyID', default='Upsampled',
+                    help='name of the architecture you want to use')
+    parser.add_argument('--Teacher', default=True,
+                        help='indicate if the Teacher is present')
+    parser.add_argument('--observeReward', default=True,
+                        help='indicate if the agent observe the reward from the teacher at each timestep')
     
     
     args = parser.parse_args()

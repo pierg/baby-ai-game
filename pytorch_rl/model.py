@@ -44,8 +44,7 @@ def weights_init_mlp(m):
             
 class UpSampled(FFPolicy):
     def __init__(self, num_inputs, action_space):
-        super(UpSampled, self).__init__()
-        
+        super(UpSampled, self).__init__()        
         self.state_size=256
         self.upSample=nn.Upsample(scale_factor=5, mode='nearest') 
 
@@ -55,15 +54,21 @@ class UpSampled(FFPolicy):
         num_outputs = action_space.n
 
         
-        self.conv1_3= nn.Conv2d(3,8,3)
-        self.conv2_3= nn.Conv2d(8,16,3)
-        self.conv3_3= nn.Conv2d(16,32,3,stride=2)
-        self.conv4_3= nn.Conv2d(32,64,3,stride=2)
-        self.conv5_3= nn.Conv2d(64,128,3,stride=2)
-        self.conv6_3= nn.Conv2d(128,256,3)
+#        self.conv1_3= nn.Conv2d(3,8,3)
+#        self.conv2_3= nn.Conv2d(8,16,3)
+#        self.conv3_3= nn.Conv2d(16,32,3,stride=2)
+#        self.conv4_3= nn.Conv2d(32,64,3,stride=2)
+#        self.conv5_3= nn.Conv2d(64,128,3,stride=2)
+#        self.conv6_3= nn.Conv2d(128,256,3)
+        self.p_fc1 = nn.Linear(num_inputs, 8)
+        self.p_fc2 = nn.Linear(8, 16)
+        self.p_fc3 = nn.Linear(16, 32)
+        self.p_fc4 = nn.Linear(32, 64)
+        self.p_fc5 = nn.Linear(64, 128)
+        self.p_fc6 = nn.Linear(128, 256)
 
+        #self.preGru = nn.Linear(256, 256)
 
-       
         
 
         self.v_fc1 = nn.Linear(self.state_size, 256)
@@ -113,24 +118,32 @@ class UpSampled(FFPolicy):
             self.dist.fc_mean.weight.data.mul_(0.01)
 
     def forward(self, inputs, states, masks, missions=False):
-        inputs=self.upSample(inputs)
+#        inputs=self.upSample(inputs)
+#        c3 = F.relu(self.conv1_3(inputs))
+#        c3 = F.relu(self.conv2_3(c3))
+#        c3 = F.relu(self.conv3_3(c3))
+#        c3 = F.relu(self.conv4_3(c3))
+#        c3 = F.relu(self.conv5_3(c3))
+#        c3 = F.relu(self.conv6_3(c3))
+#        x=x.view(-1,256)
+
         
+        batch_numel = reduce(operator.mul, inputs.size()[1:], 1)
+        x = inputs.view(-1, batch_numel)
+        x = F.relu(self.p_fc1(x))
+        x = F.relu(self.p_fc2(x))
+        x = F.relu(self.p_fc3(x))
+        x = F.relu(self.p_fc4(x))
+        x = F.relu(self.p_fc5(x))
+        x = F.relu(self.p_fc6(x))
+
         
-        
-        
-        
-        c3 = F.relu(self.conv1_3(inputs))
-        c3 = F.relu(self.conv2_3(c3))
-        c3 = F.relu(self.conv3_3(c3))
-        c3 = F.relu(self.conv4_3(c3))
-        c3 = F.relu(self.conv5_3(c3))
-        c3 = F.relu(self.conv6_3(c3))
         
 
         
-        x=c3.view(-1,256)
         
         
+        #x =F.relu(self.preGru(x))
 
         assert inputs.size(0) == states.size(0)
         x= states = self.gru(x, states * masks)
@@ -151,10 +164,116 @@ class UpSampled(FFPolicy):
 
 
         return value, actions, states
-
+    
 class RecMLPPolicy(FFPolicy):
     def __init__(self, num_inputs, action_space):
-        super(RecMLPPolicy, self).__init__()
+        super(RecMLPPolicy, self).__init__()        
+        self.state_size=256
+
+        
+        self.action_space = action_space
+        assert action_space.__class__.__name__ == "Discrete"
+        num_outputs = action_space.n
+
+        
+#        self.conv1_3= nn.Conv2d(3,8,3)
+#        self.conv2_3= nn.Conv2d(8,16,3)
+#        self.conv3_3= nn.Conv2d(16,32,3,stride=2)
+#        self.conv4_3= nn.Conv2d(32,64,3,stride=2)
+#        self.conv5_3= nn.Conv2d(64,128,3,stride=2)
+#        self.conv6_3= nn.Conv2d(128,256,3)
+        self.p_fc1 = nn.Linear(num_inputs, 8)
+        self.p_fc2 = nn.Linear(8, 16)
+        self.p_fc3 = nn.Linear(16, 32)
+        self.p_fc4 = nn.Linear(32, 64)
+        self.p_fc5 = nn.Linear(64, 128)
+        self.p_fc6 = nn.Linear(128, 256)
+
+        #self.preGru = nn.Linear(256, 256)
+
+        
+
+        self.v_fc1 = nn.Linear(self.state_size, 256)
+        self.v_fc2 = nn.Linear(256, 128)
+        self.v_fc3 = nn.Linear(128, 64)
+        self.v_fc4 = nn.Linear(64, 1)
+        
+        self.a_fc1 = nn.Linear(self.state_size, 256)
+        self.a_fc2 = nn.Linear(256, 128)
+        self.a_fc3 = nn.Linear(128, 64)
+        self.a_fc4 = nn.Linear(64, 64)
+        #self.a_fc3 = nn.Linear(32, action_space.n)
+        
+        
+
+        #self.preGru2 = nn.Linear(96, 64)
+        #self.preGru3 = nn.Linear(64, 64)
+
+
+
+        # Input size, hidden size
+        self.gru = nn.GRUCell(256, self.state_size)
+        
+        self.postGru = nn.Linear(self.state_size, self.state_size)
+
+        self.dist = Categorical(64, num_outputs)
+
+        self.train()
+        self.reset_parameters()
+
+    #@property
+    #def state_size(self):
+        """
+        Size of the recurrent state of the model (propagated between steps
+        """
+     #   return (self.state_size)
+
+    def reset_parameters(self):
+        self.apply(weights_init_mlp)
+
+        orthogonal(self.gru.weight_ih.data)
+        orthogonal(self.gru.weight_hh.data)
+        self.gru.bias_ih.data.fill_(0)
+        self.gru.bias_hh.data.fill_(0)
+
+        if self.dist.__class__.__name__ == "DiagGaussian":
+            self.dist.fc_mean.weight.data.mul_(0.01)
+
+    def forward(self, inputs, states, masks, missions=False):
+        batch_numel = reduce(operator.mul, inputs.size()[1:], 1)
+        x = inputs.view(-1, batch_numel)
+        
+        
+        x = F.relu(self.p_fc1(x))
+        x = F.relu(self.p_fc2(x))
+        x = F.relu(self.p_fc3(x))
+        x = F.relu(self.p_fc4(x))
+        x = F.relu(self.p_fc5(x))
+        x = F.relu(self.p_fc6(x))       
+
+
+        assert inputs.size(0) == states.size(0)
+        x= states = self.gru(x, states * masks)
+        x =self.postGru(x)
+        
+        
+        actions = F.relu(self.a_fc1(x))
+        actions = F.relu(self.a_fc2(actions))
+        actions = F.relu(self.a_fc3(actions))
+        actions = F.relu(self.a_fc4(actions))
+        
+
+        value = F.relu(self.v_fc1(x))
+        value = F.relu(self.v_fc2(value))
+        value = F.relu(self.v_fc3(value))
+        value = F.relu(self.v_fc4(value))
+
+
+        return value, actions, states
+
+class MixPolicy(FFPolicy):
+    def __init__(self, num_inputs, action_space):
+        super(MixPolicy, self).__init__()
         
         self.state_size=256
         
@@ -199,7 +318,7 @@ class RecMLPPolicy(FFPolicy):
         #self.a_fc3 = nn.Linear(32, action_space.n)
         
         self.preGru1 = nn.Linear(4*64, 256)
-        self.preGru2 = nn.Linear(256, 512)
+        self.preGru2 = nn.Linear(256, 256)
 
         #self.preGru2 = nn.Linear(96, 64)
         #self.preGru3 = nn.Linear(64, 64)
@@ -207,7 +326,7 @@ class RecMLPPolicy(FFPolicy):
 
 
         # Input size, hidden size
-        self.gru = nn.GRUCell(512, self.state_size)
+        self.gru = nn.GRUCell(256, self.state_size)
         
         self.postGru = nn.Linear(self.state_size, self.state_size)
 
@@ -507,7 +626,7 @@ class CNNPolicy(FFPolicy):
         if self.dist.__class__.__name__ == "DiagGaussian":
             self.dist.fc_mean.weight.data.mul_(0.01)
 
-    def forward(self, inputs, states, masks):
+    def forward(self, inputs, states, masks,mission=False):
         x = self.conv1(inputs / 255.0)
         x = F.relu(x)
 
