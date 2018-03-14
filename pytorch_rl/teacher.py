@@ -57,6 +57,8 @@ class Teacher(Wrapper):
         
         #np.random.seed(1)
         obs = self.env.reset(**kwargs)
+        #print('observation', obs)
+
         
         if not isinstance(obs, dict):
                 obs = { "image": obs, 'mission':'','bestActions':[] }
@@ -112,6 +114,7 @@ class Teacher(Wrapper):
            if action in self.bestActions:
                info['doorOpened']=1
                self.subtaskAchieved+=1
+               reward+=50
                
                
         #print('action Teacher ', self.bestActions)
@@ -146,7 +149,7 @@ class Teacher(Wrapper):
                 reward+=1    
                 
             else:
-                reward+=-1
+                reward+=-5
             
             #reward=-5+self.subtaskAchieved
               

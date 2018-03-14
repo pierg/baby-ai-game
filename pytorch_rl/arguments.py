@@ -26,7 +26,7 @@ def get_args():
                         help='entropy term coefficient (default: 0.01)')
     parser.add_argument('--entropyOffset', type=float, default=0.1,
                         help='entropy term offset (default: 0.01)')
-    parser.add_argument('--entropy-Temp', type=float, default=10000,
+    parser.add_argument('--entropy-Temp', type=float, default=20000,
                         help='entropy Temperature coefficient (default: 20 000)')
     parser.add_argument('--value-loss-coef', type=float, default=0.5,
                         help='value loss coefficient (default: 0.5)')
@@ -54,7 +54,7 @@ def get_args():
                         help='vis interval, one log per n updates (default: 100)')
     parser.add_argument('--num-frames', type=int, default=10e7,
                         help='number of frames to train (default: 10e6)')
-    parser.add_argument('--env-name', default='MiniGrid-MultiRoom-N6-v0',
+    parser.add_argument('--env-name', default='MiniGrid-MultiRoom-N2-S4-v0',
                         help='environment to train on (default: PongNoFrameskip-v4)')
     parser.add_argument('--log-dir', default='/tmp/gym/',
                         help='directory to save agent logs (default: /tmp/gym)')

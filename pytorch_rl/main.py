@@ -211,6 +211,7 @@ def main():
     elif args.policyID=='UpSampled':
         actor_critic = UpSampled(obs_numel, envs.action_space)
         architecture='Upsampled policy'
+        
     elif args.policyID=='MLPPolicy':
         actor_critic = MLPPolicy(obs_numel, envs.action_space)
         architecture='MLP policy'
@@ -587,7 +588,7 @@ def main():
             #print('   ')
             #If the teacher takes control of the agent, we use the actions given
             if useMissionFromTeacher:
-                print('inside', totalTimeStep)
+                #print('inside', totalTimeStep)
                 cpu_actions=forceTeacherMissions(bestActions)
                 #print('from main : observe reward True')
                 obsF, reward, done, info = envs.step(cpu_actions,observeReward=args.observeReward)

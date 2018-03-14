@@ -15,11 +15,12 @@ from arguments import get_args
 args = get_args()
 
 
-env = make_env(args.env_name, args.seed, 0)
+env = make_env(args.env_name, args.seed, 0,useTeacher=True)
 env = DummyVecEnv([env])
 
-
-actor_critic, ob_rms = torch.load(os.path.join(args.load_dir, args.nameExpToLoad, args.env_name + ".pt"))
+fileToLoad=os.path.join(args.load_dir, args.nameExpToLoad, args.env_name + ".pt")
+print('file to load : ', fileToLoad)
+actor_critic, ob_rms = torch.load(fileToLoad)
 
 render_func = env.envs[0].render
 
@@ -81,11 +82,11 @@ while True:
     
     #preprocess the missions to be used by the model
     missionsAsStrings=preProcessor.Code2String(missions)
-    print('mission',missionsAsStrings)
+    #print('mission',missionsAsStrings)
     #print('missions', missionsAsStrings)
     #then use the language model of our choice
     missionsEmbedded=preProcessor.simpleSentenceEmbedding(missionsAsStrings)
-    print('embedding:', missionsEmbedded)
+    #print('embedding:', missionsEmbedded)
     #print('   ')
     #convert them as Variables
     missionsVariable=Variable(missionsEmbedded,volatile=True)
@@ -103,7 +104,7 @@ while True:
     cpu_actions = action.data.squeeze(1).cpu().numpy()
 
     # Observation, reward and next obs
-    obsF, reward, done, _ = env.step(cpu_actions,allowObserveReward)
+    obsF, reward, done, _ = env.step(cpu_actions,observeReward=True)
     obs=np.array([preProcessor.preProcessImage(dico['image']) for dico in obsF])
     
 #    if useAdviceFromTeacher:
