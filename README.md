@@ -29,8 +29,6 @@ Requirements:
 Start by manually installing PyTorch. See the [PyTorch website](http://pytorch.org/)
 for installation instructions specific to your platform.
 
-```
-
 Then, clone this repository and install the other dependencies with `pip3`:
 
 ```
