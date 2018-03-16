@@ -39,15 +39,7 @@ pip3 install -e .
 
 ## Usage
 
-First export the gym_minigrid and gym_minigrid/envs/ to PYTHONPATH
-
-```
-PYTHONPATH=./gym_minigrid/:$PYTHONPATH
-PYTHONPATH=./gym_minigrid/envs/:$PYTHONPATH
-export PYTHONPATH
-```
-
-You can also run the example scripts `start_training.sh` and `start_results.sh` specifying the name of the environment:
+You can run the example scripts `start_training.sh` and `start_results.sh` specifying the name of the environment:
 
 Ex:
 ```
@@ -76,6 +68,13 @@ To run the interactive UI application:
 
 ```
 ./main.py
+```
+
+To run the environments without the script first export the `gym_minigrid` and `gym_minigrid/envs/` to PYTHONPATH
+```
+PYTHONPATH=./gym_minigrid/:$PYTHONPATH
+PYTHONPATH=./gym_minigrid/envs/:$PYTHONPATH
+export PYTHONPATH
 ```
 
 The environment being run can be selected with the `--env-name` option, eg:
