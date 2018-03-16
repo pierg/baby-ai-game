@@ -102,3 +102,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# trained_models
+./trained_models

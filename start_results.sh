@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-PYTHONPATH=../gym_minigrid/:$PYTHONPATH
-PYTHONPATH=../gym_minigrid/envs/:$PYTHONPATH
+PYTHONPATH=./gym_minigrid/:$PYTHONPATH
+PYTHONPATH=./gym_minigrid/envs/:$PYTHONPATH
 export PYTHONPATH
 
 envname=$1
@@ -31,4 +31,4 @@ MiniGrid-FourRoomQA-v0
     exit 1
 fi
 
-python3 ../pytorch_rl/enjoy.py --env-name $envname --load-dir ./trained_models/a2c
+python3 ./pytorch_rl/enjoy.py --env-name $envname --load-dir ./trained_models/a2c

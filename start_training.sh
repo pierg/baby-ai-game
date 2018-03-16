@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-PYTHONPATH=../gym_minigrid/:$PYTHONPATH
-PYTHONPATH=../gym_minigrid/envs/:$PYTHONPATH
+PYTHONPATH=./gym_minigrid/:$PYTHONPATH
+PYTHONPATH=./gym_minigrid/envs/:$PYTHONPATH
 export PYTHONPATH
 
 envname=$1
@@ -32,4 +32,4 @@ MiniGrid-FourRoomQA-v0
 fi
 
 
-python3 ../pytorch_rl/main.py --env-name $envname --no-vis --num-processes 48 --algo a2c
+python3 ./pytorch_rl/main.py --env-name $envname --no-vis --num-processes 48 --algo a2c

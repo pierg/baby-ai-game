@@ -47,13 +47,23 @@ RUN python3.6 get-pip.py
 RUN ln -s /usr/bin/python3.6 /usr/local/bin/python3
 RUN rm get-pip.py
 
-RUN git clone https://github.com/pierg/baby-ai-game.git baby-ai-game-github
-RUN cd baby-ai-game-github
-
-# Install pip3 dependencies
-RUN pip3 install -e .
-RUN cd ..
-
 RUN mkdir -p $HOME
 WORKDIR $HOME
 
+# Installing Torch
+RUN pip3 install http://download.pytorch.org/whl/cpu/torch-0.3.1-cp36-cp36m-linux_x86_64.whl
+RUN pip3 install torchvision
+
+# Install pip3 dependencies
+#RUN git clone https://github.com/pierg/baby-ai-game.git baby-ai-game-github
+#RUN cd baby-ai-game-github
+#RUN pip3 install -e .
+#RUN cd ..
+#RUN rm -r baby-ai-game-github
+
+# install python 3 dependencies
+RUN pip3 install --upgrade pip
+RUN pip3 --no-cache-dir install \
+    gym>=0.9.6 \
+    numpy>=1.10.0 \
+    pyqt5>=5.10.1
