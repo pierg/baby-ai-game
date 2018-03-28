@@ -29,10 +29,19 @@ Requirements:
 Start by manually installing PyTorch. See the [PyTorch website](http://pytorch.org/)
 for installation instructions specific to your platform.
 
+Then, install the [minigrid Gym environment](https://github.com/maximecb/gym-minigrid):
+
+```
+git clone https://github.com/pierg/gym-minigrid.git
+cd gym-minigrid
+pip3 install -e .
+cd ..
+```
+
 Then, clone this repository and install the other dependencies with `pip3`:
 
 ```
-git clone https://github.com/maximecb/baby-ai-game.git
+git clone https://github.com/pierg/baby-ai-game.git
 cd baby-ai-game
 pip3 install -e .
 ```
