@@ -30,6 +30,17 @@ if args.recurrent_policy:
 
 num_updates = int(args.num_frames) // args.num_steps // args.num_processes
 
+
+rend_env = make_env(args.env_name, args.seed, 0, None)
+rend_env = DummyVecEnv([rend_env])
+render_func = rend_env.envs[0].render
+render_func('human')
+obs_shape = rend_env.observation_space.shape
+obs_shape = (obs_shape[0] * args.num_stack, *obs_shape[1:])
+current_obs = torch.zeros(1, *obs_shape)
+# states = torch.zeros(1, actor_critic.state_size)
+masks = torch.zeros(1, 1)
+
 torch.manual_seed(args.seed)
 if args.cuda:
     torch.cuda.manual_seed(args.seed)
@@ -40,6 +51,16 @@ except OSError:
     files = glob.glob(os.path.join(args.log_dir, '*.monitor.csv'))
     for f in files:
         os.remove(f)
+
+
+def update_current_obs(obs):
+    shape_dim0 = rend_env.observation_space.shape[0]
+    obs = torch.from_numpy(obs).float()
+    if args.num_stack > 1:
+        current_obs[:, :-shape_dim0] = current_obs[:, shape_dim0:]
+    current_obs[:, -shape_dim0:] = obs
+
+
 
 def main():
     os.environ['OMP_NUM_THREADS'] = '1'
@@ -117,6 +138,11 @@ def main():
             obs, reward, done, info = envs.step(cpu_actions)
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
             episode_rewards += reward
+
+            update_current_obs(obs)
+            renderer = render_func('human')
+            if not renderer.window:
+                sys.exit(0)
 
             # If done then clean the history of observations.
             masks = torch.FloatTensor([[0.0] if done_ else [1.0] for done_ in done])
@@ -262,6 +288,7 @@ def main():
                 total_num_steps,
                 final_rewards.mean()
             )
+
 
 if __name__ == "__main__":
     main()
