@@ -105,3 +105,6 @@ ENV/
 
 # trained_models
 ./trained_models
+
+# intellij
+.idea/*
