@@ -5,7 +5,7 @@ import time
 import operator
 from functools import reduce
 
-import gym
+import sys
 import numpy as np
 import torch
 import torch.nn as nn
@@ -39,7 +39,7 @@ obs_shape = rend_env.observation_space.shape
 obs_shape = (obs_shape[0] * args.num_stack, *obs_shape[1:])
 current_obs = torch.zeros(1, *obs_shape)
 # states = torch.zeros(1, actor_critic.state_size)
-masks = torch.zeros(1, 1)
+render_masks = torch.zeros(1, 1)
 
 torch.manual_seed(args.seed)
 if args.cuda:
@@ -139,16 +139,26 @@ def main():
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
             episode_rewards += reward
 
-            update_current_obs(obs)
-            renderer = render_func('human')
-            if not renderer.window:
-                sys.exit(0)
 
             # If done then clean the history of observations.
             masks = torch.FloatTensor([[0.0] if done_ else [1.0] for done_ in done])
             final_rewards *= masks
             final_rewards += (1 - masks) * episode_rewards
             episode_rewards *= masks
+
+            # RENDERING (NOT WORKING)
+            time.sleep(0.05)
+            render_masks = masks
+            render_masks.fill_(0.0 if done else 1.0)
+            if current_obs.dim() == 4:
+                current_obs *= render_masks.unsqueeze(2).unsqueeze(2)
+            else:
+                current_obs *= render_masks
+            update_current_obs(obs)
+            renderer = render_func('human')
+            if not renderer.window:
+                sys.exit(0)
+            # END RENDERING
 
             if args.cuda:
                 masks = masks.cuda()
