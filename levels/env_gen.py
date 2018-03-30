@@ -45,9 +45,9 @@ def door_from_loc(env, loc):
     if loc == 'north' or loc == 'left':
         return (1, 0), 1
 
-    return door_from_loc(env, env._randElem(['east', 'west', 'south', 'north']))
+    assert False
 
-def gen_env(instrs, seed):
+def gen_env(instr, seed):
     """
     Generate an environment from a list of instructions (structured instruction).
 
@@ -58,10 +58,10 @@ def gen_env(instrs, seed):
     objs = set()
 
     # For each instruction
-    for instr in instrs:
+    for ainstr in instr:
         # The pick, goto and open actions mean the referenced objects must exist
-        if instr.action == 'pick' or instr.action == 'goto' or instr.action == 'open':
-            obj = instr.object
+        if ainstr.action == 'pickup' or ainstr.action == 'goto' or ainstr.action == 'open':
+            obj = ainstr.object
             objs.add(obj)
 
     # Create the environment
@@ -75,6 +75,19 @@ def gen_env(instrs, seed):
             objs.remove(obj)
             color = env._randElem(COLOR_NAMES)
             obj = Object(type=obj.type, loc=obj.loc, state=obj.state, color=color)
+            objs.add(obj)
+
+    # Assign unique locations to doors without one
+    locs = set(['north', 'south', 'west', 'east'])
+    for obj in objs:
+        if obj.type == 'door' and obj.loc == None:
+            objs.remove(obj)
+            while True:
+                loc = env._randElem(locs)
+                doors = set(filter(lambda o: o.type == 'door' and o.loc == loc, objs))
+                if len(doors) == 0:
+                    break
+            obj = Object(type=obj.type, loc=loc, state=obj.state, color=obj.color)
             objs.add(obj)
 
     # Make sure that locked doors have matching keys
@@ -122,7 +135,7 @@ def test():
 
     env = gen_env(
         [
-            Instr(action="pick", object=Object(color="red", loc=RelLoc('front'), type="key", state=None)),
+            Instr(action="pickup", object=Object(color="red", loc=RelLoc('front'), type="key", state=None)),
             Instr(action="drop", object=Object(color=None, loc=None, type="key", state=None)),
         ],
         seed
@@ -130,7 +143,7 @@ def test():
 
     # No location specified
     env = gen_env(
-        [Instr(action="pick", object=Object(color="red", loc=None, type="ball", state=None))],
+        [Instr(action="pickup", object=Object(color="red", loc=None, type="ball", state=None))],
         seed
     )
 
@@ -140,8 +153,19 @@ def test():
         seed
     )
 
+    # Multiple doors with no locations
+    env = gen_env(
+        [
+            Instr(action="goto", object=Object(color="blue", loc=None, type="door", state=None)),
+            Instr(action="goto", object=Object(color="red", loc=None, type="door", state=None)),
+            Instr(action="goto", object=Object(color="green", loc=None, type="door", state=None)),
+            Instr(action="goto", object=Object(color="yellow", loc=None, type="door", state=None))
+        ],
+        seed
+    )
+
     # The same seed should always yield the same environment
-    instrs = [Instr(action="pick", object=Object(color=None, loc=None, type="key", state=None))]
+    instrs = [Instr(action="pickup", object=Object(color=None, loc=None, type="key", state=None))]
     grid1 = gen_env(instrs, seed).grid.encode()
     grid2 = gen_env(instrs, seed).grid.encode()
     assert np.array_equal(grid2, grid1)
