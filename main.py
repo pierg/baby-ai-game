@@ -20,6 +20,8 @@ from gym_minigrid import minigrid
 
 import levels
 import agents
+from minigrid import Grid
+
 
 class ImgWidget(QLabel):
     """
@@ -350,6 +352,15 @@ class AIGameWindow(QMainWindow):
 
     def stepEnv(self, action=None):
         # If no manual action was specified by the user
+        current_obs = self.env.genObs()['image']
+        current_obs = Grid.decode(current_obs)
+        #print(current_obs.get(2,2))
+
+        print("Observation")
+        print(self.env.genObs())
+        for key in current_obs.grid:
+            print(key)
+
         if action == None:
             action = random.randint(0, self.env.action_space.n - 1)
 
