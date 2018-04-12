@@ -352,26 +352,6 @@ class AIGameWindow(QMainWindow):
 
     def stepEnv(self, action=None):
         # If no manual action was specified by the user
-        #current_obs = self.env.genObs()['image']
-        #current_obs = Grid.decode(current_obs)
-        #print("Objects in row 0:")
-        #print(current_obs.get(0,0))
-        #print(current_obs.get(1,0))
-        #print(current_obs.get(2,0))
-        #print("Objects in row 1:")
-        #print(current_obs.get(0,1))
-        #print(current_obs.get(1,1))
-        #print(current_obs.get(2,1))
-        #print("Objects in row 2:")
-        #print(current_obs.get(0,2))
-        #print(current_obs.get(1,2))
-        #print(current_obs.get(2,2))
-
-        #print("Observation")
-        #print(self.env.genObs())
-        #for key in current_obs.grid:
-        #    print(key)
-
         if action == None:
             action = random.randint(0, self.env.action_space.n - 1)
 
