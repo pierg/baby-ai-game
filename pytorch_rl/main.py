@@ -44,7 +44,7 @@ except OSError:
 def main():
     os.environ['OMP_NUM_THREADS'] = '1'
 
-    envs = [make_env(args.env_name, args.seed, i, args.log_dir) for i in range(args.num_processes)]
+    envs = [make_env(args.env_name, args.seed, i, args.log_dir, args.reset_on_catastrophe) for i in range(args.num_processes)]
 
     if args.num_processes > 1:
         envs = SubprocVecEnv(envs)
