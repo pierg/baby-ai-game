@@ -339,7 +339,7 @@ class AIGameWindow(QMainWindow):
 
         # Render and display the agent's view
         image = obs['image']
-        obsPixmap = unwrapped.getObsRender(image)
+        obsPixmap = unwrapped.get_obs_render(image)
         self.obsImgLabel.setPixmap(obsPixmap)
 
         # Update the mission text
@@ -347,7 +347,7 @@ class AIGameWindow(QMainWindow):
         self.missionBox.setPlainText(mission)
 
         # Set the steps remaining
-        stepsRem = unwrapped.getStepsRemaining()
+        stepsRem = unwrapped.steps_remaining
         self.stepsLabel.setText(str(stepsRem))
 
     def stepEnv(self, action=None):
