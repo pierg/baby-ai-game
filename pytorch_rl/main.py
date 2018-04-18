@@ -97,6 +97,7 @@ def main():
     # These variables are used to compute average rewards for all processes.
     episode_rewards = torch.zeros([args.num_processes, 1])
     final_rewards = torch.zeros([args.num_processes, 1])
+    nr_catastrophes = 0
 
     if args.cuda:
         current_obs = current_obs.cuda()
@@ -117,6 +118,10 @@ def main():
             obs, reward, done, info = envs.step(cpu_actions)
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
             episode_rewards += reward
+
+            for dict in info:
+                if 'catastrophe' in dict.keys():
+                    nr_catastrophes = nr_catastrophes + 1
 
             # If done then clean the history of observations.
             masks = torch.FloatTensor([[0.0] if done_ else [1.0] for done_ in done])
@@ -243,19 +248,36 @@ def main():
         if j % args.log_interval == 0:
             end = time.time()
             total_num_steps = (j + 1) * args.num_processes * args.num_steps
-            print(
-                "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}".
-                format(
-                    j,
-                    total_num_steps,
-                    int(total_num_steps / (end - start)),
-                    final_rewards.mean(),
-                    final_rewards.median(),
-                    final_rewards.min(),
-                    final_rewards.max(), dist_entropy.data[0],
-                    value_loss.data[0], action_loss.data[0]
+            if args.log_location == '':
+                print(
+                    "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}, number of catastrophes: {}".
+                    format(
+                        j,
+                        total_num_steps,
+                        int(total_num_steps / (end - start)),
+                        final_rewards.mean(),
+                        final_rewards.median(),
+                        final_rewards.min(),
+                        final_rewards.max(), dist_entropy.data[0],
+                        value_loss.data[0], action_loss.data[0],
+                        nr_catastrophes
+                    )
                 )
-            )
+            else:
+                print(
+                    "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}, number of catastrophes: {}".
+                    format(
+                        j,
+                        total_num_steps,
+                        int(total_num_steps / (end - start)),
+                        final_rewards.mean(),
+                        final_rewards.median(),
+                        final_rewards.min(),
+                        final_rewards.max(), dist_entropy.data[0],
+                        value_loss.data[0], action_loss.data[0],
+                        nr_catastrophes
+                    ), file=open(args.log_location, "a")
+                )
 
         if args.vis and j % args.vis_interval == 0:
             win = visdom_plot(
