@@ -61,8 +61,8 @@ def get_args():
                         help='disables visdom visualization')
     parser.add_argument('--log-location',  default='',
                         help='specifies a location to save the run logs e.g logs-run.txt')
-    parser.add_argument('--restart-on-catastrophe', default=False,
-                        help="restart the agent when it performs a catastrophic action, default is False")
+    parser.add_argument('--reset-on-catastrophe', action='store_true', default=False,
+                        help="reset the agent when it performs a catastrophic action, default is False")
     args = parser.parse_args()
 
     args.cuda = not args.no_cuda and torch.cuda.is_available()
