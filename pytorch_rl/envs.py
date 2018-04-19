@@ -11,12 +11,12 @@ try:
 except:
     pass
 
-def make_env(env_id, seed, rank, log_dir, reset_on_catastrophe=False):
+def make_env(env_id, seed, rank, log_dir, activate_blocker=False, reset_on_catastrophe=False):
     def _thunk():
         env = gym.make(env_id)
         env.seed(seed + rank)
 
-        env = SafetyEnvelope(env, reset_on_catastrophe=reset_on_catastrophe)
+        if(activate_blocker): env = SafetyEnvelope(env, reset_on_catastrophe=reset_on_catastrophe)
 
         # Maxime: until RL code supports dict observations, squash observations into a flat vector
         if isinstance(env.observation_space, spaces.Dict):
