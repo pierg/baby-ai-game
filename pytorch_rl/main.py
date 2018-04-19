@@ -120,7 +120,6 @@ def main():
             obs, reward, done, info = envs.step(cpu_actions)
             for done__ in done:
                 if done__:
-                    print("Finished episode")
                     number_of_episodes = number_of_episodes + 1
 
             #[number_of_episodes + 1 if done__ else continue for done__ in done
