@@ -266,12 +266,23 @@ def main():
                       total_num_steps,
                       number_of_episodes,
                       nr_catastrophes)
+                print("Median has been reached")
+                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}",
+                      total_num_steps,
+                      number_of_episodes,
+                      nr_catastrophes, file=("median-reached-log.log"))
+                exit(1)
             if number_of_times_reached_goal > 0:
                 print("The goal has been reached at least once:")
                 print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}",
                       total_num_steps,
                       number_of_episodes,
                       nr_catastrophes)
+                print("The goal has been reached at least once:")
+                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}",
+                      total_num_steps,
+                      number_of_episodes,
+                      nr_catastrophes, file=("goal-reached-log.log"))
             if args.log_location == '':
                 print(
                     "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}, number of catastrophes: {}, number of episodes: {}".
