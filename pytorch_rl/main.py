@@ -104,6 +104,7 @@ def main():
         rollouts.cuda()
 
     start = time.time()
+    number_of_episodes = 0
     for j in range(num_updates):
         for step in range(args.num_steps):
             # Sample actions
@@ -116,6 +117,8 @@ def main():
 
             # Obser reward and next obs
             obs, reward, done, info = envs.step(cpu_actions)
+            if(done):
+                number_of_episodes = number_of_episodes + 1
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
             episode_rewards += reward
 
@@ -248,9 +251,16 @@ def main():
         if j % args.log_interval == 0:
             end = time.time()
             total_num_steps = (j + 1) * args.num_processes * args.num_steps
+            # Check if goal has been reached for the first time, and then log number of steps
+            if (final_rewards.median() >= 992):
+                print("Median has been reached")
+                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}",
+                      total_num_steps,
+                      number_of_episodes,
+                      nr_catastrophes)
             if args.log_location == '':
                 print(
-                    "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}, number of catastrophes: {}".
+                    "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}, number of catastrophes: {}, number of episodes: {}".
                     format(
                         j,
                         total_num_steps,
@@ -260,7 +270,7 @@ def main():
                         final_rewards.min(),
                         final_rewards.max(), dist_entropy.data[0],
                         value_loss.data[0], action_loss.data[0],
-                        nr_catastrophes
+                        nr_catastrophes, number_of_episodes
                     )
                 )
             else:
