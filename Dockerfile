@@ -54,16 +54,34 @@ WORKDIR $HOME
 RUN pip3 install http://download.pytorch.org/whl/cpu/torch-0.3.1-cp36-cp36m-linux_x86_64.whl
 RUN pip3 install torchvision
 
+RUN pip3 install --upgrade pip
+RUN pip3 install -r requirements.txt
+
 # Install pip3 dependencies
-#RUN git clone https://github.com/pierg/baby-ai-game.git baby-ai-game-github
+RUN git clone -b safety_envelope --single-branch https://github.com/pierg/baby-ai-game.git
+RUN git clone -b safety_envelope --single-branch https://github.com/pierg/gym-minigrid.git
+
+RUN pip3 install -r ./baby-ai-game/requirements.txt
+
+RUN cp ./baby-ai-game/docker_launch_script.sh .
+RUN chmod +x docker_launch_script.sh
+
+ENTRYPOINT ./docker_launch_script.sh
+CMD [./baby-ai-game/configurations/default.json]
+
+
+
 #RUN cd baby-ai-game-github
 #RUN pip3 install -e .
 #RUN cd ..
 #RUN rm -r baby-ai-game-github
 
 # install python 3 dependencies
-RUN pip3 install --upgrade pip
-RUN pip3 --no-cache-dir install \
-    gym>=0.9.6 \
-    numpy>=1.10.0 \
-    pyqt5>=5.10.1
+
+#RUN pip3 --no-cache-dir install \
+#    gym>=0.9.6 \
+#    numpy>=1.10.0 \
+#    pyqt5>=5.10.1
+
+
+
