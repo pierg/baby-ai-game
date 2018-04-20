@@ -5,6 +5,9 @@ import time
 import operator
 from functools import reduce
 
+import json
+from collections import namedtuple
+
 import gym
 import numpy as np
 import torch
@@ -41,10 +44,26 @@ except OSError:
     for f in files:
         os.remove(f)
 
-def main():
-    os.environ['OMP_NUM_THREADS'] = '1'
 
-    envs = [make_env(args.env_name, args.seed, i, args.log_dir, args.reset_on_catastrophe) for i in range(args.num_processes)]
+# Importing configuration
+config = None
+# Assumption: baby-ai-game repo folder is located in the same folder containing gym-minigrid repo folder
+config_file_path = os.path.abspath(__file__ + "/../../" + "/configurations/main.json")
+with open(config_file_path, 'r') as jsondata:
+    configdata = jsondata.read()
+    config = json.loads(configdata,
+                            object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+
+# Overriding arguments with configuration file
+args.num_processes = config.num_processes
+args.env_name = config.env_name
+args.algo = config.algorithm
+args.vis = config.visdom
+
+def main():
+
+    os.environ['OMP_NUM_THREADS'] = '1'
+    envs = [make_env(args.env_name, args.seed, i, args.log_dir, config.blocker, args.reset_on_catastrophe) for i in range(args.num_processes)]
 
     if args.num_processes > 1:
         envs = SubprocVecEnv(envs)

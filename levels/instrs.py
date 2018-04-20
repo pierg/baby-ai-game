@@ -1,20 +1,23 @@
 from collections import namedtuple
 
-# Note: we may want to have an implicit parameter to distinguish between
-# locations that are near or far. This way, the difficulty level would be
-# implicitly represented in instructions.
+class Instr:
+    def __init__(self, action, object):
+        # action: goto, open, pickup, drop
+        self.action = action
+        self.object = object
 
-# action: goto, open, pick, drop
-Instr = namedtuple('Instr', ['action', 'object'])
+class Object:
+    def __init__(self, obj, pos):
+        self.type = obj.type
+        self.color = obj.color
+        self.pos = pos
 
-# loc: RelLoc, AbsLoc
-# state: locked
-Object = namedtuple('Object', ['type', 'color', 'loc', 'state'])
+        if self.type is 'locked_door':
+            self.type = 'door'
+            self.state = 'locked'
+        else:
+            self.state = None
 
-# Relative locations
-# loc: left, right, front, behind
-RelLoc = namedtuple('RelLoc', ['loc'])
-
-# Absolute locations
-# loc: north, south, east, west
-AbsLoc = namedtuple('AbsLoc', ['loc'])
+        # TODO: eventually, gen_surface should just use
+        # the pos variable to describe the object location
+        self.loc = None
