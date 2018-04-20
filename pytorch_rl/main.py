@@ -254,35 +254,37 @@ def main():
             save_model = [save_model,
                             hasattr(envs, 'ob_rms') and envs.ob_rms or None]
 
+            print(save_path)
             torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
 
         if j % args.log_interval == 0:
             end = time.time()
             total_num_steps = (j + 1) * args.num_processes * args.num_steps
             # Check if goal has been reached for the first time, and then log number of steps
-            if (final_rewards.median() >= 992):
-                print("Median has been reached")
-                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}",
+            if (final_rewards.mean() >= 992):
+                print("Mean has been reached")
+                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
                       total_num_steps,
                       number_of_episodes,
-                      nr_catastrophes)
+                      nr_catastrophes))
                 print("Median has been reached")
-                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}",
+                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
                       total_num_steps,
                       number_of_episodes,
-                      nr_catastrophes, file=("median-reached-log.log"))
+                      nr_catastrophes), file=open("median-reached-log.log", 'a+'))
+                torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
                 exit(1)
             if number_of_times_reached_goal > 0:
                 print("The goal has been reached at least once:")
-                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}",
+                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
                       total_num_steps,
                       number_of_episodes,
-                      nr_catastrophes)
+                      nr_catastrophes))
                 print("The goal has been reached at least once:")
-                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}",
+                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
                       total_num_steps,
                       number_of_episodes,
-                      nr_catastrophes, file=("goal-reached-log.log"))
+                      nr_catastrophes), file=open("goal-reached-log.log", 'a+'))
             if args.log_location == '':
                 print(
                     "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}, number of catastrophes: {}, number of episodes: {}".
