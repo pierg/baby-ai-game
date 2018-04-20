@@ -3,5 +3,8 @@
   "action_water": "wait",
   "reward_water": "-100",
   "num_processes": 48,
-  "rendering": false
+  "rendering": false,
+  "env_name": "MiniGrid-UnsafeEnvironment-6x6-v0",
+  "algorithm": "a2c",
+  "visdom_plot": true
 }
