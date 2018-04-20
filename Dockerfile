@@ -69,6 +69,7 @@ RUN pip3 install torchvision
 
 RUN pip3 install -r ./baby-ai-game/requirements.txt
 
+WORKDIR $HOME/baby-ai-game
 
 #RUN chmod +x ./baby-ai-game/launch_script.sh
 #ENTRYPOINT ./baby-ai-game/launch_script.sh
