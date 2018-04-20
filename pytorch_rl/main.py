@@ -48,14 +48,14 @@ def main():
     # Importing configuration
     config = None
     # Assumption: baby-ai-game repo folder is located in the same folder containing gym-minigrid repo folder
-    config_file_path = os.path.abspath(__file__ + "/../../" + "/configurations/default.json")
+    config_file_path = os.path.abspath(__file__ + "/../../" + "/configurations/main.json")
     with open(config_file_path, 'r') as jsondata:
         configdata = jsondata.read()
         config = json.loads(configdata,
                             object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
-    # Test config file
-    print(config.blocker)
-    print(config.action_water)
+
+    # Override num_processes
+    args.num_processes = config.num_processes
 
     os.environ['OMP_NUM_THREADS'] = '1'
     envs = [make_env(args.env_name, args.seed, i, args.log_dir, config.blocker, args.reset_on_catastrophe) for i in range(args.num_processes)]
