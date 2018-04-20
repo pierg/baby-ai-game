@@ -28,6 +28,10 @@ if [ -d "venv" ]; then
   source ./venv/bin/activate
 fi
 
+
+echo "...launch visdom server in the background..."
+python python -m visdom.server &
+
 echo "...start training..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
 export PYTHONPATH
