@@ -70,5 +70,6 @@ RUN pip3 install torchvision
 RUN pip3 install -r ./baby-ai-game/requirements.txt
 
 WORKDIR $HOME/baby-ai-game
+
 ENTRYPOINT ["./launch_script.sh"]
 CMD ["no_blocker.json"]

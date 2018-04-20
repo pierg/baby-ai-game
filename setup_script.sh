@@ -16,11 +16,7 @@ cd gym-minigrid
 git pull
 cd ..
 
-echo "...updating selected configuration file..."
-cd ./baby-ai-game/configurations
-yes | cp -rf $configuration_file "main.json"
-
-cd ..
+cd ./baby-ai-game
 
 # Use virtual environment if exists
 if [ -d "venv" ]; then
@@ -32,7 +28,7 @@ fi
 echo "...launch visdom server in the background..."
 python3 -m visdom.server &
 
-echo "...start training..."
+
+echo "...configuring PYTHONPATH..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
 export PYTHONPATH
-python3 ./pytorch_rl/main.py
