@@ -7,6 +7,10 @@ RUN echo "The user is: $USER"
 
 USER 0
 
+EXPOSE 5901
+EXPOSE 6901
+EXPOSE 8097
+
 RUN apt-get update && apt-get install -y \
         sudo \
         git \
