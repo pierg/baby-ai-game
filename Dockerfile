@@ -72,20 +72,3 @@ RUN cp ./baby-ai-game/launch_script.sh .
 RUN chmod +x launch_script.sh
 
 ENTRYPOINT ./launch_script.sh
-
-
-
-#RUN cd baby-ai-game-github
-#RUN pip3 install -e .
-#RUN cd ..
-#RUN rm -r baby-ai-game-github
-
-# install python 3 dependencies
-
-#RUN pip3 --no-cache-dir install \
-#    gym>=0.9.6 \
-#    numpy>=1.10.0 \
-#    pyqt5>=5.10.1
-
-
-
