@@ -31,4 +31,4 @@ fi
 echo "...start training..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
 export PYTHONPATH
-python3 ./pytorch_rl/main.py --env-name MiniGrid-UnsafeEnvironment-6x6-v0 --no-vis --num-processes 48 --algo a2c
+python3 ./pytorch_rl/main.py
