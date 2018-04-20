@@ -30,7 +30,7 @@ fi
 
 
 echo "...launch visdom server in the background..."
-python python -m visdom.server &
+python python3 -m visdom.server &
 
 echo "...start training..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH

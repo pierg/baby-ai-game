@@ -31,5 +31,5 @@ tornado==5.0.1
 tqdm==4.19.9
 transitions==0.6.4
 urllib3==1.22
-visdom==0.1.7
+visdom
 zmq==0.0.0
