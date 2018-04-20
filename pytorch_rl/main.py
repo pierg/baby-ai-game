@@ -58,7 +58,7 @@ with open(config_file_path, 'r') as jsondata:
 args.num_processes = config.num_processes
 args.env_name = config.env_name
 args.algo = config.algorithm
-args.vis = config.visdom_plot
+args.vis = config.visdom
 
 def main():
 

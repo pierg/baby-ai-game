@@ -6,5 +6,5 @@
   "rendering": false,
   "env_name": "MiniGrid-UnsafeEnvironment-6x6-v0",
   "algorithm": "a2c",
-  "visdom_plot": true
+  "visdom": true
 }
