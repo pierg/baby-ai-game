@@ -2,6 +2,9 @@ import os
 import numpy
 import gym
 from gym import spaces
+import os
+from collections import namedtuple
+import json
 
 try:
     import gym_minigrid
@@ -11,12 +14,17 @@ try:
 except:
     pass
 
-def make_env(env_id, seed, rank, log_dir, activate_blocker=False, reset_on_catastrophe=False):
+from helpers import config_grabber as cg
+
+def make_env(env_id, seed, rank, log_dir, reset_on_catastrophe=False):
+
+    config = cg.Configuration.grab()
+
     def _thunk():
         env = gym.make(env_id)
         env.seed(seed + rank)
 
-        if(activate_blocker): env = SafetyEnvelope(env, reset_on_catastrophe=reset_on_catastrophe)
+        if config.blocker: env = SafetyEnvelope(env, reset_on_catastrophe=reset_on_catastrophe)
 
         # Maxime: until RL code supports dict observations, squash observations into a flat vector
         if isinstance(env.observation_space, spaces.Dict):

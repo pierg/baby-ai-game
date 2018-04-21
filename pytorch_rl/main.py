@@ -25,6 +25,8 @@ from model import Policy
 from storage import RolloutStorage
 from visualize import visdom_plot
 
+from helpers import config_grabber as cg
+
 args = get_args()
 
 assert args.algo in ['a2c', 'ppo', 'acktr']
@@ -45,25 +47,19 @@ except OSError:
         os.remove(f)
 
 
-# Importing configuration
-config = None
-# Assumption: baby-ai-game repo folder is located in the same folder containing gym-minigrid repo folder
-config_file_path = os.path.abspath(__file__ + "/../../" + "/configurations/main.json")
-with open(config_file_path, 'r') as jsondata:
-    configdata = jsondata.read()
-    config = json.loads(configdata,
-                            object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
-
-# Overriding arguments with configuration file
-args.num_processes = config.num_processes
-args.env_name = config.env_name
-args.algo = config.algorithm
-args.vis = config.visdom
-
 def main():
 
+    # Getting configuration from file
+    config = cg.Configuration.grab()
+
+    # Overriding arguments with configuration file
+    args.num_processes = config.num_processes
+    args.env_name = config.env_name
+    args.algo = config.algorithm
+    args.vis = config.visdom
+
     os.environ['OMP_NUM_THREADS'] = '1'
-    envs = [make_env(args.env_name, args.seed, i, args.log_dir, config.blocker, args.reset_on_catastrophe) for i in range(args.num_processes)]
+    envs = [make_env(args.env_name, args.seed, i, args.log_dir, args.reset_on_catastrophe) for i in range(args.num_processes)]
 
     if args.num_processes > 1:
         envs = SubprocVecEnv(envs)
