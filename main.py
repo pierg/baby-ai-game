@@ -374,7 +374,7 @@ def main(argv):
     (options, args) = parser.parse_args()
 
     # Getting configuration from file
-    config = cg.Configuration.grab()
+    config = cg.Configuration.grab("blocker")
 
     # Overriding arguments with configuration file
     options.env_name = config.env_name

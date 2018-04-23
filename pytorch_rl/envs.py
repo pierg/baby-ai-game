@@ -11,7 +11,7 @@ from helpers import config_grabber as cg
 
 def make_env(env_id, seed, rank, log_dir, reset_on_catastrophe=False):
 
-    config = cg.Configuration.grab()
+    config = cg.Configuration.grab("blocker")
 
     def _thunk():
         env = gym.make(env_id)

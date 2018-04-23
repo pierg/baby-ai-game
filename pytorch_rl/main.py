@@ -51,7 +51,7 @@ except OSError:
 def main():
 
     # Getting configuration from file
-    config = cg.Configuration.grab()
+    config = cg.Configuration.grab("blocker")
 
     # Overriding arguments with configuration file
     args.num_processes = config.num_processes
@@ -145,7 +145,6 @@ def main():
                 if 'catastrophe' in dict.keys():
                     nr_catastrophes = nr_catastrophes + 1
                 if 'goal' in dict.keys():
-                    print("Goal reward: ", reward)
                     number_of_times_reached_goal = number_of_times_reached_goal + 1
 
             # If done then clean the history of observations.
