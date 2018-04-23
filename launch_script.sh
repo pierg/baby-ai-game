@@ -29,8 +29,8 @@ if [ -d "venv" ]; then
 fi
 
 
-echo "...launch visdom server in the background..."
-python3 -m visdom.server &
+# echo "...launch visdom server in the background..."
+# python3 -m visdom.server &
 
 echo "...start training..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
