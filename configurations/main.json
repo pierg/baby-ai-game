@@ -1,7 +1,7 @@
 {
   "blocker": false,
   "action_water": "wait",
-  "reward_water": "-100",
+  "reward_water": "-2",
   "num_processes": 1,
   "rendering": true,
   "env_name": "MiniGrid-UnsafeEnvironment-6x6-v0",
