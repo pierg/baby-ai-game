@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-import time
 import sys
-import threading
 import copy
 import random
 from optparse import OptionParser
@@ -11,16 +9,19 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QInputDialog
 from PyQt5.QtWidgets import QLabel, QTextEdit, QFrame
 from PyQt5.QtWidgets import QPushButton, QSlider, QHBoxLayout, QVBoxLayout
-from PyQt5.QtGui import QImage, QPixmap, QPainter, QColor
 
-# Gym environment used by the Baby AI Game
-import gym
-import gym_minigrid
 from gym_minigrid import minigrid
 
-import levels
-import agents
-from minigrid import Grid
+try:
+    import gym_minigrid
+    from gym_minigrid.wrappers import *
+    from gym_minigrid.envelopes import *
+
+except:
+    pass
+
+from helpers import config_grabber as cg
+
 
 
 class ImgWidget(QLabel):
@@ -372,8 +373,16 @@ def main(argv):
     )
     (options, args) = parser.parse_args()
 
+    # Getting configuration from file
+    config = cg.Configuration.grab()
+
+    # Overriding arguments with configuration file
+    options.env_name = config.env_name
+
     # Load the gym environment
     env = gym.make(options.env_name)
+
+    if (config.blocker): env = SafetyEnvelope(env)
 
     # Create the application window
     app = QApplication(sys.argv)
