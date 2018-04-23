@@ -48,7 +48,7 @@ except OSError:
 # Importing configuration
 config = None
 # Assumption: baby-ai-game repo folder is located in the same folder containing gym-minigrid repo folder
-config_file_path = os.path.abspath(__file__ + "/../../" + "/configurations/main.json")
+config_file_path = os.path.abspath(__file__ + "/../../" + "/configurations/blocker.json")
 with open(config_file_path, 'r') as jsondata:
     configdata = jsondata.read()
     config = json.loads(configdata,
@@ -141,9 +141,6 @@ def main():
                 if done__:
                     number_of_episodes = number_of_episodes + 1
 
-            #[number_of_episodes + 1 if done__ else continue for done__ in done
-                #number_of_episodes = number_of_episodes + 1
-
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
             episode_rewards += reward
 
@@ -151,6 +148,7 @@ def main():
                 if 'catastrophe' in dict.keys():
                     nr_catastrophes = nr_catastrophes + 1
                 if 'goal' in dict.keys():
+                    print("Goal reward: ", reward)
                     number_of_times_reached_goal = number_of_times_reached_goal + 1
 
             # If done then clean the history of observations.
@@ -273,7 +271,6 @@ def main():
             save_model = [save_model,
                             hasattr(envs, 'ob_rms') and envs.ob_rms or None]
 
-            print(save_path)
             torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
 
         if j % args.log_interval == 0:
@@ -286,26 +283,13 @@ def main():
                       total_num_steps,
                       number_of_episodes,
                       nr_catastrophes))
-                print("Median has been reached")
-                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
-                      total_num_steps,
-                      number_of_episodes,
-                      nr_catastrophes), file=open("median-reached-log.log", 'a+'))
                 torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
-                exit(1)
             if number_of_times_reached_goal > 0:
-                print("The goal has been reached at least once:")
-                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
+                print("Goal reached***: Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
                       total_num_steps,
                       number_of_episodes,
                       nr_catastrophes))
-                print("The goal has been reached at least once:")
-                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
-                      total_num_steps,
-                      number_of_episodes,
-                      nr_catastrophes), file=open("goal-reached-log.log", 'a+'))
-            if args.log_location == '':
-                print(
+            print(
                     "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}, number of catastrophes: {}, number of episodes: {}".
                     format(
                         j,
@@ -318,21 +302,6 @@ def main():
                         value_loss.data[0], action_loss.data[0],
                         nr_catastrophes, number_of_episodes
                     )
-                )
-            else:
-                print(
-                    "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}, number of catastrophes: {}".
-                    format(
-                        j,
-                        total_num_steps,
-                        int(total_num_steps / (end - start)),
-                        final_rewards.mean(),
-                        final_rewards.median(),
-                        final_rewards.min(),
-                        final_rewards.max(), dist_entropy.data[0],
-                        value_loss.data[0], action_loss.data[0],
-                        nr_catastrophes
-                    ), file=open(args.log_location, "a")
                 )
 
         if args.vis and j % args.vis_interval == 0:
