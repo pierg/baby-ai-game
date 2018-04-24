@@ -25,6 +25,8 @@ from model import Policy
 from storage import RolloutStorage
 from visualize import visdom_plot
 
+import csv
+
 from helpers import config_grabber as cg
 
 args = get_args()
@@ -46,6 +48,11 @@ except OSError:
     for f in files:
         os.remove(f)
 
+
+def write_to_log(csv_file, log_text):
+    with open(csv_file, 'a', newline='') as csv_log:
+        writer = csv.writer(csv_log, delimiter=' ')
+        writer.writerow(log_text)
 
 
 def main():
@@ -279,6 +286,10 @@ def main():
                       total_num_steps,
                       number_of_episodes,
                       nr_catastrophes))
+                write_to_log('goal-reward-blocker.csv', "Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
+                                                                                                total_num_steps,
+                                                                                                number_of_episodes,
+                                                                                                nr_catastrophes))
                 torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
             if number_of_times_reached_goal > 0:
                 print("Goal reached***: Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
