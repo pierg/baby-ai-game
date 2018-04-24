@@ -5,9 +5,6 @@ import time
 import operator
 from functools import reduce
 
-import json
-from collections import namedtuple
-
 import gym
 import numpy as np
 import torch
@@ -19,13 +16,14 @@ from torch.autograd import Variable
 from arguments import get_args
 from vec_env.dummy_vec_env import DummyVecEnv
 from vec_env.subproc_vec_env import SubprocVecEnv
-from envs import make_env
 from kfac import KFACOptimizer
 from model import Policy
 from storage import RolloutStorage
 from visualize import visdom_plot
 
 from helpers import config_grabber as cg
+
+from envs import make_env
 
 args = get_args()
 
@@ -46,7 +44,6 @@ except OSError:
     for f in files:
         os.remove(f)
 
-
 def main():
 
     # Getting configuration from file
@@ -59,7 +56,8 @@ def main():
     args.vis = config.visdom
 
     os.environ['OMP_NUM_THREADS'] = '1'
-    envs = [make_env(args.env_name, args.seed, i, args.log_dir, args.reset_on_catastrophe) for i in range(args.num_processes)]
+
+    envs = [make_env(args.env_name, args.seed, i, args.log_dir) for i in range(args.num_processes)]
 
     if args.num_processes > 1:
         envs = SubprocVecEnv(envs)
@@ -112,15 +110,12 @@ def main():
     # These variables are used to compute average rewards for all processes.
     episode_rewards = torch.zeros([args.num_processes, 1])
     final_rewards = torch.zeros([args.num_processes, 1])
-    nr_catastrophes = 0
 
     if args.cuda:
         current_obs = current_obs.cuda()
         rollouts.cuda()
 
     start = time.time()
-    number_of_episodes = 0
-    number_of_times_reached_goal = 0
     for j in range(num_updates):
         for step in range(args.num_steps):
             # Sample actions
@@ -133,21 +128,8 @@ def main():
 
             # Obser reward and next obs
             obs, reward, done, info = envs.step(cpu_actions)
-            for done__ in done:
-                if done__:
-                    number_of_episodes = number_of_episodes + 1
-
-            #[number_of_episodes + 1 if done__ else continue for done__ in done
-                #number_of_episodes = number_of_episodes + 1
-
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
             episode_rewards += reward
-
-            for dict in info:
-                if 'catastrophe' in dict.keys():
-                    nr_catastrophes = nr_catastrophes + 1
-                if 'goal' in dict.keys():
-                    number_of_times_reached_goal = number_of_times_reached_goal + 1
 
             # If done then clean the history of observations.
             masks = torch.FloatTensor([[0.0] if done_ else [1.0] for done_ in done])
@@ -269,67 +251,24 @@ def main():
             save_model = [save_model,
                             hasattr(envs, 'ob_rms') and envs.ob_rms or None]
 
-            print(save_path)
             torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
 
         if j % args.log_interval == 0:
             end = time.time()
             total_num_steps = (j + 1) * args.num_processes * args.num_steps
-            # Check if goal has been reached for the first time, and then log number of steps
-            if (final_rewards.mean() >= 992):
-                print("Mean has been reached")
-                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
-                      total_num_steps,
-                      number_of_episodes,
-                      nr_catastrophes))
-                print("Median has been reached")
-                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
-                      total_num_steps,
-                      number_of_episodes,
-                      nr_catastrophes), file=open("median-reached-log.log", 'a+'))
-                torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
-                exit(1)
-            if number_of_times_reached_goal > 0:
-                print("The goal has been reached at least once:")
-                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
-                      total_num_steps,
-                      number_of_episodes,
-                      nr_catastrophes))
-                print("The goal has been reached at least once:")
-                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
-                      total_num_steps,
-                      number_of_episodes,
-                      nr_catastrophes), file=open("goal-reached-log.log", 'a+'))
-            if args.log_location == '':
-                print(
-                    "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}, number of catastrophes: {}, number of episodes: {}".
-                    format(
-                        j,
-                        total_num_steps,
-                        int(total_num_steps / (end - start)),
-                        final_rewards.mean(),
-                        final_rewards.median(),
-                        final_rewards.min(),
-                        final_rewards.max(), dist_entropy.data[0],
-                        value_loss.data[0], action_loss.data[0],
-                        nr_catastrophes, number_of_episodes
-                    )
+            print(
+                "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.2f}/{:.2f}, min/max reward {:.2f}/{:.2f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}".
+                format(
+                    j,
+                    total_num_steps,
+                    int(total_num_steps / (end - start)),
+                    final_rewards.mean(),
+                    final_rewards.median(),
+                    final_rewards.min(),
+                    final_rewards.max(), dist_entropy.data[0],
+                    value_loss.data[0], action_loss.data[0]
                 )
-            else:
-                print(
-                    "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}, number of catastrophes: {}".
-                    format(
-                        j,
-                        total_num_steps,
-                        int(total_num_steps / (end - start)),
-                        final_rewards.mean(),
-                        final_rewards.median(),
-                        final_rewards.min(),
-                        final_rewards.max(), dist_entropy.data[0],
-                        value_loss.data[0], action_loss.data[0],
-                        nr_catastrophes
-                    ), file=open(args.log_location, "a")
-                )
+            )
 
         if args.vis and j % args.vis_interval == 0:
             win = visdom_plot(
