@@ -22,7 +22,7 @@ def make_env(env_id, seed, rank, log_dir):
 
         env.seed(seed + rank)
 
-        if config.blocker:
+        if config.monitor:
             env = SafetyEnvelope(env)
 
         # Maxime: until RL code supports dict observations, squash observations into a flat vector

@@ -1,5 +1,5 @@
 {
-  "blocker": true,
+  "monitor": true,
   "action_water": "wait",
   "reward_water": "-100",
   "num_processes": 48,
