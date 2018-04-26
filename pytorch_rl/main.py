@@ -25,7 +25,7 @@ from model import Policy
 from storage import RolloutStorage
 from visualize import visdom_plot
 
-import csv
+import csv_logger
 
 from helpers import config_grabber as cg
 
@@ -49,16 +49,19 @@ except OSError:
         os.remove(f)
 
 
-def write_to_log(csv_file, log_text):
-    with open(csv_file, 'a', newline='') as csv_log:
-        writer = csv.writer(csv_log, delimiter=' ')
-        writer.writerow(log_text)
-
-
 def main():
 
     # Getting configuration from file
     config = cg.Configuration.grab("blocker")
+
+    # Setup CSV logging
+    csv_logger.create_header(config.csv_log_file,
+                             ['Number_of_steps',
+                              'Number_of_episodes',
+                              'Number_of_blocked_actions',
+                              'First_time_number_of_steps_to_reach_goal',
+                              'Reward_mean_reached',
+                              'Number_of_processes'])
 
     # Overriding arguments with configuration file
     args.num_processes = config.num_processes
@@ -67,7 +70,7 @@ def main():
     args.vis = config.visdom
 
     os.environ['OMP_NUM_THREADS'] = '1'
-    envs = [make_env(args.env_name, args.seed, i, args.log_dir, args.reset_on_catastrophe) for i in range(args.num_processes)]
+    envs = [make_env(args.env_name, args.seed, i, args.log_dir) for i in range(args.num_processes)]
 
     if args.num_processes > 1:
         envs = SubprocVecEnv(envs)
@@ -129,6 +132,8 @@ def main():
     start = time.time()
     number_of_episodes = 0
     number_of_times_reached_goal = 0
+    first_time_goal = 0
+    has_reached_goal = False
     for j in range(num_updates):
         for step in range(args.num_steps):
             # Sample actions
@@ -280,22 +285,46 @@ def main():
             end = time.time()
             total_num_steps = (j + 1) * args.num_processes * args.num_steps
             # Check if goal has been reached for the first time, and then log number of steps
-            if (final_rewards.mean() >= 992):
-                print("Mean has been reached")
-                print("Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
-                      total_num_steps,
-                      number_of_episodes,
-                      nr_catastrophes))
-                write_to_log('goal-reward-blocker.csv', "Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
-                                                                                                total_num_steps,
-                                                                                                number_of_episodes,
-                                                                                                nr_catastrophes))
+            if final_rewards.mean() >= 992:
+                csv_logger.write_to_log("{},{},{},{},{},{}".format(
+                    total_num_steps,
+                    number_of_episodes,
+                    nr_catastrophes,
+                    first_time_goal,
+                    total_num_steps,
+                    config.num_processes
+                ))
                 torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
+                exit(1)
             if number_of_times_reached_goal > 0:
-                print("Goal reached***: Number of steps: {}, Number of episodes: {}, Number of blocked actions: {}".format(
-                      total_num_steps,
-                      number_of_episodes,
-                      nr_catastrophes))
+                if not has_reached_goal:
+                    csv_logger.write_to_log("{},{},{},{},{},{}".format(
+                        total_num_steps,
+                        number_of_episodes,
+                        nr_catastrophes,
+                        total_num_steps,
+                        0,
+                        config.num_processes
+                    ))
+                    has_reached_goal = True
+                else:
+                    csv_logger.write_to_log("{},{},{},{},{},{}".format(
+                        total_num_steps,
+                        number_of_episodes,
+                        nr_catastrophes,
+                        0,
+                        0,
+                        config.num_processes
+                    ))
+            else:
+                csv_logger.write_to_log("{},{},{},{},{},{}".format(
+                    total_num_steps,
+                    number_of_episodes,
+                    nr_catastrophes,
+                    0,
+                    0,
+                    config.num_processes
+                ))
             print(
                     "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}, number of catastrophes: {}, number of episodes: {}".
                     format(
