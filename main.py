@@ -23,17 +23,18 @@ except:
 from helpers import config_grabber as cg
 
 
-
 class ImgWidget(QLabel):
     """
     Widget to intercept clicks on the full image view
     """
+
     def __init__(self, window):
         super().__init__()
         self.window = window
 
     def mousePressEvent(self, event):
         self.window.imageClick(event.x(), event.y())
+
 
 class AIGameWindow(QMainWindow):
     """Application window for the baby AI game"""
@@ -364,6 +365,7 @@ class AIGameWindow(QMainWindow):
         if done:
             self.resetEnv()
 
+
 def main(argv):
     parser = OptionParser()
     parser.add_option(
@@ -382,7 +384,8 @@ def main(argv):
     # Load the gym environment
     env = gym.make(options.env_name)
 
-    if (config.blocker): env = SafetyEnvelope(env)
+    if config.action_planner:
+        env = ActionPlannerEnvelope(env)
 
     # Create the application window
     app = QApplication(sys.argv)
@@ -390,6 +393,7 @@ def main(argv):
 
     # Run the application
     sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main(sys.argv)

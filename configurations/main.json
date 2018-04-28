@@ -1,11 +1,8 @@
 {
-  "blocker": false,
-  "action_water": "wait",
-  "reward_water": "-100",
+  "action_planner": true,
   "num_processes": 1,
   "rendering": true,
   "env_name": "MiniGrid-DangerousTile-8x8-v0",
   "algorithm": "a2c",
-  "visdom": false,
-  "reset_catastrofe": true
+  "visdom": false
 }
