@@ -32,7 +32,9 @@ fi
 # echo "...launch visdom server in the background..."
 # python3 -m visdom.server &
 
-echo "...start training..."
+echo "...setting up python environment..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
 export PYTHONPATH
-python3 ./pytorch_rl/main.py
+
+#echo "...launching the training..."
+#python3 ./pytorch_rl/main.py
