@@ -1,12 +1,10 @@
 {
+	"env_name": "MiniGrid-Unsafe-8x8-v0",
 	"monitor": true,
     "absence_monitors": ["water"],
-	"action_water": "wait",
-	"reward_water": "-100",
+	"on_violation_reset": false,
 	"num_processes": 1,
 	"rendering": true,
-	"env_name": "MiniGrid-Unsafe-6x6-v0",
 	"algorithm": "a2c",
-	"visdom": false,
-	"on_violation": "reset"
+	"visdom": false
 }
