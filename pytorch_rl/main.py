@@ -290,7 +290,7 @@ def main():
                     total_num_steps,
                     number_of_episodes,
                     nr_catastrophes,
-                    first_time_goal,
+                    "",
                     total_num_steps,
                     config.num_processes
                 ))
@@ -303,7 +303,7 @@ def main():
                         number_of_episodes,
                         nr_catastrophes,
                         total_num_steps,
-                        0,
+                        "",
                         config.num_processes
                     ))
                     has_reached_goal = True
@@ -312,8 +312,8 @@ def main():
                         total_num_steps,
                         number_of_episodes,
                         nr_catastrophes,
-                        0,
-                        0,
+                        "",
+                        "",
                         config.num_processes
                     ))
             else:
@@ -321,8 +321,8 @@ def main():
                     total_num_steps,
                     number_of_episodes,
                     nr_catastrophes,
-                    0,
-                    0,
+                    "",
+                    "",
                     config.num_processes
                 ))
             print(

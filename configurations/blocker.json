@@ -1,11 +1,11 @@
 {
   "blocker": true,
   "action_water": "wait",
-  "reward_water": "-100",
+  "reward_water": "-2",
   "num_processes": 48,
   "rendering": false,
   "env_name": "MiniGrid-UnsafeEnvironment-6x6-v0",
   "algorithm": "a2c",
   "visdom": false,
-  "csv_log_file": "goal-reward-blocker-minus-100-reward.csv"
+  "csv_log_file": "goal-reward-blocker-minus-2-reward-NA.csv"
 }
