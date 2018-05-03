@@ -16,11 +16,14 @@ from torch.autograd import Variable
 from arguments import get_args
 from vec_env.dummy_vec_env import DummyVecEnv
 from vec_env.subproc_vec_env import SubprocVecEnv
-from envs import make_env
 from kfac import KFACOptimizer
 from model import Policy
 from storage import RolloutStorage
 from visualize import visdom_plot
+
+from helpers import config_grabber as cg
+
+from envs import make_env
 
 args = get_args()
 
@@ -42,6 +45,16 @@ except OSError:
         os.remove(f)
 
 def main():
+
+    # Getting configuration from file
+    config = cg.Configuration.grab()
+
+    # Overriding arguments with configuration file
+    args.num_processes = config.num_processes
+    args.env_name = config.env_name
+    args.algo = config.algorithm
+    args.vis = config.visdom
+
     os.environ['OMP_NUM_THREADS'] = '1'
 
     envs = [make_env(args.env_name, args.seed, i, args.log_dir) for i in range(args.num_processes)]
