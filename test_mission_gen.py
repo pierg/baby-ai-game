@@ -1,61 +1,92 @@
 #!/usr/bin/env python3
 
 import random
+import time
+from optparse import OptionParser
 
-from levels.instr_gen import gen_instr_seq, gen_surface
-from levels.env_gen import gen_env
-from levels.instrs import *
-from levels.verifier import InstrSeqVerifier
+from levels import level_dict
+
+from PyQt5.QtWidgets import QApplication
+from gym_minigrid.rendering import Window
 
 def test():
-    seed = random.randint(0, 0xFFFF)
+    parser = OptionParser()
+    parser.add_option(
+        "--level-name",
+        default='RedDoor'
+    )
+    parser.add_option(
+        "--seed",
+        type="int",
+        default=-1
+    )
+    (options, args) = parser.parse_args()
 
-    instr = [
-        Instr(action="open", object=Object(type="door", color="red", loc=None, state="locked")),
-        Instr(action="pickup", object=Object(type="key", color="green", loc=None, state=None)),
-        Instr(action="open", object=Object(type="door", color="blue", loc=None, state=None)),
-        Instr(action="drop", object=None)
-    ]
+    rng = random.Random()
+    seed = options.seed
 
-    print(instr)
-    print(gen_surface(instr))
+    level = level_dict[options.level_name]
+    mission = None
 
-    env = gen_env(instr, seed)
-    verifier = InstrSeqVerifier(env, instr)
+    app = QApplication([])
+    window = Window()
+
+    def reset():
+        nonlocal seed
+        nonlocal mission
+
+        if options.seed == -1:
+            seed = rng.randint(0, 0xFFFFFF)
+
+        mission = level(seed=seed)
+
+        print('seed=%d' % seed)
+        print(mission.instrs)
+        print(mission.surface)
+
+        pixmap = mission.render('pixmap')
+        window.setPixmap(pixmap)
+        window.setKeyDownCb(keyDownCb)
 
     def keyDownCb(keyName):
         if keyName == 'ESCAPE':
-            env.gridRender.window.close()
+            window.close()
+            return
+
+        if keyName == 'BACKSPACE':
+            reset()
+            return
 
         action = 0
         if keyName == 'LEFT':
-            action = env.actions.left
+            action = mission.actions.left
         elif keyName == 'RIGHT':
-            action = env.actions.right
+            action = mission.actions.right
         elif keyName == 'UP':
-            action = env.actions.forward
+            action = mission.actions.forward
         elif keyName == 'SPACE':
-            action = env.actions.toggle
+            action = mission.actions.toggle
         elif keyName == 'PAGE_UP':
-            action = env.actions.pickup
+            action = mission.actions.pickup
         elif keyName == 'PAGE_DOWN':
-            action = env.actions.drop
+            action = mission.actions.drop
         else:
             return
 
-        _, _, _, _ = env.step(action)
-        done = verifier.step()
-        print(done)
+        obs, reward, done, info = mission.step(action)
+        print("is done:", done)
 
-    renderer = env.render('human')
-    renderer.window.setKeyDownCb(keyDownCb)
+        if done == True:
+            reset()
 
-    import time
+    reset()
 
     while True:
         time.sleep(0.01)
-        env.render('human')
-        if env.gridRender.window.closed:
-            break
+        pixmap = mission.render('pixmap')
+        window.setPixmap(pixmap)
+        app.processEvents()
+        if window.closed:
+           break
 
 test()

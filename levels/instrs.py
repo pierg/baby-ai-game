@@ -1,20 +1,26 @@
 from collections import namedtuple
 
-# Note: we may want to have an implicit parameter to distinguish between
-# locations that are near or far. This way, the difficulty level would be
-# implicitly represented in instructions.
+from gym_minigrid.minigrid import COLOR_NAMES
 
-# action: goto, open, pick, drop
-Instr = namedtuple('Instr', ['action', 'object'])
+class Instr:
+    def __init__(self, action, object):
+        # action: goto, open, pickup, drop
+        self.action = action
+        self.object = object
 
-# loc: RelLoc, AbsLoc
-# state: locked
-Object = namedtuple('Object', ['type', 'color', 'loc', 'state'])
+class Object:
+    def __init__(self, type, color=None, loc=None):
+        assert isinstance(type, str)
+        assert color in [None, *COLOR_NAMES]
+        assert loc in [None, 'left', 'right', 'front', 'behind']
 
-# Relative locations
-# loc: left, right, front, behind
-RelLoc = namedtuple('RelLoc', ['loc'])
+        self.type = type
+        self.color = color
 
-# Absolute locations
-# loc: north, south, east, west
-AbsLoc = namedtuple('AbsLoc', ['loc'])
+        if type is 'locked_door':
+            self.type = 'door'
+            self.state = 'locked'
+        else:
+            self.state = None
+
+        self.loc = loc
