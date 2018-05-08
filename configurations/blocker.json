@@ -7,5 +7,6 @@
   "env_name": "MiniGrid-UnsafeEnvironment-6x6-v0",
   "algorithm": "a2c",
   "visdom": false,
-  "csv_log_file": "goal-reward-blocker-minus-2-reward-NA.csv"
+  "csv_log_file": "../csv_logs/goal-reward-no-blocker-run-48-1231231231231-process.csv",
+  "shortest_path": 993
 }
