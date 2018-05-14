@@ -43,6 +43,6 @@
   "on_violation_reset": false,
   "rendering": false,
   "evaluation_directory_name": "evaluations",
-  "visdom": false
+  "visdom": false,
   "debug_mode": false
 }
