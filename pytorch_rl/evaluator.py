@@ -1,15 +1,12 @@
-import json
-from collections import namedtuple
-
-import csv_logger
-
 import numpy as np
 
 import torch
 
-from helpers import config_grabber as cg
+from configurations import config_grabber as cg
 
 import csv_logger
+
+import os
 
 
 class Evaluator:
@@ -18,8 +15,17 @@ class Evaluator:
         # Getting configuration from file
         self.config = cg.Configuration.grab()
 
+        config_file_path = os.path.abspath(__file__ + "/../../"
+                                           + self.config.evaluation_directory_name + "/"
+                                           + self.config.config_name
+                                           + ".csv")
+
+        dirname = os.path.dirname(config_file_path)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+
         # Setup CSV logging
-        csv_logger.create_header(self.config.csv_log_file_path,
+        csv_logger.create_header(config_file_path,
                                  ['N_updates',
                                   'N_timesteps',
                                   'FPS',
@@ -43,6 +49,7 @@ class Evaluator:
         self.n_catastrophes = torch.zeros([self.config.num_processes, 1])
         self.n_episodes = torch.zeros([self.config.num_processes, 1])
         self.n_proccess_reached_goal = torch.zeros([self.config.num_processes, 1])
+
 
 
     def update(self, reward, done, info):
@@ -71,7 +78,7 @@ class Evaluator:
 
     def save(self, n_updates, t_start, t_end, dist_entropy, value_loss, action_loss):
 
-        total_num_steps = (j + 1) * self.config.num_processes * self.config.num_steps
+        total_num_steps = (n_updates + 1) * self.config.num_processes * self.config.num_steps
 
         csv_logger.write_to_log("{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
             n_updates,

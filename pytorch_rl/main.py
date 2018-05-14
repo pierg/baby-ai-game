@@ -5,15 +5,14 @@ import time
 import operator
 from functools import reduce
 
-import gym
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 from torch.autograd import Variable
 
 from arguments import get_args
+from evaluator import Evaluator
 from vec_env.dummy_vec_env import DummyVecEnv
 from vec_env.subproc_vec_env import SubprocVecEnv
 from kfac import KFACOptimizer
@@ -21,7 +20,7 @@ from model import Policy
 from storage import RolloutStorage
 from visualize import visdom_plot
 
-from helpers import config_grabber as cg
+from configurations import config_grabber as cg
 
 from envs import make_env
 
@@ -51,9 +50,13 @@ def main():
 
     # Overriding arguments with configuration file
     args.num_processes = config.num_processes
+    args.num_steps = config.num_steps
     args.env_name = config.env_name
     args.algo = config.algorithm
     args.vis = config.visdom
+
+    # Initializing evaluation
+    evaluator = Evaluator()
 
     os.environ['OMP_NUM_THREADS'] = '1'
 
@@ -128,6 +131,9 @@ def main():
 
             # Obser reward and next obs
             obs, reward, done, info = envs.step(cpu_actions)
+
+            evaluator.update(reward, done, info)
+
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
             episode_rewards += reward
 
@@ -256,6 +262,9 @@ def main():
         if j % args.log_interval == 0:
             end = time.time()
             total_num_steps = (j + 1) * args.num_processes * args.num_steps
+
+            # Save in the evaluator
+            evaluator.save(j, start, end, dist_entropy, value_loss, action_loss)
 
             print(
                 "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.2f}/{:.2f}, min/max reward {:.2f}/{:.2f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}".

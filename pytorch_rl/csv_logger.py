@@ -1,5 +1,5 @@
 import csv
-
+import os
 
 current_csv_file = ""
 
@@ -12,7 +12,8 @@ def create_header(csv_file, headers):
     """
     global current_csv_file
     current_csv_file = csv_file
-    with open(csv_file, 'w', newline='') as csv_log:
+
+    with open(csv_file, 'w+', newline='') as csv_log:
         writer = csv.writer(csv_log, delimiter=',')
         writer.writerow(headers)
 
