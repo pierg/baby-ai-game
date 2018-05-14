@@ -256,6 +256,7 @@ def main():
         if j % args.log_interval == 0:
             end = time.time()
             total_num_steps = (j + 1) * args.num_processes * args.num_steps
+
             print(
                 "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.2f}/{:.2f}, min/max reward {:.2f}/{:.2f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}".
                 format(
@@ -265,8 +266,10 @@ def main():
                     final_rewards.mean(),
                     final_rewards.median(),
                     final_rewards.min(),
-                    final_rewards.max(), dist_entropy.data[0],
-                    value_loss.data[0], action_loss.data[0]
+                    final_rewards.max(),
+                    dist_entropy.data[0],
+                    value_loss.data[0],
+                    action_loss.data[0]
                 )
             )
 

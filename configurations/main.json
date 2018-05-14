@@ -37,7 +37,10 @@
   },
   "env_name": "MiniGrid-BigEnv-32x32-v0",
   "num_processes": 1,
+  "num_steps": 5,
+  "log_interval": 10,
   "on_violation_reset": false,
   "rendering": true,
+  "csv_log_file_path": "../csv_logs/log.csv"
   "visdom": false
 }
