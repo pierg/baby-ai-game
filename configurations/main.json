@@ -1,10 +1,43 @@
 {
-	"env_name": "MiniGrid-Unsafe-8x8-v0",
-	"monitor": true,
-    "absence_monitors": ["water"],
-	"on_violation_reset": false,
-	"num_processes": 1,
-	"rendering": true,
-	"algorithm": "a2c",
-	"visdom": false
+  "algorithm": "a2c",
+  "monitors": {
+    "absence": {
+      "monitored": {
+        "water": {
+          "name": "water",
+          "reward": {
+            "near": -2,
+            "immediate": -15,
+            "violated": -55
+          }
+        },
+        "deadend": {
+          "name": "deadend",
+          "reward": {
+            "near": -2,
+            "immediate": -15,
+            "violated": -55
+          }
+        }
+      }
+    },
+    "precedence": {
+      "monitored": {
+        "light": {
+          "name": "light",
+          "preCondition": "door-opened",
+          "postCondition": "turn-light-on",
+          "reward": {
+            "precedenceRespected": 5,
+            "precedenceViolated": -55
+          }
+        }
+      }
+    }
+  },
+  "env_name": "MiniGrid-BigEnv-32x32-v0",
+  "num_processes": 1,
+  "on_violation_reset": false,
+  "rendering": true,
+  "visdom": false
 }
