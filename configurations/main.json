@@ -2,36 +2,19 @@
   "algorithm": "a2c",
   "monitors": {
     "absence": {
-      "monitored": {
-        "water": {
-          "name": "water",
-          "reward": {
-            "near": -2,
-            "immediate": -15,
-            "violated": -55
-          }
-        },
-        "deadend": {
-          "name": "deadend",
-          "reward": {
-            "near": -2,
-            "immediate": -15,
-            "violated": -55
-          }
-        }
-      }
+      "monitored": { }
     },
     "precedence": {
       "monitored": {
-        "light": {
-          "name": "light",
-          "preCondition": "door-opened",
-          "postCondition": "turn-light-on",
-          "reward": {
-            "precedenceRespected": 5,
-            "precedenceViolated": -55
-          }
-        }
+         "doorOpenBeforeLight": {
+           "name": "doorOpenBeforeLight",
+           "preCondition": "door-opened",
+           "postCondition": "light-on",
+           "reward": {
+             "precedenceRespected": 5,
+             "precedenceViolated": -55
+           }
+         }
       }
     }
   },
