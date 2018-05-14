@@ -9,6 +9,8 @@ import torch
 
 from helpers import config_grabber as cg
 
+import csv_logger
+
 
 class Evaluator:
     
@@ -33,7 +35,7 @@ class Evaluator:
                                   'N_goal_reached'])
 
         # Evaluation variables
-        self.shortest_path = config.shortest_path
+        # self.shortest_path = config.shortest_path
         
         self.episode_rewards = torch.zeros([self.config.num_processes, 1])
         self.final_rewards = torch.zeros([self.config.num_processes, 1])
@@ -81,7 +83,7 @@ class Evaluator:
             self.final_rewards.max(),
             dist_entropy.data[0],
             value_loss.data[0],
-            action_loss.data[0]
+            action_loss.data[0],
             self.n_episodes.sum(),
             self.n_catastrophes.sum(),
             self.n_proccess_reached_goal.sum()
