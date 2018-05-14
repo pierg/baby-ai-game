@@ -17,9 +17,23 @@ class RoomGridLevel(RoomGrid):
     of approximately similar difficulty.
     """
 
-    def __init__(self, lang_variation=1, **kwargs):
+    def __init__(
+        self,
+        lang_variation=1,
+        room_size=6,
+        max_steps=None,
+        **kwargs
+    ):
+        # Default max steps computation
+        if max_steps is None:
+            max_steps = 4 * (room_size ** 2)
+
         self.lang_variation = lang_variation
-        super().__init__(**kwargs)
+        super().__init__(
+            room_size=room_size,
+            max_steps=max_steps,
+            **kwargs
+        )
 
     def reset(self, **kwargs):
         obs = super().reset(**kwargs)
@@ -57,20 +71,19 @@ class RoomGridLevel(RoomGrid):
         """
         raise NotImplementedError
 
-class Level_RedDoor(RoomGridLevel):
+class Level_GoToRedDoor(RoomGridLevel):
     """
     Go to the red door
     (always unlocked, in the current room)
+    Note: this level is intentionally meant for debugging and is
+    intentionally kept very simple.
     """
 
     def __init__(self, seed=None):
-        room_size = 6
-
         super().__init__(
             num_rows=1,
             num_cols=2,
-            room_size=room_size,
-            max_steps=4*room_size**2,
+            room_size=5,
             lang_variation=1,
             seed=seed
         )
@@ -83,24 +96,28 @@ class Level_RedDoor(RoomGridLevel):
 class Level_GoToDoor(RoomGridLevel):
     """
     Go to the door
-    (of a given color, in the current room)
+    (of a given color, always unlocked, in the current room)
     """
 
     def __init__(self, seed=None):
-        room_size = 6
-
         super().__init__(
-            room_size=room_size,
-            max_steps=4*room_size**2,
             lang_variation=1,
             seed=seed
         )
 
     def gen_mission(self):
-        door, pos = self.add_door(1, 1)
+        colors = COLOR_NAMES[:]
+        objs = []
+
+        for i in range(4):
+            color = self._rand_elem(colors)
+            colors.remove(color)
+            obj, _ = self.add_door(1, 1, door_idx=i, color=color, locked=False)
+            objs.append(obj)
+
         self.place_agent(1, 1)
-        self.connect_all()
-        self.instrs = [Instr(action="goto", object=Object(door.type, door.color))]
+
+        self.instrs = [Instr(action="goto", object=Object(objs[0].type, objs[0].color))]
 
 class Level_GoToObjDoor(RoomGridLevel):
     """
@@ -109,11 +126,7 @@ class Level_GoToObjDoor(RoomGridLevel):
     """
 
     def __init__(self, seed=None):
-        room_size = 6
-
         super().__init__(
-            room_size=room_size,
-            max_steps=4*room_size**2,
             lang_variation=2,
             seed=seed
         )
@@ -123,6 +136,7 @@ class Level_GoToObjDoor(RoomGridLevel):
             obj, pos = self.add_door(1, 1)
         else:
             obj, pos = self.add_object(1, 1)
+        self.add_distractors()
         self.place_agent(1, 1)
         self.connect_all()
 
@@ -137,11 +151,7 @@ class Level_LocalAction(RoomGridLevel):
     """
 
     def __init__(self, seed=None):
-        room_size = 6
-
         super().__init__(
-            room_size=room_size,
-            max_steps=4*room_size**2,
             lang_variation=2,
             seed=seed
         )
@@ -154,7 +164,6 @@ class Level_LocalAction(RoomGridLevel):
             obj, pos = self.add_object(1, 1)
             action = self._rand_elem(['goto', 'pickup'])
         self.place_agent(1, 1)
-        self.connect_all()
 
         self.instrs = [Instr(action=action, object=Object(obj.type, obj.color))]
 
@@ -168,7 +177,6 @@ class Level_UnlockDoor(RoomGridLevel):
         self.distractors = distractors
 
         super().__init__(
-            max_steps=50,
             lang_variation=1,
             seed=seed
         )
@@ -177,9 +185,9 @@ class Level_UnlockDoor(RoomGridLevel):
         door, _ = self.add_door(1, 1, locked=True)
         self.add_object(1, 1, 'key', door.color)
         if self.distractors:
-            self.add_distractors(3)
-        self.place_agent(1, 1)
+            self.add_distractors()
         self.connect_all()
+        self.place_agent(1, 1)
 
         self.instrs = [
             Instr(action="open", object=Object(door.type, door.color))
@@ -201,7 +209,7 @@ class Level_PickupAbove(RoomGridLevel):
 
     def __init__(self, seed=None):
         super().__init__(
-            max_steps=50,
+            max_steps=300,
             lang_variation=2,
             seed=seed
         )
@@ -217,39 +225,67 @@ class Level_PickupAbove(RoomGridLevel):
 
         self.instrs = [Instr(action="pickup", object=Object(obj.type, obj.color))]
 
-class Level_TwoDoors(RoomGridLevel):
+class Level_OpenRedBlueDoors(RoomGridLevel):
     """
-    Open door X, then open door Y
+    Open red door, then open blue door
     The two doors are facing opposite directions, so that the agent
     Can't see whether the door behind him is open.
-    This task requires memory (recurrent policy) to solve effectively.
+    This task requires memory (recurrent policy) to be solved effectively.
     """
 
     def __init__(self, seed=None):
         room_size = 6
-
         super().__init__(
             room_size=room_size,
-            max_steps=4*room_size**2,
+            max_steps=20*room_size**2,
             lang_variation=1,
             seed=seed
         )
 
     def gen_mission(self):
-        door1, _ = self.add_door(1, 1, 0, locked=False)
+        door1, _ = self.add_door(1, 1, 0, color="blue", locked=False)
+        door2, _ = self.add_door(1, 1, 2, color="red", locked=False)
 
-        # Pick a different color for the second door
+        self.place_agent(1, 1)
+        self.start_dir = 0
+
+        self.instrs = [
+            Instr(action="open", object=Object(door2.type, door2.color)),
+            Instr(action="open", object=Object(door1.type, door1.color))
+        ]
+
+class Level_OpenTwoDoors(RoomGridLevel):
+    """
+    Open door X, then open door Y
+    The two doors are facing opposite directions, so that the agent
+    Can't see whether the door behind him is open.
+    This task requires memory (recurrent policy) to be solved effectively.
+    """
+
+    def __init__(self, seed=None):
+        room_size = 6
+        super().__init__(
+            room_size=room_size,
+            max_steps=20*room_size**2,
+            lang_variation=2,
+            seed=seed
+        )
+
+    def gen_mission(self):
         colors = COLOR_NAMES[:]
-        colors.remove(door1.color)
-        color2 = self._rand_elem(colors)
+        objs = []
 
-        door2, _ = self.add_door(1, 1, 2, color=color2, locked=False)
+        for i in range(4):
+            color = self._rand_elem(colors)
+            colors.remove(color)
+            obj, _ = self.add_door(1, 1, door_idx=i, color=color, locked=False)
+            objs.append(obj)
 
         self.place_agent(1, 1)
 
         self.instrs = [
-            Instr(action="open", object=Object(door1.type, door1.color)),
-            Instr(action="open", object=Object(door2.type, door2.color))
+            Instr(action="open", object=Object(objs[0].type, objs[0].color)),
+            Instr(action="open", object=Object(objs[2].type, objs[2].color))
         ]
 
 class Level_FindObj(RoomGridLevel):
@@ -295,7 +331,6 @@ class Level_UnlockPickup(RoomGridLevel):
 
     def __init__(self, seed=None):
         super().__init__(
-            max_steps=75,
             lang_variation=1,
             seed=seed
         )
@@ -323,7 +358,7 @@ class Level_FourObjects(RoomGridLevel):
 
     def __init__(self, seed=None):
         super().__init__(
-            max_steps=75,
+            max_steps=300,
             lang_variation=2,
             seed=seed
         )
@@ -342,7 +377,7 @@ class Level_FourObjects(RoomGridLevel):
             _, _ = self.add_door(1, 1, i, locked=False)
 
         # The agent starts facing right
-        self.place_agent(1, 1, rand_dir = False)
+        self.place_agent(1, 1, rand_dir=False)
 
         self.connect_all()
 
@@ -350,6 +385,46 @@ class Level_FourObjects(RoomGridLevel):
         loc = self._rand_elem(['left', 'right', 'front', 'behind'])
         rand_obj = Object(obj.type, obj.color, loc)
         self.instrs = [Instr(action="pickup", object=rand_obj)]
+
+class Level_LockedRoom(RoomGridLevel):
+    """
+    An object is behind a locked door, the key is placed in a
+    random room.
+    """
+
+    def __init__(self, num_rows=3, room_size=6, seed=None):
+        super().__init__(
+            room_size=room_size,
+            num_rows=num_rows,
+            max_steps=500,
+            lang_variation=3,
+            seed=seed,
+        )
+
+    def gen_mission(self):
+        # Connect the middle column rooms into a hallway
+        for j in range(1, self.num_rows):
+            self.remove_wall(1, j, 3)
+
+        # Add a locked door on the bottom right
+        # Add an object behind the locked door
+        room_idx = self._rand_int(0, 3)
+        door, _ = self.add_door(2, room_idx, 2, locked=True)
+        obj, _ = self.add_object(2, room_idx)
+
+        # Add a key in a random room on the left side
+        self.add_object(0, self._rand_int(0, 3), 'key', door.color)
+
+        # Place the agent in the middle
+        self.place_agent(1, 1)
+
+        # Make sure all rooms are accessible
+        self.connect_all()
+
+        self.instrs = [
+            Instr(action="open", object=Object(door.type, door.color)),
+            Instr(action="pickup", object=Object(obj.type, obj.color))
+        ]
 
 # Dictionary of levels, indexed by name, lexically sorted
 level_dict = OrderedDict()
@@ -387,6 +462,7 @@ def test():
         for i in range(0, 20):
             mission = level(seed=i)
             assert isinstance(mission.surface, str)
+            assert len(mission.surface) > 0
 
             obs = mission.reset()
             assert obs['mission'] == mission.surface
