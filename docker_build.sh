@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-docker build . -t baby-ai-game:automata
+docker build . -t baby-ai-game
