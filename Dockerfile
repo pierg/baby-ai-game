@@ -7,6 +7,10 @@ RUN echo "The user is: $USER"
 
 USER 0
 
+EXPOSE 5901
+EXPOSE 6901
+EXPOSE 8097
+
 RUN apt-get update && apt-get install -y \
         sudo \
         git \
@@ -26,7 +30,11 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     zlib1g-dev \
     cmake \
     python-software-properties \
-    software-properties-common
+    software-properties-common \
+    graphviz \
+    libgraphviz-dev \
+    graphviz-dev \
+    pkg-config
 
 
 # Install python and pip
@@ -50,20 +58,22 @@ RUN rm get-pip.py
 RUN mkdir -p $HOME
 WORKDIR $HOME
 
+# Cloning the repositories
+RUN git clone -b safety_envelope --single-branch https://github.com/pierg/baby-ai-game.git
+RUN git clone -b safety_envelope --single-branch https://github.com/pierg/gym-minigrid.git
+
+
+RUN pip3 install --upgrade pip
+RUN pip install --upgrade pip
+
 # Installing Torch
 RUN pip3 install http://download.pytorch.org/whl/cpu/torch-0.3.1-cp36-cp36m-linux_x86_64.whl
 RUN pip3 install torchvision
 
-# Install pip3 dependencies
-#RUN git clone https://github.com/pierg/baby-ai-game.git baby-ai-game-github
-#RUN cd baby-ai-game-github
-#RUN pip3 install -e .
-#RUN cd ..
-#RUN rm -r baby-ai-game-github
 
-# install python 3 dependencies
-RUN pip3 install --upgrade pip
-RUN pip3 --no-cache-dir install \
-    gym>=0.9.6 \
-    numpy>=1.10.0 \
-    pyqt5>=5.10.1
+RUN pip3 install -r ./baby-ai-game/requirements.txt
+
+WORKDIR $HOME/baby-ai-game
+
+ENTRYPOINT ["./launch_script.sh"]
+CMD ["main.json"]

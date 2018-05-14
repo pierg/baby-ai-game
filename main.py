@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-import time
 import sys
-import threading
 import copy
 import random
 from optparse import OptionParser
@@ -11,15 +9,20 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QInputDialog
 from PyQt5.QtWidgets import QLabel, QTextEdit, QFrame
 from PyQt5.QtWidgets import QPushButton, QSlider, QHBoxLayout, QVBoxLayout
-from PyQt5.QtGui import QImage, QPixmap, QPainter, QColor
 
-# Gym environment used by the Baby AI Game
-import gym
-import gym_minigrid
 from gym_minigrid import minigrid
 
-import levels
-import agents
+try:
+    import gym_minigrid
+    from gym_minigrid.wrappers import *
+    from gym_minigrid.envelopes import *
+
+except:
+    pass
+
+from helpers import config_grabber as cg
+
+
 
 class ImgWidget(QLabel):
     """
@@ -249,16 +252,16 @@ class AIGameWindow(QMainWindow):
             y += random.randint(-viewSz, viewSz)
             x = max(0, min(x, env2.grid.width - 1))
             y = max(0, min(y, env2.grid.height - 1))
-            env2.agentPos = (x, y)
-            env2.agentDir = random.randint(0, 3)
+            env2.agent_pos = (x, y)
+            env2.agent_dir = random.randint(0, 3)
 
             # Don't want to place the agent on top of something
-            if env2.grid.get(*env2.agentPos) != None:
+            if env2.grid.get(*env2.agent_pos) != None:
                 continue
 
-            agentSees = env2.agentSees(i, j)
+            agent_sees = env2.agent_sees(i, j)
 
-            obs, _, _, _ = env2.step(env2.actions.wait)
+            obs = env2.gen_obs()
             img = obs['image'] if isinstance(obs, dict) else obs
             obsGrid = minigrid.Grid.decode(img)
 
@@ -266,14 +269,14 @@ class AIGameWindow(QMainWindow):
                 'desc': desc,
                 'img': img,
                 'pos': (i, j),
-                'present': agentSees
+                'present': agent_sees
             }
 
-            if agentSees and numPos < NUM_TARGET:
+            if agent_sees and numPos < NUM_TARGET:
                 self.pointingData.append(datum)
                 numPos += 1
 
-            if not agentSees and numNeg < NUM_TARGET:
+            if not agent_sees and numNeg < NUM_TARGET:
                 # Don't want identical object in mismatch examples
                 if (pointObj.color, pointObj.type) not in obsGrid:
                     self.pointingData.append(datum)
@@ -337,7 +340,7 @@ class AIGameWindow(QMainWindow):
 
         # Render and display the agent's view
         image = obs['image']
-        obsPixmap = unwrapped.getObsRender(image)
+        obsPixmap = unwrapped.get_obs_render(image)
         self.obsImgLabel.setPixmap(obsPixmap)
 
         # Update the mission text
@@ -345,7 +348,7 @@ class AIGameWindow(QMainWindow):
         self.missionBox.setPlainText(mission)
 
         # Set the steps remaining
-        stepsRem = unwrapped.getStepsRemaining()
+        stepsRem = unwrapped.steps_remaining
         self.stepsLabel.setText(str(stepsRem))
 
     def stepEnv(self, action=None):
@@ -370,8 +373,16 @@ def main(argv):
     )
     (options, args) = parser.parse_args()
 
+    # Getting configuration from file
+    config = cg.Configuration.grab()
+
+    # Overriding arguments with configuration file
+    options.env_name = config.env_name
+
     # Load the gym environment
     env = gym.make(options.env_name)
+
+    if (config.monitor): env = SafetyEnvelope(env)
 
     # Create the application window
     app = QApplication(sys.argv)
