@@ -11,17 +11,6 @@ else
     yes | cp -rf $configuration_file "main.json"
 fi
 
-
-# Pull latest changes in the repositories
-echo "...updating repositories..."
-git pull
-cd ..
-cd gym-minigrid
-git pull
-cd ..
-
-cd ..
-
 # Use virtual environment if exists
 if [ -d "venv" ]; then
   echo "...activating python venv..."

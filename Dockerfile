@@ -81,5 +81,5 @@ RUN pip3 install -r ./baby-ai-game/requirements.txt
 
 WORKDIR $HOME/baby-ai-game
 
-ENTRYPOINT ["./launch_script.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
 CMD ["main.json"]

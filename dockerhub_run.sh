@@ -2,11 +2,11 @@
 if [ $# -eq 0 ]
     then
         echo "running local image with default configuration"
-        docker run -it \
+        docker run -t -d \
         -p 5901:5901 \
         -p 6901:6901 \
         -p 8097:8097 \
-        pmallozzi/baby-ai-game
+        baby-ai-game
 else
    echo "running local image with configuration file: $1"
         docker run -it \
