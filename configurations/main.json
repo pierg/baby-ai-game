@@ -24,17 +24,26 @@
     },
     "precedence": {
       "monitored": {
-        "light": {
-          "name": "light",
-          "preCondition": "door-opened",
-          "postCondition": "turn-light-on",
+         "light": {
+          "name": "lightBeforeEnter",
+          "preCondition": "light-on",
+          "postCondition": "enter-room",
           "reward": {
             "precedenceRespected": 5,
             "precedenceViolated": -55
           }
-        }
+        },
+        "doorOpenBeforeLight": {
+           "name": "lightBeforeDoor",
+           "preCondition": "light-on",
+           "postCondition": "door-opened",
+           "reward": {
+             "precedenceRespected": 5,
+             "precedenceViolated": -55
+           }
+         }
       }
-    }
+    }ok
   },
   "env_name": "MiniGrid-BigEnv-32x32-v0",
   "num_processes": 32,
