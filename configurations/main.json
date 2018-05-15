@@ -2,23 +2,49 @@
   "algorithm": "a2c",
   "monitors": {
     "absence": {
-      "monitored": { }
+      "monitored": {
+        "water": {
+          "name": "water",
+          "reward": {
+            "near": -2,
+            "immediate": -15,
+            "violated": -55
+          }
+        },
+        "deadend": {
+          "name": "deadend",
+          "reward": {
+            "near": -2,
+            "immediate": -15,
+            "violated": -55
+          }
+        }
+      }
     },
     "precedence": {
       "monitored": {
-         "doorOpenBeforeLight": {
-           "name": "doorOpenBeforeLight",
-           "preCondition": "door-opened",
-           "postCondition": "light-on",
+         "light": {
+          "name": "lightBeforeEnter",
+          "preCondition": "light-on",
+          "postCondition": "enter-room",
+          "reward": {
+            "precedenceRespected": 5,
+            "precedenceViolated": -55
+          }
+        },
+        "doorOpenBeforeLight": {
+           "name": "lightBeforeDoor",
+           "preCondition": "light-on",
+           "postCondition": "door-opened",
            "reward": {
              "precedenceRespected": 5,
              "precedenceViolated": -55
            }
          }
       }
-    }
+    }ok
   },
-  "env_name": "MiniGrid-BigEnv-32x32-v0",
+  "env_name": "MiniGrid-BigEnv-24x24-v0",
   "num_processes": 1,
   "on_violation_reset": false,
   "rendering": true,
