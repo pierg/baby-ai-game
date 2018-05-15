@@ -43,7 +43,7 @@
            }
          }
       }
-    }ok
+    }
   },
   "env_name": "MiniGrid-BigEnv-32x32-v0",
   "num_processes": 32,
