@@ -5,20 +5,12 @@ configuration_file=${1:-"main.json"}
 if [ $# -eq 0 ]
   then
     echo "using default configuration file: $configuration_file"
+else
+    echo "...updating selected configuration file..."
+    cd ./configurations
+    yes | cp -rf $configuration_file "main.json"
+    echo "using configuration file: $configuration_file"
 fi
-
-
-# Pull latest changes in the repositories
-echo "...updating repositories..."
-git pull
-cd ..
-cd gym-minigrid
-git pull
-cd ..
-
-echo "...updating selected configuration file..."
-cd ./baby-ai-game/configurations
-yes | cp -rf $configuration_file "main.json"
 
 cd ..
 
@@ -28,13 +20,14 @@ if [ -d "venv" ]; then
   source ./venv/bin/activate
 fi
 
-
-# echo "...launch visdom server in the background..."
-# python3 -m visdom.server &
-
 echo "...setting up python environment..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
 export PYTHONPATH
+
+/bin/bash
+
+# echo "...launch visdom server in the background..."
+# python3 -m visdom.server &
 
 #echo "...launching the training..."
 #python3 ./pytorch_rl/main.py
