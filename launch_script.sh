@@ -2,9 +2,6 @@
 
 configuration_file=${1:-"main.json"}
 
-echo "working directory"
-echo $PWD
-
 if [ $# -eq 0 ]
   then
     echo "using default configuration file: $configuration_file"
@@ -22,7 +19,6 @@ if [ -d "venv" ]; then
   echo "...activating python venv..."
   source ./venv/bin/activate
 fi
-
 
 echo "...setting up python environment..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
