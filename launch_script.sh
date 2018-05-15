@@ -2,6 +2,9 @@
 
 configuration_file=${1:-"main.json"}
 
+echo "working directory"
+echo $PWD
+
 if [ $# -eq 0 ]
   then
     echo "using default configuration file: $configuration_file"
@@ -24,6 +27,8 @@ fi
 echo "...setting up python environment..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
 export PYTHONPATH
+
+source bash
 
 #echo "...launching the training..."
 #python3 ./pytorch_rl/main.py
