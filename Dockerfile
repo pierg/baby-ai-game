@@ -37,22 +37,26 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     pkg-config
 
 
-# Install python and pip
+# Install python
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python-numpy \
     python-dev
 
-
-# Installing python3.6 and pip3
+# Installing python3.6
 RUN add-apt-repository ppa:jonathonf/python-3.6
-RUN apt update
-RUN apt install -y \
+RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3.6 \
     python3.6-dev \
     python3.6-venv \
-    python3-pip
-
 RUN ln -s /usr/bin/python3.6 /usr/local/bin/python3
+
+
+# Installing pip3
+RUN apt-get remove python-pip python3-pip
+RUN wget https://bootstrap.pypa.io/get-pip.py
+RUN python get-pip.py
+RUN python3 get-pip.py
+
 
 RUN mkdir -p $HOME
 WORKDIR $HOME
