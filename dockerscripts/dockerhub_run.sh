@@ -6,12 +6,12 @@ if [ $# -eq 0 ]
         -p 5901:5901 \
         -p 6901:6901 \
         -p 8097:8097 \
-        baby-ai-game
+        pmallozzi/baby-ai-game:latest
 else
    echo "running local image with configuration file: $1"
         docker run -it \
             -p 5901:5901 \
             -p 6901:6901 \
             -p 8097:8097 \
-            baby-ai-game $1
+            pmallozzi/baby-ai-game:latest $1
 fi
