@@ -121,21 +121,18 @@ def main():
     # These variables are used to compute average rewards for all processes.
     episode_rewards = torch.zeros([args.num_processes, 1])
     final_rewards = torch.zeros([args.num_processes, 1])
-    reached_goal = torch.zeros([args.num_processes, 1])
+
+    # Evaluation variables
+    shortest_path = config.shortest_path
     number_of_catastrophes = torch.zeros([args.num_processes, 1])
-    proccess_reached_goal = torch.zeros([args.num_processes, 1])
+    number_of_episodes = torch.zeros([args.num_processes, 1])
+    number_of_proccess_reached_goal = torch.zeros([args.num_processes, 1])
 
     if args.cuda:
         current_obs = current_obs.cuda()
         rollouts.cuda()
 
     start = time.time()
-
-    # Evaluation variables
-    number_of_episodes = 0
-    #number_of_catastrophes = 0
-    number_of_proccess_reached_goal = 0
-    shortest_path = config.shortest_path
 
     for j in range(num_updates):
         for step in range(args.num_steps):
@@ -153,28 +150,19 @@ def main():
                 if done__:
                     number_of_episodes = number_of_episodes + 1
 
-            #for dict in info:
-            #    if 'catastrophes' in dict:
-            #        number_of_catastrophes = number_of_catastrophes + 1
-            #    if 'goal' in dict:
-            #        number_of_proccess_reached_goal = number_of_proccess_reached_goal + 1
-
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
             episode_rewards += reward
 
             # If done then clean the history of observations.
             masks = torch.FloatTensor([[0.0] if done_ else [1.0] for done_ in done])
-            number_of_catastrophes_mask = torch.FloatTensor([[1] if 'catastrophe' in _info else [0] for _info in info])
-            p#rint("Mask: ", masks)
-            #print("Final reward: ", final_rewards)
-            #print("Nr catastrophe mask: ", number_of_catastrophes_mask)
+            number_of_catastrophes_mask = torch.FloatTensor([[1.0] if 'catastrophe' in info_ else [0.0] for info_ in info])
+            number_of_episodes_mask = torch.FloatTensor([[1.0] if done_ else [0.0] for done_ in done])
+            number_of_process_reached_goal_mask = torch.FloatTensor([[1.0] if 'goal' in info_ else [0.0] for info_ in info])
             final_rewards *= masks
             number_of_catastrophes += number_of_catastrophes_mask
-            #print("Final rewards after mask: ", final_rewards)
-            #print("Number of catastropes:", number_of_catastrophes)
-            #print("Number of catastrophes sum:", number_of_catastrophes.sum())
+            number_of_episodes += number_of_episodes_mask
+            number_of_proccess_reached_goal += number_of_process_reached_goal_mask
             final_rewards += (1 - masks) * episode_rewards
-            #print("Episode rewards: ", episode_rewards)
             episode_rewards *= masks
 
             if args.cuda:
@@ -300,21 +288,21 @@ def main():
             if final_rewards.mean() >= shortest_path:
                 csv_logger.write_to_log("{},{},{},{}".format(
                     total_num_steps,
-                    number_of_episodes,
-                    number_of_catastrophes.mean(),
-                    number_of_proccess_reached_goal
+                    number_of_episodes.sum(),
+                    number_of_catastrophes.sum(),
+                    number_of_proccess_reached_goal.sum()
                 ))
                 torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
                 exit(1)
             else:
                 csv_logger.write_to_log("{},{},{},{}".format(
                     total_num_steps,
-                    number_of_episodes,
-                    number_of_catastrophes.mean(),
-                    number_of_proccess_reached_goal
+                    number_of_episodes.sum(),
+                    number_of_catastrophes.sum(),
+                    number_of_proccess_reached_goal.sum()
                 ))
             print(
-                    "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}, number of catastrophes: {}, number of episodes: {}, {} proccess that reached goal".
+                    "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}, number of catastrophes: {}, number of episodes: {}, {} episodes that reached goal".
                     format(
                         j,
                         total_num_steps,
@@ -324,10 +312,11 @@ def main():
                         final_rewards.min(),
                         final_rewards.max(), dist_entropy.data[0],
                         value_loss.data[0], action_loss.data[0],
-                        number_of_catastrophes.sum(), number_of_episodes,
-                        number_of_proccess_reached_goal
+                        number_of_catastrophes.sum(), number_of_episodes.sum(),
+                        number_of_proccess_reached_goal.sum()
                     )
                 )
+            number_of_proccess_reached_goal = torch.zeros([args.num_processes, 1])
 
         if args.vis and j % args.vis_interval == 0:
             win = visdom_plot(
