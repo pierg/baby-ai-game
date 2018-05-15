@@ -111,4 +111,5 @@ ENV/
 
 # local log files
 *.log
+csv_logs/*
 *.csv
