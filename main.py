@@ -5,10 +5,10 @@ import copy
 import random
 from optparse import OptionParser
 
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QInputDialog
-from PyQt5.QtWidgets import QLabel, QTextEdit, QFrame
-from PyQt5.QtWidgets import QPushButton, QSlider, QHBoxLayout, QVBoxLayout
+from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import QMainWindow, QInputDialog
+from PyQt5.QtWidgets import QLabel, QTextEdit
+from PyQt5.QtWidgets import QPushButton, QSlider
 
 from gym_minigrid import minigrid
 
@@ -20,8 +20,7 @@ try:
 except:
     pass
 
-from helpers import config_grabber as cg
-
+from configurations import config_grabber as cg
 
 
 class ImgWidget(QLabel):

@@ -16,7 +16,6 @@ class Configuration():
         config = None
         with open(config_file_path, 'r') as jsondata:
             configdata = jsondata.read()
-            config = json.loads(configdata,
-                                object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+            config = json.loads(configdata, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
         return config
 

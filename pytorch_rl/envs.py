@@ -1,8 +1,3 @@
-import os
-import numpy
-import gym
-from gym import spaces
-
 try:
     import gym_minigrid
     from gym_minigrid.wrappers import *
@@ -11,7 +6,8 @@ except Exception as e:
     print(e)
     pass
 
-from helpers import config_grabber as cg
+from configurations import config_grabber as cg
+
 
 def make_env(env_id, seed, rank, log_dir):
 
@@ -22,7 +18,7 @@ def make_env(env_id, seed, rank, log_dir):
 
         env.seed(seed + rank)
 
-        if config.monitor:
+        if config.monitors:
             env = SafetyEnvelope(env)
 
         # Maxime: until RL code supports dict observations, squash observations into a flat vector
