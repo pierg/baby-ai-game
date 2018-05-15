@@ -47,7 +47,8 @@ RUN add-apt-repository ppa:jonathonf/python-3.6
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3.6 \
     python3.6-dev \
-    python3.6-venv \
+    python3.6-venv
+
 RUN ln -s /usr/bin/python3.6 /usr/local/bin/python3
 
 
