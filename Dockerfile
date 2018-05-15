@@ -51,8 +51,8 @@ RUN apt install -y \
     python3.6-dev \
     python3.6-venv
 RUN wget https://bootstrap.pypa.io/get-pip.py
-RUN python3.6 get-pip.py
 RUN ln -s /usr/bin/python3.6 /usr/local/bin/python3
+RUN python3 get-pip.py
 RUN rm get-pip.py
 
 RUN mkdir -p $HOME
