@@ -5,6 +5,10 @@ configuration_file=${1:-"main.json"}
 if [ $# -eq 0 ]
   then
     echo "using default configuration file: $configuration_file"
+else
+    echo "...updating selected configuration file..."
+    cd ./baby-ai-game/configurations
+    yes | cp -rf $configuration_file "main.json"
 fi
 
 
@@ -15,10 +19,6 @@ cd ..
 cd gym-minigrid
 git pull
 cd ..
-
-echo "...updating selected configuration file..."
-cd ./baby-ai-game/configurations
-yes | cp -rf $configuration_file "main.json"
 
 cd ..
 
