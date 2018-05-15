@@ -1,5 +1,5 @@
 {
-  "action_planner": true,
+  "action_planner": false,
   "num_processes": 1,
   "rendering": true,
   "env_name": "MiniGrid-DangerousTile-8x8-v0",
