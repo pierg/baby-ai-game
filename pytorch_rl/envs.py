@@ -13,6 +13,7 @@ except Exception as e:
 
 from helpers import config_grabber as cg
 
+
 def make_env(env_id, seed, rank, log_dir):
 
     config = cg.Configuration.grab()
@@ -22,8 +23,8 @@ def make_env(env_id, seed, rank, log_dir):
 
         env.seed(seed + rank)
 
-        if config.action_planner:
-            env = ActionPlannerEnvelope(env)
+        # if config.action_planner:
+        env = ActionPlannerEnvelope(env)
 
         # Maxime: until RL code supports dict observations, squash observations into a flat vector
         if isinstance(env.observation_space, spaces.Dict):

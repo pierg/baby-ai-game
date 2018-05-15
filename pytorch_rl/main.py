@@ -116,6 +116,11 @@ def main():
         rollouts.cuda()
 
     start = time.time()
+
+    number_episodes = 0
+    number_goal_reached = 0
+    number_unsafe_actions = 0
+
     for j in range(num_updates):
         for step in range(args.num_steps):
             # Sample actions
@@ -128,6 +133,17 @@ def main():
 
             # Obser reward and next obs
             obs, reward, done, info = envs.step(cpu_actions)
+
+            for done__ in done:
+                if done__:
+                    number_episodes += 1
+
+            for dict in info:
+                if 'unsafe_action' in dict.keys():
+                    number_unsafe_actions += 1
+                if 'goal' in dict.keys():
+                    number_goal_reached += 1
+
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
             episode_rewards += reward
 
@@ -248,16 +264,28 @@ def main():
             if args.cuda:
                 save_model = copy.deepcopy(actor_critic).cpu()
 
-            save_model = [save_model,
-                            hasattr(envs, 'ob_rms') and envs.ob_rms or None]
-
+            save_model = [save_model, hasattr(envs, 'ob_rms') and envs.ob_rms or None]
             torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
 
         if j % args.log_interval == 0:
             end = time.time()
             total_num_steps = (j + 1) * args.num_processes * args.num_steps
+
+            if number_goal_reached > 0:
+                print('Goal reached')
+
             print(
-                "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.2f}/{:.2f}, min/max reward {:.2f}/{:.2f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}".
+                "Updates {},"
+                "num timesteps {},"
+                "FPS {},"
+                "mean/median reward {:.2f}/{:.2f},"
+                "min/max reward {:.2f}/{:.2f},"
+                " entropy {:.5f},"
+                "value loss {:.5f},"
+                "policy loss {:.5f},"
+                "number of episodes {},"
+                "number of time goal reached {},"
+                "number of unsafe actions {}".
                 format(
                     j,
                     total_num_steps,
@@ -266,7 +294,10 @@ def main():
                     final_rewards.median(),
                     final_rewards.min(),
                     final_rewards.max(), dist_entropy.data[0],
-                    value_loss.data[0], action_loss.data[0]
+                    value_loss.data[0], action_loss.data[0],
+                    number_episodes,
+                    number_goal_reached,
+                    number_unsafe_actions
                 )
             )
 
@@ -275,6 +306,7 @@ def main():
                 total_num_steps,
                 final_rewards.mean()
             )
+
 
 if __name__ == "__main__":
     main()
