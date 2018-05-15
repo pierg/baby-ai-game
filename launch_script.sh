@@ -10,7 +10,7 @@ if [ $# -eq 0 ]
     echo "using default configuration file: $configuration_file"
 else
     echo "...updating selected configuration file..."
-    cd ./baby-ai-game/configurations
+    cd ./configurations
     yes | cp -rf $configuration_file "main.json"
 fi
 
@@ -28,7 +28,7 @@ echo "...setting up python environment..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
 export PYTHONPATH
 
-source bash
+/bin/bash
 
 #echo "...launching the training..."
 #python3 ./pytorch_rl/main.py
