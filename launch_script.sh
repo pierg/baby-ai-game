@@ -24,7 +24,8 @@ echo "...setting up python environment..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
 export PYTHONPATH
 
-/bin/bash
+echo "...launching the training..."
+python3 ./pytorch_rl/main.py
 
 # echo "...launch visdom server in the background..."
 # python3 -m visdom.server &
