@@ -1,5 +1,5 @@
 {
-  "config_name": "water_deadend_32x32",
+  "config_name": "firstEvalEnv",
   "algorithm": "a2c",
   "monitors": {
     "absence": {
@@ -60,6 +60,6 @@
   "debug_mode": false,
   "reward": {
     "goal": 78,
-    "step": 1
+    "step": -1
   }
 }
