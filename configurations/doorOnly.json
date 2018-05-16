@@ -1,11 +1,11 @@
 {
-  "config_name": "firstEvalAllMonitors",
+  "config_name": "firstEvalDoorOnly",
   "algorithm": "a2c",
   "monitors": {
     "absence": {
       "monitored": {
         "water": {
-          "active": true,
+          "active": false,
           "name": "water",
           "reward": {
             "near": -2,
@@ -14,7 +14,7 @@
           }
         },
         "deadend": {
-          "active": true,
+          "active":false,
           "name": "deadend",
           "reward": {
             "near": -2,
@@ -27,7 +27,7 @@
     "precedence": {
       "monitored": {
         "light": {
-          "active": true,
+          "active": false,
           "name": "lightBeforeEnter",
           "preCondition": "light-on",
           "postCondition": "enter-room",
