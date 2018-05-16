@@ -1,5 +1,5 @@
 {
-  "config_name": "firstEvalDeadendOnly",
+  "config_name": "firstEvalNoMonitor",
   "algorithm": "a2c",
   "monitors": false,
   "env_name": "MiniGrid-FirstEvalEnv-10x10-v0",
