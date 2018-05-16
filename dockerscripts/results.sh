@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "Launching plot scripts in all the running containers..."
-sudo docker exec -t $(sudo docker ps -lq) python3 plotResults
+sudo docker exec -t $(sudo docker ps -lq) python3 plotResults.py
 echo "...done"
 echo ""
 
