@@ -14,12 +14,11 @@ random_token = token_hex(4)
 
 
 def generate_environment(grid_size, nr_of_water_tiles, max_block_size):
-    with open(environment_path + "randomenv-{0}-{1}.py".format(nr_of_water_tiles, random_token), 'w') as env:
+    with open(environment_path + "randomenv{0}{1}.py".format(nr_of_water_tiles, random_token), 'w') as env:
         env.write("""
 from gym_minigrid.extendedminigrid import *
 from gym_minigrid.register import register
-from random import randint
-from random import seed
+import random
 
 class RandomEnv(ExMiniGridEnv):
 
@@ -46,19 +45,19 @@ class RandomEnv(ExMiniGridEnv):
         self.grid.set(width - 2, height - 2, Goal())
 
         # Set the random seed to the random token, so we can reproduce the environment
-        random_nr = seed("{2}")
+        random.seed("{2}")
 
         # Place water
         placed_water_tiles = 0
         while {1} > placed_water_tiles:
             # Minus 2 because grid is zero indexed, and the last one is just a wall
-            width_pos = random_nr.randint(1, width - 2)
-            height_pos = random_nr.randint(1, height - 2)
+            width_pos = random.randint(1, width - 2)
+            height_pos = random.randint(1, height - 2)
             
             if width_pos == 1 and height_pos == 1:
                 # Do not place water on agent
                 continue
-            if isinstance(self.grid.get(width_pos, height_pos), Water()):
+            if isinstance(self.grid.get(width_pos, height_pos), Water):
                 # Do not place water on water
                 continue                
         
@@ -76,6 +75,10 @@ register(
 )
 """.format(grid_size, nr_of_water_tiles, random_token))
         env.close()
+    with open(environment_path + "__init__.py", 'a') as init_file:
+        init_file.write("from gym_minigrid.envs.randomenv{0}{1} import *".format(nr_of_water_tiles, random_token))
+        init_file.close()
+
     with open(configuration_path + "randomEnv-{0}-{1}.json".format(nr_of_water_tiles, random_token), 'w') as config:
         config.write(json.dumps({
             "config_name": "firstEvalWaterRandomEnv",
