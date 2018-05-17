@@ -2,9 +2,9 @@ import argparse
 import json
 
 parser = argparse.ArgumentParser(description='Arguments for creating the environments and its configuration')
-parser.add_argument('--grid_size', type=int)
-parser.add_argument('--number_of_water_tiles', type=int)
-parser.add_argument('--max_block_size', type=int)
+parser.add_argument('--grid_size', type=int, required=True)
+parser.add_argument('--number_of_water_tiles', type=int, required=True)
+parser.add_argument('--max_block_size', type=int, required=True)
 
 from secrets import token_hex  # NOQA
 
@@ -76,6 +76,7 @@ register(
 """.format(grid_size, nr_of_water_tiles, random_token))
         env.close()
     with open(environment_path + "__init__.py", 'a') as init_file:
+        init_file.write("\n")
         init_file.write("from gym_minigrid.envs.randomenv{0}{1} import *".format(nr_of_water_tiles, random_token))
         init_file.close()
 
