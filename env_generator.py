@@ -43,7 +43,8 @@ class RandomEnv(ExMiniGridEnv):
         # Place a goal square in the bottom-right corner
         self.grid.set(width - 2, height - 2, Goal())
 
-        random_nr = seed()
+        # Set the random seed to the random token, so we can reproduce the environment
+        random_nr = seed({2})
 
         # Place water
         placed_water_tiles = 0
@@ -71,7 +72,7 @@ register(
     id='MiniGrid-RandomEnv-{0}x{0}-v0',
     entry_point='gym_minigrid.envs:RandomEnv{0}x{0}'
 )
-""".format(grid_size, nr_of_water_tiles))
+""".format(grid_size, nr_of_water_tiles, random_token.decode('utf-8')))
         env.close()
     with open(configuration_path + "randomEnv-{0}-{1}.json".format(nr_of_water_tiles, random_token.decode('utf-8')), 'w') as config:
         config.write(""" 
