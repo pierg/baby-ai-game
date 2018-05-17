@@ -52,7 +52,7 @@ class RandomEnv(ExMiniGridEnv):
 
         # Place water
         placed_water_tiles = 0
-        while 5 > placed_water_tiles:
+        while {1} > placed_water_tiles:
             # Minus 2 because grid is zero indexed, and the last one is just a wall
             width_pos = random.randint(1, width - 2)
             height_pos = random.randint(1, height - 2)
@@ -60,8 +60,7 @@ class RandomEnv(ExMiniGridEnv):
             if width_pos == 1 and height_pos == 1:
                 # Do not place water on agent
                 continue
-            if width_pos == 1 and height_pos == 2 and isinstance(self.grid.get(2, 1), Water) or \
-                width_pos == 2 and height_pos == 1 and isinstance(self.grid.get(1, 2), Water):
+            if width_pos == 1 and height_pos == 2 and isinstance(self.grid.get(2, 1), Water) or width_pos == 2 and height_pos == 1 and isinstance(self.grid.get(1, 2), Water):
                 # Do not place two water tiles in front of the agent A W -
                 #                                                    W | |
                 #                                                    | | |
@@ -69,11 +68,10 @@ class RandomEnv(ExMiniGridEnv):
             if isinstance(self.grid.get(width_pos, height_pos), Water):
                 # Do not place water on water
                 continue
-            if isinstance(self.grid.get(width - 2, height - 2), Goal):
+            if isinstance(self.grid.get(width_pos, height_pos), Goal):
                 # Do not place water on Goal
                 continue
-            if width_pos == width - 2 and height_pos == height - 3 and isinstance(self.grid.get(width - 3, height - 2)) or \
-                width_pos == width - 3 and height_pos == height - 2 and isinstance(self.grid.get(width - 2, height - 3), Water):
+            if width_pos == width - 2 and height_pos == height - 3 and isinstance(self.grid.get(width - 3, height - 2)) or width_pos == width - 3 and height_pos == height - 2 and isinstance(self.grid.get(width - 2, height - 3), Water):
                 # Do not place water preventing the agent from reaching the goal - | |
                 #                                                                - A W
                 #                                                                - W G
