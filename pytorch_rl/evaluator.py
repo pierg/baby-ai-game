@@ -49,9 +49,10 @@ class Evaluator:
 
         self.n_catastrophes = torch.zeros([self.config.num_processes, 1])
         self.n_episodes = torch.zeros([self.config.num_processes, 1])
-        self.n_proccess_reached_goal = torch.zeros([self.config.num_processes, 1])
+        self.n_proccess_reached_goal = [0] * self.config.num_processes
         self.numberOfStepPerEpisode = [0] * self.config.num_processes
         self.numberOfStepAverage = 0
+        self.N_goal_reached = 0
 
 
     def update(self, reward, done, info,numberOfStepPerEpisode):
@@ -64,9 +65,8 @@ class Evaluator:
         self.final_rewards += (1 - masks) * self.episode_rewards
         self.episode_rewards *= masks
 
-        n_catastrophes_mask = torch.FloatTensor([[1.0] if 'violation' in info_ else [0.0] for info_ in info])
+        n_catastrophes_mask = torch.FloatTensor([[1.0] if "violation" in info_ else [0.0] for info_ in info])
         n_episodes_mask = torch.FloatTensor([[1.0] if done_ else [0.0] for done_ in done])
-        n_process_reached_goal_mask = torch.FloatTensor([[1.0] if 'goal' in info_ else [0.0] for info_ in info])
         for i in range(0,len(done)):
             if done[i]:
                 self.n_episodes = self.n_episodes + 1
@@ -77,8 +77,17 @@ class Evaluator:
                 self.numberOfStepAverage /= len(self.numberOfStepPerEpisode)
 
         self.n_catastrophes += n_catastrophes_mask
-        self.n_episodes += n_episodes_mask
-        self.n_proccess_reached_goal += n_process_reached_goal_mask
+        self.N_goal_reached = 0
+        for i in range(0,len(info)):
+            if info[i] == "died":
+                self.n_proccess_reached_goal[i]= 0
+            elif info[i] == "goal":
+                self.n_proccess_reached_goal[i]= 1
+            elif info[i] == "violation":
+                self.n_proccess_reached_goal[i] = 0
+        for i in range(0,len(self.n_proccess_reached_goal)):
+            self.N_goal_reached += self.n_proccess_reached_goal[i]
+        self.n_episodes = n_episodes_mask
 
 
 
@@ -98,6 +107,6 @@ class Evaluator:
             action_loss.data[0],
             self.n_episodes.sum(),
             self.n_catastrophes.sum(),
-            self.n_proccess_reached_goal.sum(),
+            self.N_goal_reached,
             self.numberOfStepAverage
         ))
