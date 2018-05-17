@@ -39,8 +39,8 @@ def plotResult(columnNameX,columnNameY,columnNameZ,fileName,resultFileName):
                 y.append(float(row[column2]))
                 z.append(float(row[column3]))
     figure = plt.figure()
-    plt.plot(x, y,'r',label='N Step Before Done')
-    plt.plot(x, z,'b',label='N Goal Reach')
+    plt.plot(x, y,'r',label='N Step AVG')
+    plt.plot(x, z,'b',label='N Goal Reached')
     plt.legend()
     plt.xlabel('numberOfStep')
     figure.savefig(resultFileName)
@@ -54,4 +54,4 @@ def autoPlot(columnNameX,columnNameY,columnNameZ):
 
 
 
-autoPlot("N_updates","N_step_before_done","N_goal_reached")
+autoPlot("N_updates","N_step_per_episode","N_goal_reached")

@@ -38,7 +38,8 @@ class Evaluator:
                                   'Action_loss',
                                   'N_episodes',
                                   'N_blocked_actions',
-                                  'N_goal_reached','N_step_before_done'])
+                                  'N_goal_reached',
+                                  'N_step_per_episode'])
 
         # Evaluation variables
         # self.shortest_path = config.shortest_path
@@ -49,12 +50,14 @@ class Evaluator:
         self.n_catastrophes = torch.zeros([self.config.num_processes, 1])
         self.n_episodes = torch.zeros([self.config.num_processes, 1])
         self.n_proccess_reached_goal = torch.zeros([self.config.num_processes, 1])
-        self.numberOfStepBeforeDone = 0
+        self.numberOfStepPerEpisode = [0] * self.config.num_processes
+        self.numberOfStepAverage = 0
 
 
-    def update(self, reward, done, info,numberOfStepBeforeDone):
+    def update(self, reward, done, info,numberOfStepPerEpisode):
         reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
         self.episode_rewards += reward
+        
         # If done then clean the history of observations.
         masks = torch.FloatTensor([[0.0] if done_ else [1.0] for done_ in done])
         self.final_rewards *= masks
@@ -64,14 +67,14 @@ class Evaluator:
         n_catastrophes_mask = torch.FloatTensor([[1.0] if 'violation' in info_ else [0.0] for info_ in info])
         n_episodes_mask = torch.FloatTensor([[1.0] if done_ else [0.0] for done_ in done])
         n_process_reached_goal_mask = torch.FloatTensor([[1.0] if 'goal' in info_ else [0.0] for info_ in info])
-
-        for done__ in done:
-            if done__:
-                self.numberOfStepBeforeDone = 0
+        for i in range(0,len(done)):
+            if done[i]:
                 self.n_episodes = self.n_episodes + 1
-                for i in range(0,len(numberOfStepBeforeDone)):
-                    self.numberOfStepBeforeDone += numberOfStepBeforeDone[i]
-                self.numberOfStepBeforeDone /= len(numberOfStepBeforeDone)
+                self.numberOfStepPerEpisode[i] = numberOfStepPerEpisode[i]
+                self.numberOfStepAverage = 0
+                for j in range(0,len(self.numberOfStepPerEpisode)):
+                    self.numberOfStepAverage += self.numberOfStepPerEpisode[j]
+                self.numberOfStepAverage /= len(self.numberOfStepPerEpisode)
 
         self.n_catastrophes += n_catastrophes_mask
         self.n_episodes += n_episodes_mask
@@ -96,5 +99,5 @@ class Evaluator:
             self.n_episodes.sum(),
             self.n_catastrophes.sum(),
             self.n_proccess_reached_goal.sum(),
-            self.numberOfStepBeforeDone
+            self.numberOfStepAverage
         ))

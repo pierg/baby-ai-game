@@ -60,6 +60,6 @@
   "debug_mode": false,
   "reward": {
     "goal": 78,
-    "step": -1
+    "step": -2
   }
 }
