@@ -31,7 +31,6 @@ if args.recurrent_policy:
     assert args.algo in ['a2c', 'ppo'], 'Recurrent policy is not implemented for ACKTR'
 
 num_updates = int(args.num_frames) // args.num_steps // args.num_processes
-
 torch.manual_seed(args.seed)
 if args.cuda:
     torch.cuda.manual_seed(args.seed)
@@ -109,7 +108,11 @@ def main():
     obs = envs.reset()
     update_current_obs(obs)
     rollouts.observations[0].copy_(current_obs)
-
+    numberOfStepBeforeDone = []
+    stepOnLastGoal = []
+    for i in range(0,32):
+        numberOfStepBeforeDone.append(0)
+        stepOnLastGoal.append(0)
     # These variables are used to compute average rewards for all processes.
     episode_rewards = torch.zeros([args.num_processes, 1])
     final_rewards = torch.zeros([args.num_processes, 1])
@@ -117,7 +120,6 @@ def main():
     if args.cuda:
         current_obs = current_obs.cuda()
         rollouts.cuda()
-
     start = time.time()
     for j in range(num_updates):
         for step in range(args.num_steps):
@@ -131,8 +133,12 @@ def main():
 
             # Obser reward and next obs
             obs, reward, done, info = envs.step(cpu_actions)
+            for x in range (0,len(done)):
+                if done[x]:
+                    numberOfStepBeforeDone[x] = (j*args.num_steps+step+1) - stepOnLastGoal[x]
+                    stepOnLastGoal[x] = (j*args.num_steps+step+1)
 
-            evaluator.update(reward, done, info)
+            evaluator.update(reward, done, info,numberOfStepBeforeDone)
 
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
             episode_rewards += reward
@@ -265,7 +271,6 @@ def main():
 
             # Save in the evaluator
             evaluator.save(j, start, end, dist_entropy, value_loss, action_loss)
-
             print(
                 "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.2f}/{:.2f}, min/max reward {:.2f}/{:.2f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}".
                 format(

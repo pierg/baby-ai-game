@@ -38,7 +38,7 @@ class Evaluator:
                                   'Action_loss',
                                   'N_episodes',
                                   'N_blocked_actions',
-                                  'N_goal_reached'])
+                                  'N_goal_reached','N_step_before_done'])
 
         # Evaluation variables
         # self.shortest_path = config.shortest_path
@@ -49,14 +49,12 @@ class Evaluator:
         self.n_catastrophes = torch.zeros([self.config.num_processes, 1])
         self.n_episodes = torch.zeros([self.config.num_processes, 1])
         self.n_proccess_reached_goal = torch.zeros([self.config.num_processes, 1])
+        self.numberOfStepBeforeDone = 0
 
 
-
-    def update(self, reward, done, info):
-
+    def update(self, reward, done, info,numberOfStepBeforeDone):
         reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
         self.episode_rewards += reward
-
         # If done then clean the history of observations.
         masks = torch.FloatTensor([[0.0] if done_ else [1.0] for done_ in done])
         self.final_rewards *= masks
@@ -69,18 +67,22 @@ class Evaluator:
 
         for done__ in done:
             if done__:
+                self.numberOfStepBeforeDone = 0
                 self.n_episodes = self.n_episodes + 1
+                for i in range(0,len(numberOfStepBeforeDone)):
+                    self.numberOfStepBeforeDone += numberOfStepBeforeDone[i]
+                self.numberOfStepBeforeDone /= len(numberOfStepBeforeDone)
 
         self.n_catastrophes += n_catastrophes_mask
         self.n_episodes += n_episodes_mask
         self.n_proccess_reached_goal += n_process_reached_goal_mask
 
 
+
     def save(self, n_updates, t_start, t_end, dist_entropy, value_loss, action_loss):
 
         total_num_steps = (n_updates + 1) * self.config.num_processes * self.config.num_steps
-
-        csv_logger.write_to_log("{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
+        csv_logger.write_to_log("{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
             n_updates,
             total_num_steps,
             int(total_num_steps / (t_end - t_start)),
@@ -93,5 +95,6 @@ class Evaluator:
             action_loss.data[0],
             self.n_episodes.sum(),
             self.n_catastrophes.sum(),
-            self.n_proccess_reached_goal.sum()
+            self.n_proccess_reached_goal.sum(),
+            self.numberOfStepBeforeDone
         ))
