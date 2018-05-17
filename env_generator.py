@@ -1,16 +1,23 @@
+import argparse
+parser = argparse.ArgumentParser(description='Arguments for creating the environments and its configuration')
+parser.add_argument('--grid_size', type=int)
+parser.add_argument('--number_of_water_tiles', type=int)
+parser.add_argument('--max_block_size', type=int)
+
+from secrets import token_hex  # NOQA
+
 environment_path = "../gym-minigrid/gym_minigrid/envs/"
 configuration_path = "configurations/"
+random_token = token_hex(8)
 
 
-class EnvironmentGenerator:
-
-    @staticmethod
-    def generate_environment(grid_size, nr_of_water_tiles, nr_of_total_blocks):
-        with open(environment_path + "randomenv.py", 'w') as env:
-            env.write("""
+def generate_environment(grid_size, nr_of_water_tiles):
+    with open(environment_path + "randomenv.py-{0}-{1}".format(nr_of_water_tiles, random_token.decode('utf-8')), 'w') as env:
+        env.write("""
 from gym_minigrid.extendedminigrid import *
 from gym_minigrid.register import register
 from random import randint
+from random import seed
 
 class RandomEnv(ExMiniGridEnv):
 
@@ -36,22 +43,24 @@ class RandomEnv(ExMiniGridEnv):
         # Place a goal square in the bottom-right corner
         self.grid.set(width - 2, height - 2, Goal())
 
+        random_nr = seed()
+
         # Place water
-        index = 0
+        placed_water_tiles = 0
         while {1} > index:
             # Minus 2 because grid is zero indexed, and the last one is just a wall
-            width_pos = randint(1, width - 2)
-            height_pos = randint(1, height - 2)
+            width_pos = random_nr.randint(1, width - 2)
+            height_pos = random_nr.randint(1, height - 2)
             
             if width_pos = 1 and height_pos = 1:
-                # Do not  place water on agent
+                # Do not place water on agent
                 continue
             if isinstance(self.grid.get(width_pos, height_pos), Water()):
                 # Do not place water on water
                 continue                
         
             self.grid.set(width_pos, height_pos, Water())
-            index += 1
+            placed_water_tiles += 1
         self.mission = ""
 
 class RandomEnv{0}x{0}(RandomEnv):
@@ -62,10 +71,10 @@ register(
     id='MiniGrid-RandomEnv-{0}x{0}-v0',
     entry_point='gym_minigrid.envs:RandomEnv{0}x{0}'
 )
-""".format(grid_size, nr_of_water_tiles, nr_of_total_blocks))
-            env.close()
-        with open(configuration_path + "randomEnv.json", 'w') as config:
-            config.write(""" 
+""".format(grid_size, nr_of_water_tiles))
+        env.close()
+    with open(configuration_path + "randomEnv-{0}-{1}.json".format(nr_of_water_tiles, random_token.decode('utf-8')), 'w') as config:
+        config.write(""" 
 {
   "config_name": "firstEvalWaterRandomEnv",
   "algorithm": "a2c",
@@ -98,3 +107,10 @@ register(
     "step": -1
   }
 }""".format(grid_size))
+        config.close()
+    return "RandomEnv-{0}x{0}-Water-{1}-{2}".format(grid_size, nr_of_water_tiles, random_token.decode('utf-8'))
+
+
+def main():
+    args = parser.parse_args()
+    generate_environment(args.grid_size, args.number_of_water_tiles, args.max_block_size)
