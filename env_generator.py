@@ -14,7 +14,7 @@ random_token = token_hex(4)
 
 
 def generate_environment(grid_size, nr_of_water_tiles, max_block_size):
-    with open(environment_path + "randomenv.py-{0}-{1}".format(nr_of_water_tiles, random_token), 'w') as env:
+    with open(environment_path + "randomenv-{0}-{1}.py".format(nr_of_water_tiles, random_token), 'w') as env:
         env.write("""
 from gym_minigrid.extendedminigrid import *
 from gym_minigrid.register import register
@@ -46,16 +46,16 @@ class RandomEnv(ExMiniGridEnv):
         self.grid.set(width - 2, height - 2, Goal())
 
         # Set the random seed to the random token, so we can reproduce the environment
-        random_nr = seed({2})
+        random_nr = seed("{2}")
 
         # Place water
         placed_water_tiles = 0
-        while {1} > index:
+        while {1} > placed_water_tiles:
             # Minus 2 because grid is zero indexed, and the last one is just a wall
             width_pos = random_nr.randint(1, width - 2)
             height_pos = random_nr.randint(1, height - 2)
             
-            if width_pos = 1 and height_pos = 1:
+            if width_pos == 1 and height_pos == 1:
                 # Do not place water on agent
                 continue
             if isinstance(self.grid.get(width_pos, height_pos), Water()):
