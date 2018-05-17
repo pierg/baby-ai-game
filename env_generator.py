@@ -52,18 +52,32 @@ class RandomEnv(ExMiniGridEnv):
 
         # Place water
         placed_water_tiles = 0
-        while {1} > placed_water_tiles:
+        while 5 > placed_water_tiles:
             # Minus 2 because grid is zero indexed, and the last one is just a wall
             width_pos = random.randint(1, width - 2)
             height_pos = random.randint(1, height - 2)
-            
+
             if width_pos == 1 and height_pos == 1:
                 # Do not place water on agent
                 continue
+            if width_pos == 1 and height_pos == 2 and isinstance(self.grid.get(2, 1), Water) or \
+                width_pos == 2 and height_pos == 1 and isinstance(self.grid.get(1, 2), Water):
+                # Do not place two water tiles in front of the agent A W -
+                #                                                    W | |
+                #                                                    | | |
+                continue
             if isinstance(self.grid.get(width_pos, height_pos), Water):
                 # Do not place water on water
-                continue                
-        
+                continue
+            if isinstance(self.grid.get(width - 2, height - 2), Goal):
+                # Do not place water on Goal
+                continue
+            if width_pos == width - 2 and height_pos == height - 3 and isinstance(self.grid.get(width - 3, height - 2)) or \
+                width_pos == width - 3 and height_pos == height - 2 and isinstance(self.grid.get(width - 2, height - 3), Water):
+                # Do not place water preventing the agent from reaching the goal - | |
+                #                                                                - A W
+                #                                                                - W G
+                continue
             self.grid.set(width_pos, height_pos, Water())
             placed_water_tiles += 1
         self.mission = ""
@@ -125,6 +139,8 @@ register(
     with open(configuration_path + "main.json", 'r+') as main_config:
         data = json.load(main_config)
         data["env_name"] = "MiniGrid-RandomEnv-{0}x{0}-v0".format(grid_size)
+        main_config.seek(0)
+        json.dump(data, main_config, sort_keys=True, indent=4)
         main_config.close()
 
     return "RandomEnv-{0}x{0}-Water-{1}-{2}".format(grid_size, nr_of_water_tiles, random_token)
