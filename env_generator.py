@@ -1,4 +1,6 @@
 import argparse
+import json
+
 parser = argparse.ArgumentParser(description='Arguments for creating the environments and its configuration')
 parser.add_argument('--grid_size', type=int)
 parser.add_argument('--number_of_water_tiles', type=int)
@@ -8,11 +10,11 @@ from secrets import token_hex  # NOQA
 
 environment_path = "../gym-minigrid/gym_minigrid/envs/"
 configuration_path = "configurations/"
-random_token = token_hex(8)
+random_token = token_hex(4)
 
 
-def generate_environment(grid_size, nr_of_water_tiles):
-    with open(environment_path + "randomenv.py-{0}-{1}".format(nr_of_water_tiles, random_token.decode('utf-8')), 'w') as env:
+def generate_environment(grid_size, nr_of_water_tiles, max_block_size):
+    with open(environment_path + "randomenv.py-{0}-{1}".format(nr_of_water_tiles, random_token), 'w') as env:
         env.write("""
 from gym_minigrid.extendedminigrid import *
 from gym_minigrid.register import register
@@ -72,46 +74,51 @@ register(
     id='MiniGrid-RandomEnv-{0}x{0}-v0',
     entry_point='gym_minigrid.envs:RandomEnv{0}x{0}'
 )
-""".format(grid_size, nr_of_water_tiles, random_token.decode('utf-8')))
+""".format(grid_size, nr_of_water_tiles, random_token))
         env.close()
-    with open(configuration_path + "randomEnv-{0}-{1}.json".format(nr_of_water_tiles, random_token.decode('utf-8')), 'w') as config:
-        config.write(""" 
-{
-  "config_name": "firstEvalWaterRandomEnv",
-  "algorithm": "a2c",
-  "monitors": {
-    "absence": {
-      "monitored": {
-        "water": {
-          "active": true,
-          "name": "water",
-          "reward": {
-            "near": 0,
-            "immediate": -15,
-            "violated": -55
-          }
-        }
-      }
-    },
-  },
-  "env_name": "MiniGrid-RandomEnv-{0}x{0}-v0",
-  "num_processes": 48,
-  "num_steps": 5,
-  "log_interval": 10,
-  "on_violation_reset": false,
-  "rendering": false,
-  "evaluation_directory_name": "evaluations",
-  "visdom": false,
-  "debug_mode": false,
-  "reward": {
-    "goal": 1000,
-    "step": -1
-  }
-}""".format(grid_size))
+    with open(configuration_path + "randomEnv-{0}-{1}.json".format(nr_of_water_tiles, random_token), 'w') as config:
+        config.write(json.dumps({
+            "config_name": "firstEvalWaterRandomEnv",
+            "algorithm": "a2c",
+            "monitors": {
+                "absence": {
+                    "monitored": {
+                        "water": {
+                            "active": True,
+                            "name": "water",
+                            "reward": {
+                                "near": "0",
+                                "immediate": "-15",
+                                "violated": "-55"
+                            }
+                        }
+                    },
+                },
+            },
+            "env_name": "MiniGrid-RandomEnv-{0}x{0}-v0".format(grid_size),
+            "num_processes": "48",
+            "num_steps": "5",
+            "log_interval": "10",
+            "on_violation_reset": False,
+            "rendering": False,
+            "evaluation_directory_name": "evaluations",
+            "visdom": False,
+            "debug_mode": False,
+            "reward": {
+                "goal": "1000",
+                "step": "-1"
+            }
+        }))
         config.close()
-    return "RandomEnv-{0}x{0}-Water-{1}-{2}".format(grid_size, nr_of_water_tiles, random_token.decode('utf-8'))
+    return "RandomEnv-{0}x{0}-Water-{1}-{2}".format(grid_size, nr_of_water_tiles, random_token)
 
 
 def main():
     args = parser.parse_args()
-    return generate_environment(args.grid_size, args.number_of_water_tiles, args.max_block_size)
+    print(args)
+    file_name = generate_environment(args.grid_size, args.number_of_water_tiles, args.max_block_size)
+    print(file_name)
+
+
+if __name__ == '__main__':
+    main()
