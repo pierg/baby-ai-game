@@ -114,4 +114,4 @@ register(
 
 def main():
     args = parser.parse_args()
-    generate_environment(args.grid_size, args.number_of_water_tiles, args.max_block_size)
+    return generate_environment(args.grid_size, args.number_of_water_tiles, args.max_block_size)
