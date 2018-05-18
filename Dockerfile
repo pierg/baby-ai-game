@@ -52,8 +52,6 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3.6-distutils
 
-RUN ln -s /usr/bin/python3.6 /usr/local/bin/python3
-
 
 # Installing pip and pip3
 RUN apt-get remove python-pip python3-pip
