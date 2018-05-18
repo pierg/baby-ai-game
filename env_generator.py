@@ -6,17 +6,22 @@ parser = argparse.ArgumentParser(description='Arguments for creating the environ
 parser.add_argument('--grid_size', type=int, required=True)
 parser.add_argument('--number_of_water_tiles', type=int, required=True)
 parser.add_argument('--max_block_size', type=int, required=True)
+parser.add_argument('--near_reward', type=int, default=0)
+parser.add_argument('--immediate_reward', type=int, default=0)
+parser.add_argument('--violated_reward', type=int, required=True)
 
 
 environment_path = "../gym-minigrid/gym_minigrid/envs/"
 configuration_path = "configurations/"
 random_token = token_hex(4)
 
+""" This script creates a random environment in the gym_minigrid/envs folder. It uses a token_hex(4) 
+        as the ID and the random seed for placing tiles in the grid.
+    This to ensure that certain environments can be reproduced 
+        in case the agent behaves strange in certain environments, in order to investigate why.        
+"""
 
-def generate_environment(grid_size, nr_of_water_tiles, max_block_size):
-    # Creates a random environment python file, it currently only places water tiles randomly in the environment
-    # It uses the random_token as the seed for all its random functions, this to enable reproduction
-    # of environments. Using the random_token found in the end of file name.
+def generate_environment(grid_size, nr_of_water_tiles, max_block_size, rewards=None):
     with open(environment_path + "randomenv{0}{1}.py".format(nr_of_water_tiles, random_token), 'w') as env:
         env.write("""
 from gym_minigrid.extendedminigrid import *
@@ -109,9 +114,9 @@ register(
                             "active": True,
                             "name": "water",
                             "reward": {
-                                "near": "0",
-                                "immediate": "0",
-                                "violated": "-55"
+                                "near": "{}".format(rewards['near'] if 'near' in rewards else "0"),
+                                "immediate": "{}".format(rewards['immediate'] if 'immediate' in rewards else "0"),
+                                "violated": "{}".format(rewards['violated'] if 'violated' in rewards else "-55")
                             }
                         }
                     },
@@ -138,6 +143,7 @@ register(
         data = json.load(main_config)
         data["env_name"] = "MiniGrid-RandomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token)
         main_config.seek(0)
+        main_config.truncate()
         json.dump(data, main_config, indent=2)
         main_config.close()
 
@@ -146,8 +152,14 @@ register(
 
 def main():
     args = parser.parse_args()
-    print(args)
-    file_name = generate_environment(args.grid_size, args.number_of_water_tiles, args.max_block_size)
+    rewards = {
+        "violated": args.violated_reward
+    }
+    if args.near_reward:
+        rewards['near'] = args.near_reward
+    if args.immediate_reward:
+        rewards['immediate'] = args.immediate_reward
+    file_name = generate_environment(args.grid_size, args.number_of_water_tiles, args.max_block_size, rewards)
     print(file_name)
 
 
