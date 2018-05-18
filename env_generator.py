@@ -6,10 +6,10 @@ parser = argparse.ArgumentParser(description='Arguments for creating the environ
 parser.add_argument('--grid_size', type=int, required=True)
 parser.add_argument('--number_of_water_tiles', type=int, required=True)
 parser.add_argument('--max_block_size', type=int, required=True)
-parser.add_argument('--near_reward', type=int, default=0)
-parser.add_argument('--immediate_reward', type=int, default=0)
-parser.add_argument('--violated_reward', type=int, required=True)
-
+parser.add_argument('--rewards_file', type=str, required=True, help="A json file containing the keys: "
+                                                                      "step, goal, near, immediate, violated. "
+                                                                      "The values should be the wanted rewards "
+                                                                      "of the actions")
 
 environment_path = "../gym-minigrid/gym_minigrid/envs/"
 configuration_path = "configurations/"
@@ -116,7 +116,7 @@ register(
                             "reward": {
                                 "near": "{}".format(rewards['near'] if 'near' in rewards else "0"),
                                 "immediate": "{}".format(rewards['immediate'] if 'immediate' in rewards else "0"),
-                                "violated": "{}".format(rewards['violated'] if 'violated' in rewards else "-55")
+                                "violated": "{}".format(rewards['violated'] if 'violated' in rewards else "-1")
                             }
                         }
                     },
@@ -132,8 +132,8 @@ register(
             "visdom": False,
             "debug_mode": False,
             "reward": {
-                "goal": "1000",
-                "step": "-1"
+                "goal": "{}".format(rewards['goal'] if 'goal' in rewards else "1"),
+                "step": "{}".format(rewards['step'] if 'step' in rewards else "-1")
             }
         }, indent=2))
         config.close()
@@ -152,13 +152,9 @@ register(
 
 def main():
     args = parser.parse_args()
-    rewards = {
-        "violated": args.violated_reward
-    }
-    if args.near_reward:
-        rewards['near'] = args.near_reward
-    if args.immediate_reward:
-        rewards['immediate'] = args.immediate_reward
+    rewards = {}
+    with open(args.rewards_file, 'r') as reward_config:
+        rewards = json.loads(reward_config.read())
     file_name = generate_environment(args.grid_size, args.number_of_water_tiles, args.max_block_size, rewards)
     print(file_name)
 

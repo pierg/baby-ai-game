@@ -4,8 +4,7 @@
 
 
 echo "...creating a random environment..."
-configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 3 --max_block_size 1 --violated_reward -2`
-
+configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 3 --max_block_size 1 --rewards_file "configurations/rewards/default.json"
 echo "...environment name is..."
 echo $configuration_file
 
