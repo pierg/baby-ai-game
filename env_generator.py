@@ -114,26 +114,26 @@ register(
                             "active": True,
                             "name": "water",
                             "reward": {
-                                "near": "{}".format(rewards['near'] if 'near' in rewards else "0"),
-                                "immediate": "{}".format(rewards['immediate'] if 'immediate' in rewards else "0"),
-                                "violated": "{}".format(rewards['violated'] if 'violated' in rewards else "-1")
+                                "near": float("{0:.2f}".format(rewards['near'] if 'near' in rewards else "0")),
+                                "immediate": float("{0:.2f}".format(rewards['immediate'] if 'immediate' in rewards else "0")),
+                                "violated": float("{0:.2f}".format(rewards['violated'] if 'violated' in rewards else "-1"))
                             }
                         }
                     },
                 },
             },
             "env_name": "MiniGrid-RandomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token),
-            "num_processes": "48",
-            "num_steps": "5",
-            "log_interval": "10",
+            "num_processes": 48,
+            "num_steps": 5,
+            "log_interval": 10,
             "on_violation_reset": False,
             "rendering": False,
             "evaluation_directory_name": "evaluations",
             "visdom": False,
             "debug_mode": False,
             "reward": {
-                "goal": "{}".format(rewards['goal'] if 'goal' in rewards else "1"),
-                "step": "{}".format(rewards['step'] if 'step' in rewards else "-1")
+                "goal": float("{0:.2f}".format(rewards['goal'] if 'goal' in rewards else "1")),
+                "step": float("{0:.2f}".format(rewards['step'] if 'step' in rewards else "-1"))
             }
         }, indent=2))
         config.close()
