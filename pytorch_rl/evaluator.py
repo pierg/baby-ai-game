@@ -54,8 +54,7 @@ class Evaluator:
         self.numberOfStepAverage = 0
         self.N_goal_reached = 0
 
-
-    def update(self, reward, done, info,numberOfStepPerEpisode):
+    def update(self, reward, done, info, numberOfStepPerEpisode):
         reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
         self.episode_rewards += reward
         
@@ -89,24 +88,19 @@ class Evaluator:
             self.N_goal_reached += self.n_proccess_reached_goal[i]
         self.n_episodes = n_episodes_mask
 
-
-
     def save(self, n_updates, t_start, t_end, dist_entropy, value_loss, action_loss):
-
         total_num_steps = (n_updates + 1) * self.config.num_processes * self.config.num_steps
-        csv_logger.write_to_log("{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
-            n_updates,
-            total_num_steps,
-            int(total_num_steps / (t_end - t_start)),
-            self.final_rewards.mean(),
-            self.final_rewards.median(),
-            self.final_rewards.min(),
-            self.final_rewards.max(),
-            dist_entropy.data[0],
-            value_loss.data[0],
-            action_loss.data[0],
-            self.n_episodes.sum(),
-            self.n_catastrophes.sum(),
-            self.N_goal_reached,
-            self.numberOfStepAverage
-        ))
+        csv_logger.write_to_log([n_updates,
+                                 total_num_steps,
+                                 int(total_num_steps / t_end - t_start),
+                                 self.final_rewards.mean(),
+                                 self.final_rewards.median(),
+                                 self.final_rewards.min(),
+                                 self.final_rewards.max(),
+                                 dist_entropy.data[0],
+                                 value_loss.data[0],
+                                 action_loss.data[0],
+                                 self.n_episodes.sum(),
+                                 self.n_catastrophes.sum(),
+                                 self.N_goal_reached,
+                                 self.numberOfStepAverage])
