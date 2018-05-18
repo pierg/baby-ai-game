@@ -15,7 +15,7 @@ else
     echo "...updating selected configuration file..."
     cd ./configurations
     echo $PWD
-    ls 
+    ls
     yes | cp -rf $configuration_file "main.json"
     echo "using configuration file: $configuration_file"
 fi
@@ -33,6 +33,7 @@ PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
 export PYTHONPATH
 
 echo "...launching the training..."
+echo $PWD
 python ./pytorch_rl/main.py
 
 # echo "...launch visdom server in the background..."
