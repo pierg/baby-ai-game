@@ -71,7 +71,7 @@ class RandomEnv(ExMiniGridEnv):
             if isinstance(self.grid.get(width_pos, height_pos), Goal):
                 # Do not place water on Goal
                 continue
-            if width_pos == width - 2 and height_pos == height - 3 and isinstance(self.grid.get(width - 3, height - 2)) or width_pos == width - 3 and height_pos == height - 2 and isinstance(self.grid.get(width - 2, height - 3), Water):
+            if width_pos == width - 2 and height_pos == height - 3 and isinstance(self.grid.get(width - 3, height - 2), Water) or width_pos == width - 3 and height_pos == height - 2 and isinstance(self.grid.get(width - 2, height - 3), Water):
                 # Do not place water preventing the agent from reaching the goal - | |
                 #                                                                - A W
                 #                                                                - W G
@@ -80,13 +80,13 @@ class RandomEnv(ExMiniGridEnv):
             placed_water_tiles += 1
         self.mission = ""
 
-class RandomEnv{0}x{0}(RandomEnv):
+class RandomEnv{0}x{0}_{2}(RandomEnv):
     def __init__(self):
         super().__init__(size={0})
 
 register(
-    id='MiniGrid-RandomEnv-{0}x{0}-v0',
-    entry_point='gym_minigrid.envs:RandomEnv{0}x{0}'
+    id='MiniGrid-RandomEnv-{0}x{0}-{2}-v0',
+    entry_point='gym_minigrid.envs:RandomEnv{0}x{0}_{2}'
 )
 """.format(grid_size, nr_of_water_tiles, random_token))
         env.close()
@@ -110,14 +110,14 @@ register(
                             "name": "water",
                             "reward": {
                                 "near": "0",
-                                "immediate": "-15",
+                                "immediate": "0",
                                 "violated": "-55"
                             }
                         }
                     },
                 },
             },
-            "env_name": "MiniGrid-RandomEnv-{0}x{0}-v0".format(grid_size),
+            "env_name": "MiniGrid-RandomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token),
             "num_processes": "48",
             "num_steps": "5",
             "log_interval": "10",
@@ -130,18 +130,18 @@ register(
                 "goal": "1000",
                 "step": "-1"
             }
-        }))
+        }, indent=4))
         config.close()
 
     # Updates the main.json file and set the env name to the randomly generated one
     with open(configuration_path + "main.json", 'r+') as main_config:
         data = json.load(main_config)
-        data["env_name"] = "MiniGrid-RandomEnv-{0}x{0}-v0".format(grid_size)
+        data["env_name"] = "MiniGrid-RandomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token)
         main_config.seek(0)
-        json.dump(data, main_config, sort_keys=True, indent=4)
+        json.dump(data, main_config, indent=4)
         main_config.close()
 
-    return "RandomEnv-{0}x{0}-Water-{1}-{2}".format(grid_size, nr_of_water_tiles, random_token)
+    return "RandomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token)
 
 
 def main():
