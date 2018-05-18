@@ -24,6 +24,9 @@ echo "...setting up python environment..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
 export PYTHONPATH
 
+echo "...creating a random environment..."
+# python3 env_generator.py --grid_size 6 --number_of_water_tiles 3 --max_block_size 1 --violated_reward -2
+
 echo "...launching the training..."
 python3 ./pytorch_rl/main.py
 

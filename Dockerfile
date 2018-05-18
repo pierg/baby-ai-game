@@ -65,8 +65,8 @@ RUN mkdir -p $HOME
 WORKDIR $HOME
 
 # Cloning the repositories
-RUN git clone https://github.com/pierg/baby-ai-game.git
-RUN git clone https://github.com/pierg/gym-minigrid.git
+RUN git clone https://github.com/pierg/baby-ai-game.git -b random_envs --single-branch
+RUN git clone https://github.com/pierg/gym-minigrid.git -b random_envs --single-branch
 
 
 RUN pip3 install --upgrade pip

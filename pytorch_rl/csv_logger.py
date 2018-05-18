@@ -17,7 +17,7 @@ def create_header(csv_file, headers):
         writer = csv.writer(csv_log, delimiter=',')
         writer.writerow(headers)
 
-def write_to_log(log_text):
+def write_to_log(values):
     """
     Writes a row to a csv log file, appends to an existing file
     :param csv_file: A csv file to append to
