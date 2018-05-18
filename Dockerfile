@@ -49,8 +49,9 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3.6-dev \
     python3.6-venv
 
-#RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-#    python3.6-distutils
+# It causes problems TODO:Fix distutils installation
+RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    python3.6-distutils
 
 RUN ln -s /usr/bin/python3.6 /usr/local/bin/python3
 
