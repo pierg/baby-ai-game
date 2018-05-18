@@ -1,2 +1,1 @@
 N_updates,N_timesteps,FPS,Reward_mean,Reward_median,Reward_min,Reward_max,Entropy,Value_loss,Action_loss,N_episodes,N_blocked_actions,N_goal_reached
-0,160,380,0.0,0.0,0.0,0.0,1.9093621969223022,14.234233856201172,-4.836169242858887,0.0,0.0,0.0

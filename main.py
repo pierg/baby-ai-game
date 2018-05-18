@@ -34,6 +34,7 @@ class ImgWidget(QLabel):
     def mousePressEvent(self, event):
         self.window.imageClick(event.x(), event.y())
 
+
 class AIGameWindow(QMainWindow):
     """Application window for the baby AI game"""
 
@@ -363,6 +364,7 @@ class AIGameWindow(QMainWindow):
         if done:
             self.resetEnv()
 
+
 def main(argv):
     parser = OptionParser()
     parser.add_option(
@@ -381,7 +383,8 @@ def main(argv):
     # Load the gym environment
     env = gym.make(options.env_name)
 
-    if (config.monitor): env = SafetyEnvelope(env)
+    if config.monitors:
+        env = ActionPlannerEnvelope(env)
 
     # Create the application window
     app = QApplication(sys.argv)
@@ -389,6 +392,7 @@ def main(argv):
 
     # Run the application
     sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main(sys.argv)
