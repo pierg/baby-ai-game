@@ -105,7 +105,7 @@ register(
     # Creates a json config file for the random environment
     with open(configuration_path + "randomEnv-{0}-{1}.json".format(nr_of_water_tiles, random_token), 'w') as config:
         config.write(json.dumps({
-            "config_name": "firstEvalWaterRandomEnv",
+            "config_name": "evalRandomWaterEnv-Water-{0}-{1}".format(nr_of_water_tiles, random_token),
             "algorithm": "a2c",
             "monitors": {
                 "absence": {
