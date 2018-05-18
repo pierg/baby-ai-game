@@ -1,56 +1,23 @@
 {
-  "config_name": "firstEvalAllMonitors",
+  "config_name": "evalRandomWaterEnv-Water-3-9e71cd22",
   "algorithm": "a2c",
   "monitors": {
     "absence": {
       "monitored": {
         "water": {
-          "active": false,
+          "active": true,
           "name": "water",
           "reward": {
-            "near": -2,
-            "immediate": -15,
-            "violated": -55
-          }
-        },
-        "deadend": {
-          "active": false,
-          "name": "deadend",
-          "reward": {
-            "near": -2,
-            "immediate": -15,
-            "violated": -55
-          }
-        }
-      }
-    },
-    "precedence": {
-      "monitored": {
-        "light": {
-          "active": false,
-          "name": "lightBeforeEnter",
-          "preCondition": "light-on",
-          "postCondition": "enter-room",
-          "reward": {
-            "precedenceRespected": 25,
-            "precedenceViolated": -55
-          }
-        },
-        "doorOpenBeforeLight": {
-          "active": false,
-          "name": "lightBeforeDoor",
-          "preCondition": "light-on",
-          "postCondition": "door-opened",
-          "reward": {
-            "precedenceRespected": 25,
-            "precedenceViolated": -55
+            "near": 0.0,
+            "immediate": 0.0,
+            "violated": -1.0
           }
         }
       }
     }
   },
-  "env_name": "MiniGrid-RandomEnv-6x6-v0",
-  "num_processes": 32,
+  "env_name": "MiniGrid-RandomEnv-6x6-9e71cd22-v0",
+  "num_processes": 48,
   "num_steps": 5,
   "log_interval": 10,
   "on_violation_reset": false,
@@ -59,7 +26,7 @@
   "visdom": false,
   "debug_mode": false,
   "reward": {
-    "goal": 78,
-    "step": 0
+    "goal": 1.0,
+    "step": -1.0
   }
 }
