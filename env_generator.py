@@ -130,7 +130,7 @@ register(
                 "goal": "1000",
                 "step": "-1"
             }
-        }, indent=4))
+        }, indent=2))
         config.close()
 
     # Updates the main.json file and set the env name to the randomly generated one
@@ -138,7 +138,7 @@ register(
         data = json.load(main_config)
         data["env_name"] = "MiniGrid-RandomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token)
         main_config.seek(0)
-        json.dump(data, main_config, indent=4)
+        json.dump(data, main_config, indent=2)
         main_config.close()
 
     return "RandomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token)
