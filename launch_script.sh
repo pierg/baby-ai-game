@@ -15,6 +15,7 @@ else
     echo "...updating selected configuration file..."
     cd ./configurations
     echo $PWD
+    ls 
     yes | cp -rf $configuration_file "main.json"
     echo "using configuration file: $configuration_file"
 fi
