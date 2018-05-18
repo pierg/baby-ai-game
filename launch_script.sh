@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 
-configuration_file=${1:-"main.json"}
+# configuration_file=${1:-"main.json"}
+
+
+echo "...creating a random environment..."
+configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 3 --max_block_size 1 --violated_reward -2`
+
+echo "...environment name is..."
+echo $configuration_file
 
 if [ $# -eq 0 ]
   then
@@ -24,14 +31,8 @@ echo "...setting up python environment..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
 export PYTHONPATH
 
-echo "...creating a random environment..."
-# python3 env_generator.py --grid_size 6 --number_of_water_tiles 3 --max_block_size 1 --violated_reward -2
-
 echo "...launching the training..."
-python3 ./pytorch_rl/main.py
+python ./pytorch_rl/main.py
 
 # echo "...launch visdom server in the background..."
 # python3 -m visdom.server &
-
-#echo "...launching the training..."
-#python3 ./pytorch_rl/main.py
