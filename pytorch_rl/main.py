@@ -110,7 +110,7 @@ def main():
     rollouts.observations[0].copy_(current_obs)
     numberOfStepBeforeDone = []
     stepOnLastGoal = []
-    for i in range(0,32):
+    for i in range(0,args.num_processes):
         numberOfStepBeforeDone.append(0)
         stepOnLastGoal.append(0)
     # These variables are used to compute average rewards for all processes.
