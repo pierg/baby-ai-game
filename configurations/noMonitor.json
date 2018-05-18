@@ -1,5 +1,5 @@
 {
-  "config_name": "firstEvalNoMonitor",
+  "config_name": "NoMonitor",
   "algorithm": "a2c",
   "monitors": false,
   "env_name": "MiniGrid-FirstEvalEnv-10x10-v0",
@@ -12,7 +12,8 @@
   "visdom": false,
   "debug_mode": false,
   "reward": {
-    "goal": 78,
-    "step": -2
+    "goal": 1,
+    "step": -0.1,
+    "death":-1
   }
 }
