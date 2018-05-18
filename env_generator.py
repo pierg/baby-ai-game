@@ -147,7 +147,7 @@ register(
         json.dump(data, main_config, indent=2)
         main_config.close()
 
-    return "RandomEnv-{0}x{0}-{1}-v0.json".format(grid_size, random_token)
+    return "randomEnv-{0}x{0}-{1}-v0.json".format(grid_size, random_token)
 
 
 def main():
