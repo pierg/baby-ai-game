@@ -2,13 +2,16 @@
 
 # Pull latest changes in the repositories
 echo "...updating repositories..."
+echo pwd
 git pull
 cd ..
 cd gym-minigrid
+echo pwd
 git pull
 cd ..
 
 cd baby-ai-game
+echo pwd
 
 if [ $# -eq 0 ]
   then
