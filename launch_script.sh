@@ -3,18 +3,17 @@
 # Sets the main.json as default, if the -t is specifed
 # it will use that as config file.
 configuration_file="main.json"
-container=0
+start_training=0
 
 while getopts ":trc" opt; do
     case ${opt} in
         r)
             random=1
+            start_training=1
             ;;
         t)
             configuration_file=${OPTARG}
-            ;;
-        c)
-            container=1
+            start_training=2
             ;;
     esac
 done
@@ -55,12 +54,12 @@ PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
 export PYTHONPATH
 
 
-if [ $container -eq 0 ]
+if [ start_training -eq 1 ]
   then
-    echo "environment ready!"
-else
     echo "...launching the training..."
     python ./pytorch_rl/main.py
+else
+    echo "environment ready!"
 fi
 
 
