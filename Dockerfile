@@ -47,8 +47,11 @@ RUN add-apt-repository ppa:jonathonf/python-3.6
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3.6 \
     python3.6-dev \
-    python3.6-venv \
-    python3-distutils
+    python3.6-venv
+
+# It causes problems TODO:Fix distutils installation
+RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    python3.6-distutils
 
 RUN ln -s /usr/bin/python3.6 /usr/local/bin/python3
 
@@ -82,4 +85,4 @@ RUN pip3 install -r ./baby-ai-game/requirements.txt
 WORKDIR $HOME/baby-ai-game
 
 ENTRYPOINT ["./entrypoint.sh"]
-CMD ["main.json"]
+CMD [""]

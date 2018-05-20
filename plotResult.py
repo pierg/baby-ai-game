@@ -3,7 +3,7 @@ matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import csv
 import glob
-
+from random import randint
 """
 File used to create a graph from a csv file and the name of the columns that need to be used
 """
@@ -47,10 +47,13 @@ def plotResult(columnNameX,columnNameY,columnNameZ,fileName,resultFileName):
 
 def autoPlot(columnNameX,columnNameY,columnNameZ):
     for csvFile in glob.glob("evaluations/*.csv"):
-        str = csvFile
-        str = str.replace(".csv",".pdf")
-        str = str.replace("evaluations/","results/")
-        plotResult(columnNameX,columnNameY,columnNameZ,csvFile,str)
+        name = csvFile
+        randomNumber = randint(0,999999)
+        name = name.replace(".csv",str(randomNumber))
+        name += str(".pdf")
+        print(name)
+        name = name.replace("evaluations/","results/")
+        plotResult(columnNameX,columnNameY,columnNameZ,csvFile,name)
 
 
 

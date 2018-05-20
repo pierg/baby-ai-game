@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 sudo docker exec -t $(sudo docker ps -lq) mkdir -p /headless/baby-ai-game/results
-
+dir -p /headless/baby-a
 echo "Launching plot scripts in all the running containers..."
 sudo docker exec -t $(sudo docker ps -lq) python3 plotResult.py
 echo "...done"

@@ -1,5 +1,5 @@
 {
-  "config_name": "firstEvalWaterOnly",
+  "config_name": "Unsafe6x6_Water_near,1_immediate,2_violated,5_process32_numstep5_goal1_death1_step,1",
   "algorithm": "a2c",
   "monitors": {
     "absence": {
@@ -8,18 +8,18 @@
           "active": true,
           "name": "water",
           "reward": {
-            "near": -2,
-            "immediate": -15,
-            "violated": -55
+            "near": -0.1,
+            "immediate": -0.2,
+            "violated": -0.5
           }
         },
         "deadend": {
           "active":false,
           "name": "deadend",
           "reward": {
-            "near": -2,
-            "immediate": -15,
-            "violated": -55
+            "near": -0.1,
+            "immediate": -0.2,
+            "violated": -0.5
           }
         }
       }
@@ -32,8 +32,8 @@
           "preCondition": "light-on",
           "postCondition": "enter-room",
           "reward": {
-            "precedenceRespected": 25,
-            "precedenceViolated": -55
+            "precedenceRespected": 0.25,
+            "precedenceViolated": -0.55
           }
         },
         "doorOpenBeforeLight": {
@@ -42,14 +42,14 @@
           "preCondition": "light-on",
           "postCondition": "door-opened",
           "reward": {
-            "precedenceRespected": 25,
-            "precedenceViolated": -55
+            "precedenceRespected": 0.25,
+            "precedenceViolated": -0.55
           }
         }
       }
     }
   },
-  "env_name": "MiniGrid-FirstEvalEnv-10x10-v0",
+  "env_name": "MiniGrid-Unsafe-6x6-v0",
   "num_processes": 32,
   "num_steps": 5,
   "log_interval": 10,
@@ -59,7 +59,8 @@
   "visdom": false,
   "debug_mode": false,
   "reward": {
-    "goal": 78,
-    "step": -2
+    "goal": 1,
+    "step": -0.1,
+    "death":-1,
   }
 }

@@ -1,8 +1,8 @@
 {
-  "config_name": "firstEvalTestA2C",
+  "config_name": "NoMonitor",
   "algorithm": "a2c",
   "monitors": false,
-  "env_name": "MiniGrid-Unsafe-6x6-v0",
+  "env_name": "MiniGrid-FirstEvalEnv-10x10-v0",
   "num_processes": 32,
   "num_steps": 5,
   "log_interval": 10,
@@ -12,7 +12,8 @@
   "visdom": false,
   "debug_mode": false,
   "reward": {
-    "goal": 78,
-    "step": -2
+    "goal": 1,
+    "step": -0.1,
+    "death":-1
   }
 }
