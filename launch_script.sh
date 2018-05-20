@@ -54,7 +54,7 @@ PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
 export PYTHONPATH
 
 
-if [ start_training -eq 1 ]
+if [ $start_training -eq 1 ]
   then
     echo "...launching the training..."
     python ./pytorch_rl/main.py
