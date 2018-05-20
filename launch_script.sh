@@ -50,9 +50,16 @@ echo "...setting up python environment..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
 export PYTHONPATH
 
-echo "...launching the training..."
-echo $PWD
-python ./pytorch_rl/main.py
+
+if [ $# -eq 0 ]
+  then
+    echo "environment ready!"
+else
+    echo "...launching the training..."
+    echo $PWD
+    python ./pytorch_rl/main.py
+fi
+
 
 # echo "...launch visdom server in the background..."
 # python3 -m visdom.server &
