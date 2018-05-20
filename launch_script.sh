@@ -28,8 +28,6 @@ fi
 echo "...environment name is..."
 echo $configuration_file
 
-exit
-
 if [ $# -eq 0 ]
   then
     echo "using default configuration file: $configuration_file"
