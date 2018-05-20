@@ -52,7 +52,7 @@ except OSError:
 def main():
 
     # Getting configuration from file
-    config = cg.Configuration.grab("blocker")
+    config = cg.Configuration.grab()
 
     # Setup CSV logging
     csv_logger.create_header(config.csv_log_file,

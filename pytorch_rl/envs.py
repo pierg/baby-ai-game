@@ -4,14 +4,15 @@ try:
     from gym_minigrid.wrappers import *
     from gym_minigrid.envelopes import SafetyEnvelope
 
-except:
+except Exception as e:
+    print(e)
     pass
 
 from helpers import config_grabber as cg
 
 def make_env(env_id, seed, rank, log_dir):
 
-    config = cg.Configuration.grab("blocker")
+    config = cg.Configuration.grab()
 
     def _thunk():
         env = gym.make(env_id)
