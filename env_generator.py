@@ -24,18 +24,17 @@ random_token = token_hex(4)
 def generate_environment(grid_size, nr_of_water_tiles, max_block_size, rewards=None):
     with open(environment_path + "randomenv{0}{1}.py".format(nr_of_water_tiles, random_token), 'w') as env:
         env.write("""
-from gym_minigrid.extendedminigrid import *
+from gym_minigrid.minigrid import *
 from gym_minigrid.register import register
+from unsafe import *
 import random
 
-class RandomEnv(ExMiniGridEnv):
+class RandomEnv(UnsafeMiniGridEnv):
 
     def __init__(self, size=8):
         super().__init__(
             grid_size=size,
-            max_steps=4*size*size,
-            # Set this to True for maximum speed
-            see_through_walls=True
+            max_steps=4*size*size
         )
 
     def _gen_grid(self, width, height):
