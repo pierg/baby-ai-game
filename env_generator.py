@@ -138,15 +138,6 @@ register(
         }, indent=2))
         config.close()
 
-    # Updates the main.json file and set the env name to the randomly generated one
-    with open(configuration_path + "main.json", 'r+') as main_config:
-        data = json.load(main_config)
-        data["env_name"] = "MiniGrid-RandomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token)
-        main_config.seek(0)
-        main_config.truncate()
-        json.dump(data, main_config, indent=2)
-        main_config.close()
-
     return "randomEnv-{0}x{0}-{1}-v0.json".format(grid_size, random_token)
 
 
