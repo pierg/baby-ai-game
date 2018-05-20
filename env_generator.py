@@ -133,7 +133,8 @@ register(
             "debug_mode": False,
             "reward": {
                 "goal": float("{0:.2f}".format(rewards['goal'] if 'goal' in rewards else "1")),
-                "step": float("{0:.2f}".format(rewards['step'] if 'step' in rewards else "-1"))
+                "step": float("{0:.2f}".format(rewards['step'] if 'step' in rewards else "-1")),
+                'death': float("{0:.2f}".format(rewards['death'] if 'death' in rewards else "-1"))
             }
         }, indent=2))
         config.close()
