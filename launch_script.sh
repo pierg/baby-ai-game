@@ -1,12 +1,34 @@
 #!/usr/bin/env bash
 
-# configuration_file=${1:-"main.json"}
+# Sets the main.json as default, if the -t is specifed
+# it will use that as config file.
+configuration_file="main.json"
 
+while getopts ":tr" opt; do
+    case ${opt} in
+        r)
+            random=1
+            ;;
+        t)
+            configuration_file=${OPTARG}
+            ;;
+    esac
+done
+shift $((OPTIND -1))
 
-echo "...creating a random environment..."
-configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 3 --max_block_size 1 --rewards_file "configurations/rewards/default.json"`
+if [ $random ]
+    then
+        echo "...creating a random environment..."
+        echo "...creating environment with grid_size 6, number of water tiles 3, max block size 1, with default reward config"
+        configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 3 --max_block_size 1 --rewards_file "configurations/rewards/default.json"`
+    else
+        configuration_file=${1:-"main.json"}
+fi
+
 echo "...environment name is..."
 echo $configuration_file
+
+exit
 
 if [ $# -eq 0 ]
   then
@@ -14,8 +36,6 @@ if [ $# -eq 0 ]
 else
     echo "...updating selected configuration file..."
     cd ./configurations
-    echo $PWD
-    ls
     yes | cp -rf $configuration_file "main.json"
     echo "using configuration file: $configuration_file"
 fi
