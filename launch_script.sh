@@ -28,7 +28,7 @@ fi
 echo "...environment name is..."
 echo $configuration_file
 
-if [ $# -eq 0 ]
+if [ $configuration_file -eq "main.json" ]
   then
     echo "using default configuration file: $configuration_file"
 else
