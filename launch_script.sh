@@ -38,17 +38,20 @@ if [ ${random} ]
     then
         echo "...creating a random environment..."
         echo "...creating environment with grid_size 6, number of water tiles 2, max block size 1, with default reward config, without a monitor"
-        if [ ${seed} ]
+        if [ ${seed} -ne 0 ]
             then
                 if [ ${no_monitor} ]
                     then
+                        echo "Seed and no_monitor provided, creating from seed without monitor"
                         configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json" --no-monitor --seed ${seed}`
                     else
+                        echo "Seed with monitor provied, creating from seed wih a montior"
                         configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json"`
                 fi
             else
                 if [ ${no_monitor} ]
                     then
+                        echo "No seed was provided but no_monitor was, creating random without a monitor"
                         configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json" --no-monitor`
                     else
                         configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json"`
