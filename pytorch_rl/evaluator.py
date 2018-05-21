@@ -39,7 +39,9 @@ class Evaluator:
                                   'N_episodes',
                                   'N_blocked_actions',
                                   'N_goal_reached',
-                                  'N_step_per_episode'])
+                                  'N_step_per_episode',
+                                  'N_death',
+                                  'N_avoided_death'])
 
         # Evaluation variables
         # self.shortest_path = config.shortest_path
@@ -53,6 +55,8 @@ class Evaluator:
         self.numberOfStepPerEpisode = [0] * self.config.num_processes
         self.numberOfStepAverage = 0
         self.N_goal_reached = 0
+        self.N_death = 0
+        self.N_avoided_death = 0
 
     def update(self, reward, done, info, numberOfStepPerEpisode):
         reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
@@ -80,9 +84,11 @@ class Evaluator:
         for i in range(0,len(info)):
             if info[i] == "died":
                 self.n_proccess_reached_goal[i]= 0
+                self.N_death += 1
             elif info[i] == "goal":
                 self.n_proccess_reached_goal[i]= 1
             elif info[i] == "violation":
+                self.N_avoided_death += 1
                 self.n_proccess_reached_goal[i] = 0
         for i in range(0,len(self.n_proccess_reached_goal)):
             self.N_goal_reached += self.n_proccess_reached_goal[i]
@@ -103,4 +109,6 @@ class Evaluator:
                                  self.n_episodes.sum(),
                                  self.n_catastrophes.sum(),
                                  self.N_goal_reached,
-                                 self.numberOfStepAverage])
+                                 self.numberOfStepAverage,
+                                 self.N_death,
+                                 self.N_avoided_death,])
