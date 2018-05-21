@@ -4,10 +4,12 @@
 echo "...updating repositories..."
 pwd
 git pull
+git checkout random_envs
 cd ..
 cd gym-minigrid
 pwd
 git pull
+git checkout random_envs
 cd ..
 
 cd baby-ai-game
