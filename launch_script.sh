@@ -5,7 +5,7 @@
 configuration_file="main.json"
 start_training=0
 
-while getopts ":trc" opt; do
+while getopts ":tr" opt; do
     case ${opt} in
         r)
             random=1
