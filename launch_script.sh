@@ -50,7 +50,7 @@ if [ -d "venv" ]; then
 fi
 
 echo "...setting up python environment..."
-PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./:$PYTHONPATH
+PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./configurations:./:$PYTHONPATH
 export PYTHONPATH
 
 
