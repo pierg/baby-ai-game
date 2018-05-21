@@ -49,9 +49,9 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3.6-dev \
     python3.6-venv
 
-# It causes problems TODO:Fix distutils installation
-RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    python3.6-distutils
+## It causes problems TODO:Fix distutils installation
+#RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+#    python3.6-distutils
 
 RUN ln -s /usr/bin/python3.6 /usr/local/bin/python3
 
@@ -68,8 +68,8 @@ RUN mkdir -p $HOME
 WORKDIR $HOME
 
 # Cloning the repositories
-RUN git clone https://github.com/pierg/baby-ai-game.git -b random_envs --single-branch
-RUN git clone https://github.com/pierg/gym-minigrid.git -b random_envs --single-branch
+RUN git clone https://github.com/pierg/baby-ai-game.git
+RUN git clone https://github.com/pierg/gym-minigrid.git
 
 
 RUN pip3 install --upgrade pip
