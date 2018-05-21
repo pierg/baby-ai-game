@@ -4,7 +4,7 @@
 # it will use that as config file.
 configuration_file="main.json"
 
-while getopts ":tr" opt; do
+while getopts ":trswbc" opt; do
     case ${opt} in
         r)
             random=1
@@ -52,7 +52,7 @@ export PYTHONPATH
 
 echo "...launching the training..."
 echo $PWD
-python ./pytorch_rl/main.py
+python3 ./pytorch_rl/main.py
 
 # echo "...launch visdom server in the background..."
 # python3 -m visdom.server &
