@@ -270,7 +270,7 @@ def main():
 
             # Save in the evaluator
             evaluator.save(j, start, end, dist_entropy, value_loss, action_loss)
-            if final_rewards.mean() > 990:
+            if final_rewards.mean() > 985:
                 torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
                 time.sleep(1)
                 exit(1)
