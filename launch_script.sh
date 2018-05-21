@@ -23,7 +23,7 @@ if [ $random ]
     then
         echo "...creating a random environment..."
         echo "...creating environment with grid_size 6, number of water tiles 2, max block size 1, with default reward config"
-        configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json"`
+        configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-1000.json"`
     else
         configuration_file=${1:-"main.json"}
 fi
