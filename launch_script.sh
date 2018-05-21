@@ -13,7 +13,7 @@ while getopts ":trc" opt; do
             ;;
         t)
             configuration_file=${OPTARG}
-            start_training=2
+            start_training=1
             ;;
     esac
 done
