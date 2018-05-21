@@ -137,7 +137,7 @@ def main():
                 if done[x]:
                     numberOfStepBeforeDone[x] = (j*args.num_steps+step+1) - stepOnLastGoal[x]
                     stepOnLastGoal[x] = (j*args.num_steps+step+1)
-            evaluator.update(reward, done, info,numberOfStepBeforeDone)
+            evaluator.update(reward, done, info, numberOfStepBeforeDone)
 
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
             episode_rewards += reward
@@ -270,6 +270,10 @@ def main():
 
             # Save in the evaluator
             evaluator.save(j, start, end, dist_entropy, value_loss, action_loss)
+            if final_rewards.mean() > 990:
+                torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
+                time.sleep(1)
+                exit(1)
             print(
                 "Updates {}, num timesteps {}, FPS {}, mean/median reward {:.2f}/{:.2f}, min/max reward {:.2f}/{:.2f}, entropy {:.5f}, value loss {:.5f}, policy loss {:.5f}".
                 format(
@@ -294,3 +298,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

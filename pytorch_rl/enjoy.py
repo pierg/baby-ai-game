@@ -10,6 +10,8 @@ from torch.autograd import Variable
 from vec_env.dummy_vec_env import DummyVecEnv
 
 from envs import make_env
+from configurations import config_grabber as cg
+
 
 parser = argparse.ArgumentParser(description='RL')
 parser.add_argument('--seed', type=int, default=1,
@@ -23,6 +25,9 @@ parser.add_argument('--env-name', default='PongNoFrameskip-v4',
 parser.add_argument('--load-dir', default='./trained_models/',
                     help='directory to save agent logs (default: ./trained_models/)')
 args = parser.parse_args()
+
+config = cg.Configuration.grab()
+args.env_name = config.env_name
 
 env = make_env(args.env_name, args.seed, 0, None)
 env = DummyVecEnv([env])

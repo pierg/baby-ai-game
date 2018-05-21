@@ -10,10 +10,17 @@ parser.add_argument('--rewards_file', type=str, required=True, help="A json file
                                                                       "step, goal, near, immediate, violated. "
                                                                       "The values should be the wanted rewards "
                                                                       "of the actions")
+parser.add_argument('--seed', type=str, help="A seed for generating an environment, in order to produce the same environment.")
 
 environment_path = "../gym-minigrid/gym_minigrid/envs/"
 configuration_path = "configurations/"
-random_token = token_hex(4)
+
+args = parser.parse_args()
+
+if args.seed:
+    random_token = args.seed
+else:
+    random_token = token_hex(4)
 
 """ This script creates a random environment in the gym_minigrid/envs folder. It uses a token_hex(4) 
         as the ID and the random seed for placing tiles in the grid.
@@ -22,6 +29,11 @@ random_token = token_hex(4)
 """
 
 def generate_environment(grid_size, nr_of_water_tiles, max_block_size, rewards=None):
+    env_config_name = "randomEnv-{0}x{0}-Water-{1}-violated{2}-{3}-v0.json".format(grid_size,
+                                                                                    nr_of_water_tiles,
+                                                                                    int(rewards['violated']),
+                                                                                    random_token)
+    env_eval_name = "evalRandomWaterEnv-{0}x{0}-Water-{1}-violated{2}-{3}".format(grid_size, nr_of_water_tiles, int(rewards['violated']), random_token)
     with open(environment_path + "randomenv{0}{1}.py".format(nr_of_water_tiles, random_token), 'w') as env:
         env.write("""
 from gym_minigrid.extendedminigrid import *
@@ -33,7 +45,7 @@ class RandomEnv(ExMiniGridEnv):
     def __init__(self, size=8):
         super().__init__(
             grid_size=size,
-            max_steps=4*size*size,
+            max_steps=4 * size * size,
             # Set this to True for maximum speed
             see_through_walls=True
         )
@@ -103,9 +115,9 @@ register(
         init_file.close()
 
     # Creates a json config file for the random environment
-    with open(configuration_path + "randomEnv-{0}x{0}-{1}-v0.json".format(grid_size, random_token), 'w') as config:
+    with open(configuration_path + env_config_name, 'w') as config:
         config.write(json.dumps({
-            "config_name": "evalRandomWaterEnv-Water-{0}-{1}".format(nr_of_water_tiles, random_token),
+            "config_name": env_eval_name,
             "algorithm": "a2c",
             "monitors": {
                 "absence": {
@@ -139,11 +151,10 @@ register(
         }, indent=2))
         config.close()
 
-    return "randomEnv-{0}x{0}-{1}-v0.json".format(grid_size, random_token)
+    return env_config_name
 
 
 def main():
-    args = parser.parse_args()
     rewards = {}
     with open(args.rewards_file, 'r') as reward_config:
         rewards = json.loads(reward_config.read())

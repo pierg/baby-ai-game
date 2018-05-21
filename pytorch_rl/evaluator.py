@@ -40,9 +40,6 @@ class Evaluator:
                                   'N_blocked_actions',
                                   'N_goal_reached',
                                   'N_step_per_episode'])
-
-        # Evaluation variables
-        # self.shortest_path = config.shortest_path
         
         self.episode_rewards = torch.zeros([self.config.num_processes, 1])
         self.final_rewards = torch.zeros([self.config.num_processes, 1])
