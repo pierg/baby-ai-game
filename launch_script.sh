@@ -5,6 +5,7 @@
 configuration_file="main.json"
 start_training=0
 seed=0
+seed_val=0
 no_monitor=0
 
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
@@ -22,7 +23,8 @@ while getopts t:rs:m opt; do
             echo "config"
             ;;
         s)
-            seed=$OPTARG
+            seed_val=$OPTARG
+            seed=1
             echo $OPTARG
             echo "seed set"
             ;;
@@ -38,15 +40,15 @@ if [ ${random} ]
     then
         echo "...creating a random environment..."
         echo "...creating environment with grid_size 6, number of water tiles 2, max block size 1, with default reward config, without a monitor"
-        if [ ${seed} -ne 0 ]
+        if [ ${seed} ]
             then
                 if [ ${no_monitor} ]
                     then
                         echo "Seed and no_monitor provided, creating from seed without monitor"
-                        configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json" --no-monitor --seed ${seed}`
+                        configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json" --no-monitor --seed ${seed_val}`
                     else
                         echo "Seed with monitor provied, creating from seed wih a montior"
-                        configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json"`
+                        configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json" --seed ${seed_val}`
                 fi
             else
                 if [ ${no_monitor} ]
