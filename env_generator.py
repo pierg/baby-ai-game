@@ -11,6 +11,7 @@ parser.add_argument('--rewards_file', type=str, required=True, help="A json file
                                                                       "The values should be the wanted rewards "
                                                                       "of the actions")
 parser.add_argument('--seed', type=str, help="A seed for generating an environment, in order to produce the same environment.")
+parser.add_argument('--no-monitor', action="store_true", default=False, help="Toggle monitoring on and off")
 
 environment_path = "../gym-minigrid/gym_minigrid/envs/"
 configuration_path = "configurations/"
@@ -28,12 +29,27 @@ else:
         in case the agent behaves strange in certain environments, in order to investigate why.        
 """
 
-def generate_environment(grid_size, nr_of_water_tiles, max_block_size, rewards=None):
-    env_config_name = "randomEnv-{0}x{0}-Water-{1}-violated{2}-{3}-v0.json".format(grid_size,
-                                                                                    nr_of_water_tiles,
-                                                                                    int(rewards['violated']),
-                                                                                    random_token)
-    env_eval_name = "evalRandomWaterEnv-{0}x{0}-Water-{1}-violated{2}-{3}".format(grid_size, nr_of_water_tiles, int(rewards['violated']), random_token)
+def generate_environment(grid_size, nr_of_water_tiles, max_block_size, rewards=None, no_monitor=False):
+    if no_monitor:
+        env_config_name = "randomEnv-{0}x{0}-Water-{1}-violated{2}-without-monitor-{3}-v0.json".format(grid_size,
+                                                                                                       nr_of_water_tiles,
+                                                                                                       int(rewards[
+                                                                                                               'violated']),
+                                                                                                       random_token)
+        env_eval_name = "evalRandomWaterEnv-{0}x{0}-Water-{1}-violated{2}-without-monitor-{3}".format(grid_size,
+                                                                                                  nr_of_water_tiles,
+                                                                                                  int(rewards[
+                                                                                                          'violated']),
+                                                                                                  random_token)
+    else:
+        env_config_name = "randomEnv-{0}x{0}-Water-{1}-violated{2}-with-monitor-{3}-v0.json".format(grid_size,
+                                                                                            nr_of_water_tiles,
+                                                                                            int(rewards['violated']),
+                                                                                            random_token)
+        env_eval_name = "evalRandomWaterEnv-{0}x{0}-Water-{1}-violated{2}-with-monitor-{3}".format(grid_size, nr_of_water_tiles,
+                                                                                           int(rewards['violated']),
+                                                                                           random_token)
+
     with open(environment_path + "randomenv{0}{1}.py".format(nr_of_water_tiles, random_token), 'w') as env:
         env.write("""
 from gym_minigrid.extendedminigrid import *
@@ -123,7 +139,7 @@ register(
                 "absence": {
                     "monitored": {
                         "water": {
-                            "active": True,
+                            "active": not no_monitor,
                             "name": "water",
                             "reward": {
                                 "near": float("{0:.2f}".format(rewards['near'] if 'near' in rewards else "0")),
@@ -158,7 +174,7 @@ def main():
     rewards = {}
     with open(args.rewards_file, 'r') as reward_config:
         rewards = json.loads(reward_config.read())
-    file_name = generate_environment(args.grid_size, args.number_of_water_tiles, args.max_block_size, rewards)
+    file_name = generate_environment(args.grid_size, args.number_of_water_tiles, args.max_block_size, rewards, args.no_monitor)
     print(file_name)
 
 

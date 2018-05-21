@@ -4,6 +4,7 @@
 # it will use that as config file.
 configuration_file="main.json"
 start_training=0
+seed=0
 
 while getopts ":tr" opt; do
     case ${opt} in
@@ -15,15 +16,23 @@ while getopts ":tr" opt; do
             configuration_file=${OPTARG}
             start_training=1
             ;;
+        s)
+            seed=${OPTARG}
+            ;;
     esac
 done
 shift $((OPTIND -1))
 
-if [ $random ]
+if [ ${random} ]
     then
         echo "...creating a random environment..."
-        echo "...creating environment with grid_size 6, number of water tiles 2, max block size 1, with default reward config"
-        configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-1000.json"`
+        echo "...creating environment with grid_size 6, number of water tiles 2, max block size 1, with default reward config, without a monitor"
+        if [ ${seed} ]
+            then
+                configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json" --seed ${seed}`
+            else
+                configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json"`
+        fi
     else
         configuration_file=${1:-"main.json"}
 fi
