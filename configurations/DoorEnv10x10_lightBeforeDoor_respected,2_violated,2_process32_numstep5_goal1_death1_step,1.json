@@ -1,5 +1,5 @@
 {
-  "config_name": "DoorEnv10x10_doorOpenBeforeLight_respected,2_violated,2_process32_numstep5_goal1_death1_step,1",
+  "config_name": "DoorEnv10x10_lightBeforeDoor_respected,2_violated,2_process32_numstep5_goal1_death1_step,1",
   "algorithm": "a2c",
   "monitors": {
     "absence": {
@@ -27,7 +27,7 @@
     "precedence": {
       "monitored": {
         "light": {
-          "active": true,
+          "active": false,
           "name": "lightBeforeEnter",
           "preCondition": "light-on",
           "postCondition": "enter-room",
@@ -36,7 +36,7 @@
             "precedenceViolated": -0.2
           }
         },
-        "doorOpenBeforeLight": {
+        "lightBeforeDoor": {
           "active": true,
           "name": "lightBeforeDoor",
           "preCondition": "light-on",

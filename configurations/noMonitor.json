@@ -1,7 +1,54 @@
 {
-  "config_name": "NoMonitor",
+  "config_name": "noMonitor",
   "algorithm": "a2c",
-  "monitors": false,
+  "monitors": {
+    "absence": {
+      "monitored": {
+        "water": {
+          "active": false,
+          "name": "water",
+          "reward": {
+            "near": -0.1,
+            "immediate": -0.2,
+            "violated": -0.5
+          }
+        },
+        "deadend": {
+          "active":false,
+          "name": "deadend",
+          "reward": {
+            "near": -0.1,
+            "immediate": -0.2,
+            "violated": -0.5
+          }
+        }
+      }
+    },
+    "precedence": {
+      "monitored": {
+        "light": {
+          "active": false,
+          "name": "lightBeforeEnter",
+          "preCondition": "light-on",
+          "postCondition": "enter-room",
+          "reward": {
+            "precedenceRespected": 0.25,
+            "precedenceViolated": -0.55
+          }
+        },
+        "lightBeforeDoor": {
+          "active": false,
+          "name": "lightBeforeDoor",
+          "preCondition": "light-on",
+          "postCondition": "door-opened",
+          "reward": {
+            "precedenceRespected": 0.25,
+            "precedenceViolated": -0.55
+          }
+        }
+      }
+    }
+  },
   "env_name": "MiniGrid-FirstEvalEnv-10x10-v0",
   "num_processes": 32,
   "num_steps": 5,

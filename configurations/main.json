@@ -49,7 +49,7 @@
       }
     }
   },
-  "env_name": "MiniGrid-Unsafe-6x6-v0",
+  "env_name": "MiniGrid-FirstEvalEnv-10x10-v0",
   "num_processes": 48,
   "num_steps": 5,
   "log_interval": 10,
