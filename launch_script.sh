@@ -5,19 +5,30 @@
 configuration_file="main.json"
 start_training=0
 seed=0
+no_monitor=0
 
-while getopts ":tr" opt; do
+OPTIND=1         # Reset in case getopts has been used previously in the shell.
+
+while getopts t:rs:m opt; do
     case ${opt} in
         r)
             random=1
             start_training=1
+            echo "random"
             ;;
         t)
-            configuration_file=${OPTARG}
+            configuration_file=$OPTARG
             start_training=1
+            echo "config"
             ;;
         s)
-            seed=${OPTARG}
+            seed=$OPTARG
+            echo $OPTARG
+            echo "seed set"
+            ;;
+        m)
+            no_monitor=1
+            echo "no monitor"
             ;;
     esac
 done
@@ -29,9 +40,19 @@ if [ ${random} ]
         echo "...creating environment with grid_size 6, number of water tiles 2, max block size 1, with default reward config, without a monitor"
         if [ ${seed} ]
             then
-                configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json" --seed ${seed}`
+                if [ ${no_monitor} ]
+                    then
+                        configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json" --no-monitor --seed ${seed}`
+                    else
+                        configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json"`
+                fi
             else
-                configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json"`
+                if [ ${no_monitor} ]
+                    then
+                        configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json" --no-monitor`
+                    else
+                        configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/violated-100.json"`
+                fi
         fi
     else
         configuration_file=${1:-"main.json"}
@@ -39,6 +60,8 @@ fi
 
 echo "...environment name is..."
 echo $configuration_file
+
+exit 1
 
 if [ $configuration_file -eq "main.json" ]
   then
