@@ -57,7 +57,7 @@ export PYTHONPATH
 if [ $start_training -eq 1 ]
   then
     echo "...launching the training..."
-    python ./pytorch_rl/main.py
+    python3 ./pytorch_rl/main.py
 else
     echo "environment ready!"
     /bin/bash
