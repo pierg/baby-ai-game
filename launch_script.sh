@@ -61,7 +61,6 @@ fi
 echo "...environment name is..."
 echo $configuration_file
 
-exit 1
 
 if [ $configuration_file -eq "main.json" ]
   then
