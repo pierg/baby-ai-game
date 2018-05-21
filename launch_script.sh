@@ -60,6 +60,7 @@ if [ $start_training -eq 1 ]
     python ./pytorch_rl/main.py
 else
     echo "environment ready!"
+    /bin/bash
 fi
 
 
