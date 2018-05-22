@@ -59,8 +59,6 @@ if [ ${random} ]
                         configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/default.json"`
                 fi
         fi
-    else
-        configuration_file=${1:-"main.json"}
 fi
 
 echo "...environment name is..."
