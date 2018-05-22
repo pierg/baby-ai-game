@@ -45,18 +45,18 @@ if [ ${random} ]
                 if [ ${no_monitor} -eq 1 ]
                     then
                         echo "Seed and no_monitor provided, creating from seed without monitor"
-                        configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/default.json" --no-monitor --seed ${seed_val}`
+                        configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/default.json" --no-monitor --seed ${seed_val}`
                     else
                         echo "Seed with monitor provied, creating from seed wih a montior"
-                        configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/default.json" --seed ${seed_val}`
+                        configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/default.json" --seed ${seed_val}`
                 fi
             else
                 if [ ${no_monitor} -eq 1 ]
                     then
                         echo "No seed was provided but no_monitor was, creating random without a monitor"
-                        configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/default.json" --no-monitor`
+                        configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/default.json" --no-monitor`
                     else
-                        configuration_file=`python3 env_generator.py --grid_size 5 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/default.json"`
+                        configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 2 --max_block_size 1 --rewards_file "configurations/rewards/default.json"`
                 fi
         fi
 fi
