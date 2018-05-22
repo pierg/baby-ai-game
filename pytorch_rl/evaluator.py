@@ -38,6 +38,7 @@ class Evaluator:
                                   'Action_loss',
                                   'N_episodes',
                                   'N_blocked_actions',
+                                  'N_deaths',
                                   'N_goal_reached',
                                   'N_step_per_episode'])
         
@@ -45,6 +46,7 @@ class Evaluator:
         self.final_rewards = torch.zeros([self.config.num_processes, 1])
 
         self.n_catastrophes = torch.zeros([self.config.num_processes, 1])
+        self.n_deaths = torch.zeros([self.config.num_processes, 1])
         self.n_episodes = torch.zeros([self.config.num_processes, 1])
         self.n_proccess_reached_goal = [0] * self.config.num_processes
         self.numberOfStepPerEpisode = [0] * self.config.num_processes
@@ -62,6 +64,7 @@ class Evaluator:
         self.episode_rewards *= masks
 
         n_catastrophes_mask = torch.FloatTensor([[1.0] if "violation" in info_ else [0.0] for info_ in info])
+        n_deaths_mask = torch.FloatTensor([[1.0] if 'died' in info_ else [0.0] for info_ in info])
         n_episodes_mask = torch.FloatTensor([[1.0] if done_ else [0.0] for done_ in done])
         for i in range(0,len(done)):
             if done[i]:
@@ -73,6 +76,7 @@ class Evaluator:
                 self.numberOfStepAverage /= len(self.numberOfStepPerEpisode)
 
         self.n_catastrophes += n_catastrophes_mask
+        self.n_deaths += n_deaths_mask
         self.N_goal_reached = 0
         for i in range(0,len(info)):
             if info[i] == "died":
@@ -99,5 +103,6 @@ class Evaluator:
                                  action_loss.data[0],
                                  self.n_episodes.sum(),
                                  self.n_catastrophes.sum(),
+                                 self.n_deaths.sum(),
                                  self.N_goal_reached,
                                  self.numberOfStepAverage])
