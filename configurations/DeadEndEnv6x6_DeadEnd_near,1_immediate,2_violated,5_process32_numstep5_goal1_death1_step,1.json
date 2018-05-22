@@ -1,11 +1,11 @@
 {
-  "config_name": "AllMonitors_near,1_immediate,2_violated,5_respected,2_violated,2_process32_numstep5_goal1_death1_step,1",
+  "config_name": "DeadEndEnv6x6_DeadEnd_near,1_immediate,2_violated,5_process32_numstep5_goal1_death1_step,1",
   "algorithm": "a2c",
   "monitors": {
     "absence": {
       "monitored": {
         "water": {
-          "active": true,
+          "active": false,
           "name": "water",
           "reward": {
             "near": -0.1,
@@ -27,7 +27,7 @@
     "precedence": {
       "monitored": {
         "light": {
-          "active": true,
+          "active": false,
           "name": "lightBeforeEnter",
           "preCondition": "light-on",
           "postCondition": "enter-room",
@@ -36,8 +36,8 @@
             "precedenceViolated": -0.2
           }
         },
-        "doorOpenBeforeLight": {
-          "active": true,
+        "lightBeforeDoor": {
+          "active": false,
           "name": "lightBeforeDoor",
           "preCondition": "light-on",
           "postCondition": "door-opened",
@@ -49,8 +49,8 @@
       }
     }
   },
-  "env_name": "MiniGrid-FirstEvalEnv-10x10-v0",
-  "num_processes": 48,
+  "env_name": "MiniGrid-DeadEndEnv-6x6-v0",
+  "num_processes": 32,
   "num_steps": 5,
   "log_interval": 10,
   "on_violation_reset": false,

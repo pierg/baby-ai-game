@@ -17,14 +17,13 @@ def create_header(csv_file, headers):
         writer = csv.writer(csv_log, delimiter=',')
         writer.writerow(headers)
 
-def write_to_log(log_text):
+def write_to_log(values):
     """
     Writes a row to a csv log file, appends to an existing file
-    :param csv_file: A csv file to append to
-    :param log_text: A row to add to the file, make sure it follows the headers specified, expects a string with comma
-    seperated values, e.g "51,73,735"
+    :param values: A list of values that will be written in the CSV files, ensure they follow the same order
+    as the headers in the CSV file
     :return: void
     """
     with open(current_csv_file, 'a', newline='') as csv_log:
         writer = csv.writer(csv_log, delimiter=',')
-        writer.writerow(log_text.split(","))
+        writer.writerow(values)

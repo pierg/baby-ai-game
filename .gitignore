@@ -109,5 +109,10 @@ ENV/
 # intellij
 .idea/*
 
-# local log files
+# local log files, csvs and evaluations directory
 *.log
+*.csv
+evaluations
+
+# OSX .DS_STORE
+.DS_STORE

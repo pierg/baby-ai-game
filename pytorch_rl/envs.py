@@ -3,6 +3,7 @@ try:
     from gym_minigrid.wrappers import *
     from gym_minigrid.envelopes import *
 except Exception as e:
+    print(" =========== =========== IMPORT ERROR ===========")
     print(e)
     pass
 
