@@ -50,8 +50,9 @@
   "num_steps": 5,
   "log_interval": 10,
   "on_violation_reset": false,
-  "rendering": true,
+  "rendering": false,
   "evaluation_directory_name": "evaluations",
   "visdom": false,
-  "debug_mode": false
+  "debug_mode": false,
+  "action_planner": true
 }
