@@ -41,7 +41,9 @@ class Evaluator:
                                   'N_goal_reached',
                                   'N_step_per_episode',
                                   'N_death',
-                                  'N_avoided_death'])
+                                  'N_violation'
+                                  'N_death_by_end',
+                                  'Total_death'])
 
         # Evaluation variables
         # self.shortest_path = config.shortest_path
@@ -56,7 +58,9 @@ class Evaluator:
         self.numberOfStepAverage = 0
         self.N_goal_reached = 0
         self.N_death = 0
-        self.N_avoided_death = 0
+        self.N_violation = 0
+        self.N_death_by_end = 0
+        self.Total_death = 0
 
     def update(self, reward, done, info, numberOfStepPerEpisode):
         reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
@@ -85,11 +89,16 @@ class Evaluator:
             if info[i] == "died":
                 self.n_proccess_reached_goal[i]= 0
                 self.N_death += 1
+                self.Total_death += 1
             elif info[i] == "goal":
                 self.n_proccess_reached_goal[i]= 1
             elif info[i] == "violation":
-                self.N_avoided_death += 1
+                self.N_violation += 1
                 self.n_proccess_reached_goal[i] = 0
+            elif info[i] == "end":
+                self.n_proccess_reached_goal[i] = 0
+                self.N_death_by_end += 1
+                self.Total_death += 1
         for i in range(0,len(self.n_proccess_reached_goal)):
             self.N_goal_reached += self.n_proccess_reached_goal[i]
         self.n_episodes = n_episodes_mask
@@ -111,4 +120,6 @@ class Evaluator:
                                  self.N_goal_reached,
                                  self.numberOfStepAverage,
                                  self.N_death,
-                                 self.N_avoided_death,])
+                                 self.N_violation,
+                                 self.N_death_by_end,
+                                 self.Total_death])
