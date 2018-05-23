@@ -5,7 +5,8 @@ from secrets import token_hex
 parser = argparse.ArgumentParser(description='Arguments for creating the environments and its configuration')
 parser.add_argument('--grid_size', type=int, required=True)
 parser.add_argument('--number_of_water_tiles', type=int, required=True)
-parser.add_argument('--max_block_size', type=int, required=True)
+parser.add_argument('--number_of_deadends', type=int, required=True)
+parser.add_argument('--light_switch', type=bool, required=True)
 parser.add_argument('--rewards_file', type=str, required=True, help="A json file containing the keys: "
                                                                       "step, goal, near, immediate, violated. "
                                                                       "The values should be the wanted rewards "
@@ -21,8 +22,8 @@ random_token = token_hex(4)
         in case the agent behaves strange in certain environments, in order to investigate why.        
 """
 
-def generate_environment(grid_size, nr_of_water_tiles, max_block_size, rewards=None):
-    with open(environment_path + "randomenv{0}{1}.py".format(nr_of_water_tiles, random_token), 'w') as env:
+def generate_environment(grid_size, n_water, n_deadend, light_switch, rewards=None):
+    with open(environment_path + "randomenv_{0}x{0}_W{1}-D-{2}-L{3}.py".format(grid_size, n_water, n_deadend, light_switch), 'w') as env:
         env.write("""
 from gym_minigrid.extendedminigrid import *
 from gym_minigrid.register import register
@@ -53,7 +54,7 @@ class RandomEnv(ExMiniGridEnv):
         self.grid.set(width - 2, height - 2, Goal())
 
         # Set the random seed to the random token, so we can reproduce the environment
-        random.seed("{2}")
+        random.seed("{4}")
 
         # Place water
         placed_water_tiles = 0
@@ -85,27 +86,28 @@ class RandomEnv(ExMiniGridEnv):
             placed_water_tiles += 1
         self.mission = ""
 
-class RandomEnv{0}x{0}_{2}(RandomEnv):
+class RandomEnv{0}x{0}_{4}(RandomEnv):
     def __init__(self):
         super().__init__(size={0})
 
 register(
-    id='MiniGrid-RandomEnv-{0}x{0}-{2}-v0',
-    entry_point='gym_minigrid.envs:RandomEnv{0}x{0}_{2}'
+    id='MiniGrid-RandomEnv-{0}x{0}-{4}-v0',
+    entry_point='gym_minigrid.envs:RandomEnv{0}x{0}_{4}'
 )
-""".format(grid_size, nr_of_water_tiles, random_token))
+""".format(grid_size, n_water, n_deadend, light_switch, random_token))
         env.close()
     # Adds the import statement to __init__.py in the envs folder in gym_minigrid,
     # otherwise the environment is unavailable to use.
     with open(environment_path + "__init__.py", 'a') as init_file:
         init_file.write("\n")
-        init_file.write("from gym_minigrid.envs.randomenv{0}{1} import *".format(nr_of_water_tiles, random_token))
+        init_file.write("from gym_minigrid.envs.randomenv{0}{1} import *".format(n_water, random_token))
         init_file.close()
 
     # Creates a json config file for the random environment
     with open(configuration_path + "randomEnv-{0}x{0}-{1}-v0.json".format(grid_size, random_token), 'w') as config:
+        # TODO: take the default.json and modify it (rewards form the reward file, the env-name, the active monitors..)
         config.write(json.dumps({
-            "config_name": "evalRandomWaterEnv-Water-{0}-{1}".format(nr_of_water_tiles, random_token),
+            "config_name": "evalRandomWaterEnv-Water-{0}-{1}".format(n_water, random_token),
             "algorithm": "a2c",
             "monitors": {
                 "absence": {
@@ -147,7 +149,7 @@ def main():
     rewards = {}
     with open(args.rewards_file, 'r') as reward_config:
         rewards = json.loads(reward_config.read())
-    file_name = generate_environment(args.grid_size, args.number_of_water_tiles, args.max_block_size, rewards)
+    file_name = generate_environment(args.grid_size, args.number_of_water_tiles, rewards)
     print(file_name)
 
 
