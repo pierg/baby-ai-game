@@ -1,0 +1,6 @@
+{
+  "grid_size": 5,
+  "n_water": 3,
+  "n_deadend": 1,
+  "light_switch": false
+}
