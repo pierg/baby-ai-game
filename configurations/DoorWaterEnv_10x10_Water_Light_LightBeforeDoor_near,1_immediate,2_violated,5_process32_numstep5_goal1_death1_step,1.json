@@ -1,5 +1,5 @@
 {
-  "config_name": "Unsafe6x6_Water_near,1_immediate,2_violated,5_process32_numstep5_goal1_death1_step,1",
+  "config_name": "DoorWaterEnv_Water_Light_LightBeforeDoor_near,1_immediate,2_violated,5_process32_numstep5_goal1_death1_step,1",
   "algorithm": "a2c",
   "monitors": {
     "absence": {
