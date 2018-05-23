@@ -22,7 +22,7 @@ def visdom_plot(
     global avg_reward
 
     if vis is None:
-        vis = Visdom()
+        vis = Visdom(use_incoming_socket=False)
         assert vis.check_connection()
 
         # Close all existing plots

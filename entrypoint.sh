@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+lau #!/usr/bin/env bash
 
 # Pull latest changes in the repositories
 echo "...updating repositories..."
