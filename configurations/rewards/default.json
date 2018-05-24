@@ -8,7 +8,7 @@
     "violated": -1
   },
   "precedence":{
-    "precedenceRespected": 1,
-    "precedenceViolated": -1
+    "precedenceRespected": 0.5,
+    "precedenceViolated": -0.5
   }
 }
