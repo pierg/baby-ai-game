@@ -60,8 +60,11 @@
   "action_planner": true,
   "debug_mode": false,
   "reward": {
+    "range": [-100, 100],
     "goal": 100,
-    "step": -1,
-    "death":-100
+    "step": 0,
+    "unsafe":-100,
+    "on_plan": 5,
+    "off_plan": -5
   }
 }

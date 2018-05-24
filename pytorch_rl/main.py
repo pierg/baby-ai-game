@@ -18,7 +18,6 @@ from vec_env.subproc_vec_env import SubprocVecEnv
 from kfac import KFACOptimizer
 from model import Policy
 from storage import RolloutStorage
-from visualize import visdom_plot
 
 from configurations import config_grabber as cg
 
@@ -287,10 +286,7 @@ def main():
             )
 
         if args.vis and j % args.vis_interval == 0:
-            win = visdom_plot(
-                total_num_steps,
-                final_rewards.mean()
-            )
+            evaluator.visdom()
 
 if __name__ == "__main__":
     main()

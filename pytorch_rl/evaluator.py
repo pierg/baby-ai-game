@@ -3,6 +3,7 @@ import numpy as np
 import torch
 
 from configurations import config_grabber as cg
+from visualize import visdom_plot
 
 import csv_logger
 
@@ -41,7 +42,7 @@ class Evaluator:
                                   'N_goal_reached',
                                   'N_step_per_episode',
                                   'N_death',
-                                  'N_violation'
+                                  'N_violation',
                                   'N_death_by_end',
                                   'Total_death'])
 
@@ -61,6 +62,7 @@ class Evaluator:
         self.N_violation = 0
         self.N_death_by_end = 0
         self.Total_death = 0
+        self.total_num_steps = 0
 
     def update(self, reward, done, info, numberOfStepPerEpisode):
         reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
@@ -104,10 +106,10 @@ class Evaluator:
         self.n_episodes = n_episodes_mask
 
     def save(self, n_updates, t_start, t_end, dist_entropy, value_loss, action_loss):
-        total_num_steps = (n_updates + 1) * self.config.num_processes * self.config.num_steps
+        self.total_num_steps = (n_updates + 1) * self.config.num_processes * self.config.num_steps
         csv_logger.write_to_log([n_updates,
-                                 total_num_steps,
-                                 int(total_num_steps / t_end - t_start),
+                                 self.total_num_steps,
+                                 int(self.total_num_steps / t_end - t_start),
                                  self.final_rewards.mean(),
                                  self.final_rewards.median(),
                                  self.final_rewards.min(),
@@ -123,3 +125,10 @@ class Evaluator:
                                  self.N_violation,
                                  self.N_death_by_end,
                                  self.Total_death])
+
+    def visdom(self):
+        visdom_plot(
+            self.total_num_steps,
+            self.final_rewards.mean(),
+            self.N_violation
+        )
