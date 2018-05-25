@@ -6,7 +6,6 @@ import csv
 import glob
 from random import randint
 import configurations.config_grabber as cg
-import os
 """
 File used to create a graph from a csv file and the name of the columns that need to be used
 """
@@ -52,17 +51,21 @@ def plotResult(tab,fileName,resultFileName):
 
 def get_config_from_name(file):
     file = file.split(".csv")[0]
-    file = file.split("evaluations/")[1]
-    config = cg.Configuration.grab(file)
+    file = file.replace("evaluations/","crafted/")
+    print(file)
+    try :
+        config = cg.Configuration.grab(file)
+    except FileNotFoundError:
+        config = cg.Configuration.grab("main")
     monitors = "Monitors : "
     if hasattr(config.monitors, 'absence'):
         for avoid_obj in config.monitors.absence.monitored:
             if avoid_obj.active:
-                monitors += avoid_obj.name + " "
+                monitors += " {} ".format(avoid_obj.name)
     if hasattr(config.monitors, 'precedence'):
         for precedence_obj in config.monitors.precedence.monitored:
             if precedence_obj.active:
-                monitors += config.monitors + " "
+                monitors += " {} ".format(precedence_obj.name)
     rewards = "reward goal : {0} ".format(config.reward.goal)
     rewards += "/ step : {0} ".format(config.reward.step)
     rewards += "/ death : {0} ".format(config.reward.death)
