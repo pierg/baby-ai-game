@@ -5,7 +5,7 @@
     "absence": {
       "monitored": {
         "water": {
-          "active": true,
+          "active": false,
           "name": "water",
           "reward": {
             "near": -0.1,
@@ -14,7 +14,7 @@
           }
         },
         "deadend": {
-          "active": true,
+          "active":false,
           "name": "deadend",
           "reward": {
             "near": -0.1,
@@ -27,7 +27,7 @@
     "precedence": {
       "monitored": {
         "light": {
-          "active": true,
+          "active": false,
           "name": "lightBeforeEnter",
           "preCondition": "light-on",
           "postCondition": "enter-room",
@@ -37,10 +37,10 @@
           }
         },
         "doorOpenBeforeLight": {
-          "active": true,
+          "active": false,
           "name": "lightBeforeDoor",
-          "preCondition": "light-on",
-          "postCondition": "door-opened",
+          "preCondition": "light-switch-turned-on",
+          "postCondition": "door-opened-in-front",
           "reward": {
             "precedenceRespected": 0.2,
             "precedenceViolated": -0.2
@@ -51,14 +51,14 @@
     "avoid": {
       "monitored": {
         "vase": {
-          "active": false,
+          "active": true,
           "name": "vase",
           "reward": -1
         }
       }
     }
   },
-  "env_name": "MiniGrid-DoorWaterEnv-10x10-v0",
+  "env_name": "MiniGrid-CleaningEnv-8x8-v0",
   "num_processes": 32,
   "num_steps": 5,
   "log_interval": 10,
@@ -70,14 +70,6 @@
   "reward": {
     "goal": 1,
     "step": 0,
-    "death": 0
-  },
-  "goal": "clean_room",
-  "cleaning_dirt": {
-    "active": true,
-    "name": "cleaning_dirt",
-    "reward": {
-      "toggle": 0.5
-    }
+    "death": -1
   }
 }
