@@ -74,8 +74,37 @@ def plotResult(tab,fileName,resultFileName):
 
     plt.legend()
     plt.xlabel('N Updates')
-    plt.savefig(pp,format='pdf')
+    plt.savefig(pp, format='pdf')
+    plt.figure()
+
+    ymax = max(array[6])
+    xpos = array[6].index(ymax)
+    xmax = array[0][xpos]
+
+    plt.plot(array[0], array[6], 'b', label='Reward mean')
+    plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax + 5))
+
+    ymax = max(array[7])
+    xpos = array[7].index(ymax)
+    xmax = array[0][xpos]
+
+    plt.plot(array[0], array[7], 'r', label='Reward max')
+    plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax + 5))
+
+    ymax = max(array[7])
+    xpos = array[7].index(ymax)
+    xmax = array[0][xpos]
+
+    plt.plot(array[0], array[8], 'g', label='Reward min')
+    plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax + 5))
+
+    plt.legend()
+    plt.xlabel('N Updates')
+    plt.savefig(pp, format='pdf')
+    plt.figure()
     pp.close()
+
+
 
 def autoPlot(tab):
     for csvFile in glob.glob("evaluations/*.csv"):
@@ -88,5 +117,5 @@ def autoPlot(tab):
         plotResult(tab,csvFile,name)
 
 
-tab = ("N_updates","N_step_AVG","N_goal_reached","N_death","N_saved","N_Total_episodes")
+tab = ("N_updates","N_step_AVG","N_goal_reached","N_death","N_saved","N_Total_episodes","Reward_mean","Reward_max","Reward_min")
 autoPlot(tab)
