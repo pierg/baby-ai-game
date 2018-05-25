@@ -1,6 +1,6 @@
 import argparse
 import json
-from secrets import token_hex
+from random import randint
 
 parser = argparse.ArgumentParser(description='Arguments for creating the environments and its configuration')
 parser.add_argument('--grid_size', type=int, required=True)
@@ -13,7 +13,7 @@ parser.add_argument('--rewards_file', type=str, required=True, help="A json file
 
 environment_path = "../gym-minigrid/gym_minigrid/envs/"
 configuration_path = "configurations/"
-random_token = token_hex(4)
+random_token = randint(0,999999)
 
 """ This script creates a random environment in the gym_minigrid/envs folder. It uses a token_hex(4) 
         as the ID and the random seed for placing tiles in the grid.

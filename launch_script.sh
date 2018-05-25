@@ -5,7 +5,7 @@
 configuration_file="main.json"
 start_training=0
 
-while getopts ":tr" opt; do
+while getopts ":etr" opt; do
     case ${opt} in
         r)
             random=1
@@ -15,6 +15,18 @@ while getopts ":tr" opt; do
             configuration_file=${OPTARG}
             start_training=1
             ;;
+        e)
+            environmnent=${OPTARG}
+            start_training=1
+            ;;
+        j)
+            monitors=${OPTARG}
+            start_training=1
+            ;;
+        w)
+            rewards=${OPTARG}
+            start_training=1
+            ;;
     esac
 done
 shift $((OPTIND -1))
@@ -22,8 +34,14 @@ shift $((OPTIND -1))
 if [ $random ]
     then
         echo "...creating a random environment..."
-        echo "...creating environment with grid_size 6, number of water tiles 3, max block size 1, with default reward config"
-        configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 3 --max_block_size 1 --rewards_file "configurations/rewards/default.json"`
+        if [$rewards]
+            then
+                echo "...creating environment with grid_size 6, number of water tiles 3, max block size 1, with selected reward config : $rewards"
+                configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 3 --number_of_deadends 1 --light_switch True --max_block_size 1 --rewards_file $rewards`
+            else
+                echo "...creating environment with grid_size 6, number of water tiles 3, max block size 1, with default reward config"
+                configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 3 --max_block_size 1 --rewards_file "configurations/rewards/default.json"`
+        fi
     else
         configuration_file=${1:-"main.json"}
 fi

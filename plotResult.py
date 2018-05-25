@@ -1,60 +1,85 @@
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 import csv
 import glob
 from random import randint
+import configurations.config_grabber as cg
 """
 File used to create a graph from a csv file and the name of the columns that need to be used
 """
 
-def plotResult(columnNameX,columnNameY,columnNameZ,fileName,resultFileName):
-    columnNameX = columnNameX
-    columnNameY = columnNameY
-    columnNameZ = columnNameZ
-    fileName = fileName
-    resultFileName = resultFileName
+def plotResult(tab,fileName,resultFileName):
+    array = [[] for i in range(0,len(tab))]
+    columnNumber = [0 for i in range(0,len(tab))]
 
-    x = []
-    y = []
-    z = []
-    column1 = 0
-    column2 = 0
-    column3 = 0
     with open(fileName, 'r') as csvfile:
         plots = csv.reader(csvfile, delimiter=',')
         firstLine = True
         for row in plots:
             if firstLine:
                 for column in range(0, len(row)):
-                    if row[column] == columnNameX:
-                        column1 = column
-                    if row[column] == columnNameY:
-                        column2 = column
-                    if row[column] == columnNameZ:
-                        column3 = column
+                    for i in range(0,len(tab)):
+                        if tab[i] == row[column]:
+                            columnNumber[i] = column
                 firstLine = False
             else:
-                x.append(int(row[column1]))
-                y.append(float(row[column2]))
-                z.append(float(row[column3]))
-    figure = plt.figure()
-    plt.plot(x, y,'r',label='N Step AVG')
-    plt.plot(x, z,'b',label='N Goal Reached')
-    plt.legend()
-    plt.xlabel('numberOfStep')
-    figure.savefig(resultFileName)
+                for i in range(0,len(tab)):
+                    array[i].append((float(row[columnNumber[i]])))
 
-def autoPlot(columnNameX,columnNameY,columnNameZ):
+    pp = PdfPages(resultFileName)
+    title = get_config_from_name(fileName)
+    plt.figure()
+    color = 'g'
+    for i in range(1,len(tab)):
+        ymax = max(array[i])
+        xpos = array[i].index(ymax)
+        xmax = array[0][xpos]
+        plt.plot(array[0], array[i],color,label=tab[i])
+        plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax-1 if ymax < 5 else ymax+5))
+        if i%2 == 0:
+            color = 'g'
+            plt.legend()
+            plt.title(title)
+            plt.xlabel('N Updates')
+            plt.savefig(pp,format='pdf')
+            plt.figure()
+        else:
+            color = 'b'
+    pp.close()
+
+def get_config_from_name(file):
+    file = file.split(".csv")[0]
+    file = file.replace("evaluations/","crafted/")
+    print(file)
+    try :
+        config = cg.Configuration.grab(file)
+    except FileNotFoundError:
+        config = cg.Configuration.grab("main")
+    monitors = "Monitors : "
+    if hasattr(config.monitors, 'absence'):
+        for avoid_obj in config.monitors.absence.monitored:
+            if avoid_obj.active:
+                monitors += " {} ".format(avoid_obj.name)
+    if hasattr(config.monitors, 'precedence'):
+        for precedence_obj in config.monitors.precedence.monitored:
+            if precedence_obj.active:
+                monitors += " {} ".format(precedence_obj.name)
+    rewards = "reward goal : {0} ".format(config.reward.goal)
+    rewards += "/ step : {0} ".format(config.reward.step)
+    rewards += "/ death : {0} ".format(config.reward.death)
+    return monitors + "\n" + rewards
+
+def autoPlot(tab):
     for csvFile in glob.glob("evaluations/*.csv"):
         name = csvFile
         randomNumber = randint(0,999999)
         name = name.replace(".csv",str(randomNumber))
         name += str(".pdf")
-        print(name)
         name = name.replace("evaluations/","results/")
-        plotResult(columnNameX,columnNameY,columnNameZ,csvFile,name)
+        plotResult(tab,csvFile,name)
 
 
-
-autoPlot("N_updates","N_step_per_episode","N_goal_reached")
+tab = ("N_updates","N_step_AVG","N_goal_reached","N_death","N_saved","Reward_mean","Reward_max")
+autoPlot(tab)
