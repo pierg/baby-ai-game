@@ -103,7 +103,7 @@ class Evaluator:
                 self.Total_death += 1
         for i in range(0,len(self.n_proccess_reached_goal)):
             self.N_goal_reached += self.n_proccess_reached_goal[i]
-        self.n_episodes = n_episodes_mask
+        self.n_episodes
 
     def save(self, n_updates, t_start, t_end, dist_entropy, value_loss, action_loss):
         self.total_num_steps = (n_updates + 1) * self.config.num_processes * self.config.num_steps
@@ -130,5 +130,6 @@ class Evaluator:
         visdom_plot(
             self.total_num_steps,
             self.final_rewards.mean(),
-            self.N_violation
+            self.N_violation,
+            self.n_episodes.sum(),
         )

@@ -7,11 +7,16 @@ X = []
 Y = []
 Y2 = []
 
+last_episodes = 0
+last_violations = 0
+last_unsafe = 0
+
 
 def visdom_plot(
         total_num_steps,
         mean_reward,
-        n_violation
+        n_violation,
+        episodes
 ):
     # Lazily import visdom so that people don't need to install visdom
     # if they're not actually using it
@@ -19,7 +24,9 @@ def visdom_plot(
 
     global vis
     global win
-    global avg_reward
+    global last_episodes
+    global last_violations
+    global last_unsafe
 
     if vis is None:
         vis = Visdom(use_incoming_socket=False)
@@ -27,9 +34,21 @@ def visdom_plot(
         # Close all existing plots
         vis.close()
 
+    violation_change = n_violation - last_violations
+    last_violations = n_violation
+
+    episode_change = episodes - last_episodes
+    last_episodes = episodes
+
+    unsafe_actions_per_episode = 0
+    if n_violation > 0:
+        unsafe_actions_per_episode = round(episodes / n_violation, 2)
+        # print('episodes ' + str(episodes))
+        # print('unsafe ' + str(unsafe_actions_per_episode))
+
     X.append(total_num_steps)
     Y.append(mean_reward)
-    Y2.append(n_violation)
+    Y2.append(violation_change)
 
     # The plot with the handle 'win' is updated each time this is called
     win = vis.line(
