@@ -2,21 +2,25 @@ import numpy as np
 
 vis = None
 win = None
+win2 = None
 
 X = []
 Y = []
 Y2 = []
 
-last_episodes = 0
+X_followed = []
+
 last_violations = 0
-last_unsafe = 0
+followed_avg = 0
 
 
 def visdom_plot(
         total_num_steps,
         mean_reward,
         n_violation,
-        episodes
+        created,
+        finished,
+        followed
 ):
     # Lazily import visdom so that people don't need to install visdom
     # if they're not actually using it
@@ -24,9 +28,9 @@ def visdom_plot(
 
     global vis
     global win
-    global last_episodes
+    global win2
     global last_violations
-    global last_unsafe
+    global followed_avg
 
     if vis is None:
         vis = Visdom(use_incoming_socket=False)
@@ -37,18 +41,15 @@ def visdom_plot(
     violation_change = n_violation - last_violations
     last_violations = n_violation
 
-    episode_change = episodes - last_episodes
-    last_episodes = episodes
-
-    unsafe_actions_per_episode = 0
-    if n_violation > 0:
-        unsafe_actions_per_episode = round(episodes / n_violation, 2)
-        # print('episodes ' + str(episodes))
-        # print('unsafe ' + str(unsafe_actions_per_episode))
-
     X.append(total_num_steps)
     Y.append(mean_reward)
     Y2.append(violation_change)
+
+    if followed > 0:
+        X_followed.append(followed)
+
+    if len(X_followed) > 0:
+        followed_avg = sum(X_followed) / len(X_followed)
 
     # The plot with the handle 'win' is updated each time this is called
     win = vis.line(
@@ -63,11 +64,19 @@ def visdom_plot(
         ),
         win=win
     )
-
     vis.line(
         X=np.array(X),
         Y=np.array(Y2),
         win=win,
         name='violations',
         update='append'
+    )
+
+    win2 = vis.bar(
+        X=np.array([followed_avg, finished]),
+        opts=dict(
+            rownames=['Followed %', 'Finished'],
+            xtickstep=1
+        ),
+        win=win2
     )

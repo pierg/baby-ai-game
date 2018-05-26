@@ -49,7 +49,7 @@
       }
     }
   },
-  "env_name": "MiniGrid-UnsafeEnv-12x12-v0",
+  "env_name": "MiniGrid-UnsafeEnv-8x8-v0",
   "random_unsafe_obj": 0,
   "num_processes": 48,
   "num_steps": 5,
@@ -61,10 +61,10 @@
   "action_planner": true,
   "debug_mode": false,
   "reward": {
-    "range": [-10, 50],
-    "goal": 50,
-    "step": 0,
-    "unsafe":-10,
+    "range": [-100, 500],
+    "goal": 500,
+    "step": -1,
+    "unsafe":-100,
     "on_plan": 5,
     "off_plan": -5
   }
