@@ -61,11 +61,11 @@
   "action_planner": true,
   "debug_mode": false,
   "reward": {
-    "range": [-100, 500],
-    "goal": 500,
+    "range": [-37, 50],
+    "goal": 50,
     "step": -1,
-    "unsafe":-100,
-    "on_plan": 5,
-    "off_plan": -5
+    "unsafe":-37,
+    "on_plan": 1,
+    "off_plan": -1
   }
 }
