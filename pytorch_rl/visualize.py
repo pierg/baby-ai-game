@@ -57,7 +57,7 @@ def visdom_plot(
         Y=np.array(Y),
         name='reward mean',
         opts=dict(
-            xlabel='Total time steps',
+            xlabel='Total time steps Andres PC',
             ytickmin=0,
             width=900,
             height=500,
@@ -75,7 +75,7 @@ def visdom_plot(
     win2 = vis.bar(
         X=np.array([followed_avg, finished]),
         opts=dict(
-            rownames=['Followed %', 'Finished'],
+            rownames=['Andres PC Followed %', 'Finished'],
             xtickstep=1
         ),
         win=win2
