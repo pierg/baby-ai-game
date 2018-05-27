@@ -104,6 +104,7 @@ class Evaluator:
             elif info[i] == "goal+plan_finished":
                 self.n_proccess_reached_goal[i] = 1
                 self.N_plan_finished += 1
+                plan_followed.append(100)
             elif info[i] == "violation":
                 self.N_violation += 1
             elif info[i] == "end":
@@ -114,6 +115,7 @@ class Evaluator:
                 self.N_plan_created += 1
             elif info[i] == "plan_finished":
                 self.N_plan_finished += 1
+                plan_followed.append(100)
             elif isinstance(info[i], str) and info[i].startswith("plan_followed:"):
                 split = info[i].split(":")
                 extracted_data = split[1].split(",")
