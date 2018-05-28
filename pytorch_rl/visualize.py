@@ -33,7 +33,7 @@ def visdom_plot(
     global followed_avg
 
     if vis is None:
-        vis = Visdom(use_incoming_socket=False)
+        vis = Visdom(use_incoming_socket=False, server="http://46.239.105.140")
         assert vis.check_connection()
         # Close all existing plots
         vis.close()
@@ -57,7 +57,8 @@ def visdom_plot(
         Y=np.array(Y),
         name='reward mean',
         opts=dict(
-            xlabel='Total time steps Andres PC',
+            title='Mantas',
+            xlabel='Total time steps',
             ytickmin=0,
             width=900,
             height=500,
@@ -72,11 +73,11 @@ def visdom_plot(
         update='append'
     )
 
-    win2 = vis.bar(
-        X=np.array([followed_avg, finished]),
-        opts=dict(
-            rownames=['Andres PC Followed %', 'Finished'],
-            xtickstep=1
-        ),
-        win=win2
-    )
+    # win2 = vis.bar(
+    #     X=np.array([followed_avg, finished]),
+    #     opts=dict(
+    #         rownames=['Followed %', 'Finished'],
+    #         xtickstep=1
+    #     ),
+    #     win=win2
+    # )
