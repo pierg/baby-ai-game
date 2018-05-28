@@ -50,11 +50,11 @@ def plotResult(tab,fileName,resultFileName):
     plt.savefig(pp,format='pdf')
     plt.figure()
 
-    ymax = max(array[3])
-    xpos = array[3].index(ymax)
+    ymax = max(array[9])
+    xpos = array[9].index(ymax)
     xmax = array[0][xpos]
 
-    plt.plot(array[0], array[3],'r',label='N Death')
+    plt.plot(array[0], array[9],'r',label='N break')
     plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax+5))
 
     ymax = max(array[4])
@@ -117,5 +117,5 @@ def autoPlot(tab):
         plotResult(tab,csvFile,name)
 
 
-tab = ("N_updates","N_step_AVG","N_goal_reached","N_death","N_saved","N_Total_episodes","Reward_mean","Reward_max","Reward_min")
+tab = ("N_updates","N_step_AVG","N_goal_reached","N_death","N_saved","N_Total_episodes","Reward_mean","Reward_max","Reward_min","N_break")
 autoPlot(tab)
