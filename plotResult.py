@@ -48,6 +48,21 @@ def plotResult(tab,fileName,resultFileName):
             plt.figure()
         else:
             color = 'b'
+    Dif_vase = []
+    Dif_vase.append(array[9][0])
+    for i in range(1, len(array[9])):
+        Dif_vase.append(array[9][i] - array[9][i - 1])
+
+    plt.plot(array[0], Dif_vase, 'r', label='N difference broken vase')
+    for k in range(0, len(Dif_vase), 400):
+        y = Dif_vase[k]
+        x = array[0][k]
+        plt.annotate(y, xy=(x, y), xytext=(x, y))
+
+    plt.legend()
+    plt.xlabel('N Updates')
+    plt.savefig(pp, format='pdf')
+    plt.figure()
     pp.close()
 
 def get_config_from_name(file):
@@ -78,5 +93,5 @@ def autoPlot(tab):
         plotResult(tab,csvFile,name)
 
 
-tab = ("N_updates","N_step_AVG","N_goal_reached","N_death","N_saved","Reward_mean","Reward_max")
+tab = ("N_updates","N_step_AVG","N_goal_reached","N_death","N_saved""N_Total_episodes","Reward_mean","Reward_max","Reward_min","N_break")
 autoPlot(tab)

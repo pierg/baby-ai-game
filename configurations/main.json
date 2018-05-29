@@ -57,10 +57,19 @@
           }
         }
       }
+    },
+    "avoid": {
+      "monitored": {
+        "vase": {
+          "active": false,
+          "name": "vase",
+          "reward": -1
+        }
+      }
     }
   },
-  "env_name": "MiniGrid-BigEnv-24x24-v0",
-  "num_processes": 48,
+  "env_name": "MiniGrid-CleaningEnv-8x8-v0",
+  "num_processes": 32,
   "num_steps": 5,
   "log_interval": 10,
   "on_violation_reset": false,
