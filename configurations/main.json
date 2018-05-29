@@ -5,7 +5,7 @@
     "absence": {
       "monitored": {
         "water": {
-          "active": true,
+          "active": false,
           "name": "water",
           "reward": {
             "near": -0.1,
@@ -51,14 +51,14 @@
     "avoid": {
       "monitored": {
         "vase": {
-          "active": true,
+          "active": false,
           "name": "vase",
           "reward": -1
         }
       }
     }
   },
-  "env_name": "MiniGrid-CleaningEnv-16x16-v0",
+  "env_name": "MiniGrid-CleaningEnv-8x8-v0",
   "num_processes": 32,
   "num_steps": 5,
   "log_interval": 10,
@@ -70,8 +70,7 @@
   "reward": {
     "goal": 1,
     "step": 0,
-    "death": -1,
-    "clean": 1
+    "death": -1
   }
 }
 

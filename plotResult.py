@@ -54,8 +54,8 @@ def plotResult(tab,fileName,resultFileName):
     xpos = array[9].index(ymax)
     xmax = array[0][xpos]
 
-    plt.plot(array[0], array[9],'r',label='N break')
-    plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax+5))
+    plt.plot(array[0], array[9], 'r', label='N broken vases')
+    plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax + 5))
 
     ymax = max(array[4])
     xpos = array[4].index(ymax)
@@ -77,11 +77,11 @@ def plotResult(tab,fileName,resultFileName):
     plt.savefig(pp, format='pdf')
     plt.figure()
 
-    ymax = max(array[6])
-    xpos = array[6].index(ymax)
+    ymax = max(array[8])
+    xpos = array[8].index(ymax)
     xmax = array[0][xpos]
 
-    plt.plot(array[0], array[6], 'b', label='Reward mean')
+    plt.plot(array[0], array[8], 'b', label='Reward min')
     plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax + 5))
 
     ymax = max(array[7])
@@ -91,12 +91,28 @@ def plotResult(tab,fileName,resultFileName):
     plt.plot(array[0], array[7], 'r', label='Reward max')
     plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax + 5))
 
-    ymax = max(array[7])
-    xpos = array[7].index(ymax)
+    ymax = max(array[6])
+    xpos = array[6].index(ymax)
     xmax = array[0][xpos]
 
-    plt.plot(array[0], array[8], 'g', label='Reward min')
+    plt.plot(array[0], array[6], 'g', label='Reward mean')
     plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax + 5))
+
+    plt.legend()
+    plt.xlabel('N Updates')
+    plt.savefig(pp, format='pdf')
+    plt.figure()
+
+    Dif_vase = []
+    Dif_vase.append(array[9][0])
+    for i in range(1, len(array[9])):
+        Dif_vase.append(array[9][i] - array[9][i - 1])
+
+    plt.plot(array[0], Dif_vase, 'r', label='N difference broken vase')
+    for k in range(0,len(Dif_vase),400):
+        y = Dif_vase[k]
+        x = array[0][k]
+        plt.annotate(y, xy=(x, y), xytext=(x, y))
 
     plt.legend()
     plt.xlabel('N Updates')
