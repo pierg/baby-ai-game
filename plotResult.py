@@ -6,7 +6,7 @@ import csv
 import glob
 from random import randint
 import configurations.config_grabber as cg
-import os
+
 """
 File used to create a graph from a csv file and the name of the columns that need to be used
 """
