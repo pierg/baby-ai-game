@@ -2,58 +2,68 @@
   "config_name": "AllMonitors_near,1_immediate,2_violated,5_respected,2_violated,2_process32_numstep5_goal1_death1_step,1",
   "algorithm": "a2c",
   "monitors": {
-    "absence": {
-      "monitored": {
+    "properties": {
+      "avoid": {
         "water": {
-          "active": false,
+          "mode": "enforcing",
+          "action_planner": "wait",
+          "active": true,
           "name": "water",
-          "reward": {
-            "near": -0.1,
-            "immediate": -0.2,
-            "violated": -0.5
-          }
-        },
-        "deadend": {
-          "active": false,
-          "name": "deadend",
-          "reward": {
+          "rewards": {
             "near": -0.1,
             "immediate": -0.2,
             "violated": -0.5
           }
         }
-      }
-    },
-    "precedence": {
-      "monitored": {
-        "light": {
-          "active": false,
-          "name": "lightBeforeEnter",
-          "preCondition": "light-on-current-room",
-          "postCondition": "enter-room",
-          "reward": {
-            "precedenceRespected": 0.2,
-            "precedenceViolated": -0.2
-          }
-        },
-        "doorOpenBeforeLight": {
-          "active": false,
-          "name": "lightBeforeDoor",
-          "preCondition": "light-switch-turned-on",
-          "postCondition": "door-opened-in-front",
-          "reward": {
-            "precedenceRespected": 0.2,
-            "precedenceViolated": -0.2
-          }
-        }
-      }
-    },
-    "avoid": {
-      "monitored": {
+      },
+      "avert": {
         "vase": {
-          "active": false,
+          "mode": "enforcing",
+          "action_planner": "wait",
+          "active": true,
           "name": "vase",
-          "reward": -1
+          "rewards": -1
+        }
+      }
+    },
+    "patterns": {
+      "absence": {
+        "absence_1": {
+          "active": true,
+          "mode": "monitoring",
+          "name": "deadend",
+          "condition": "deadend-in-front",
+          "rewards": {
+            "respected": 0,
+            "violated": -0.2
+          }
+        }
+      },
+      "precedence": {
+        "precedence_1": {
+          "active": false,
+          "mode": "monitoring",
+          "name": "light-before-entering",
+          "conditions": {
+            "pre": "light-switch-turned-on",
+            "post": "entering-a-room"
+          },
+          "rewards": {
+            "respected": 0.3,
+            "violated": -0.3
+          }
+        }
+      },
+      "universality": {
+        "universality_1": {
+          "active": true,
+          "mode": "monitoring",
+          "name": "light",
+          "condition": "light-on-current-room",
+          "rewards": {
+            "respected": 0.2,
+            "violated": -0.2
+          }
         }
       }
     }
@@ -67,10 +77,10 @@
   "evaluation_directory_name": "evaluations",
   "visdom": false,
   "debug_mode": false,
-  "reward": {
+  "rewards": {
     "goal": 1,
     "step": 0,
-    "death": -1
+    "death":-1
   }
 }
 
