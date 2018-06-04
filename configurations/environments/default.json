@@ -1,6 +1,19 @@
 {
-  "grid_size": 5,
+  "grid_size": 6,
   "n_water": 3,
-  "n_deadend": 1,
-  "light_switch": false
+  "n_deadend": 0,
+  "light_switch": false,
+  "monitors": {
+                "properties": {
+                    "avoid": {
+                        "water": {
+                            "type": "avoid",
+                            "mode": "enforcing",
+                            "action_planner": "wait",
+                            "active": true,
+                            "name": "water"
+                        }
+                    }
+                }
+  }
 }
