@@ -15,16 +15,17 @@
             "immediate": -0.2,
             "violated": -0.5
           }
-        }
-      },
-      "avert": {
+        },
         "vase": {
-          "type": "avert",
-          "mode": "enforcing",
-          "action_planner": "wait",
+          "type": "avoid",
+          "mode": "shaping",
           "active": true,
           "name": "vase",
-          "rewards": -1
+          "rewards": {
+            "near": 0.0,
+            "immediate": 0.0,
+            "violated": -0.5
+          }
         }
       }
     },
@@ -32,7 +33,7 @@
       "absence": {
         "absence_1": {
           "type": "absence",
-          "mode": "monitoring",
+          "mode": "shaping",
           "active": true,
           "name": "deadend",
           "conditions": "deadend-in-front",
@@ -45,7 +46,7 @@
       "precedence": {
         "precedence_1": {
           "type": "precedence",
-          "mode": "monitoring",
+          "mode": "shaping",
           "active": true,
           "name": "light-before-entering",
           "conditions": {
@@ -61,7 +62,7 @@
       "response": {
         "response_1": {
           "type": "response",
-          "mode": "monitoring",
+          "mode": "shaping",
           "active": true,
           "name": "light-before-entering",
           "conditions": {
@@ -77,7 +78,7 @@
       "universality": {
         "universality_1": {
           "type": "universality",
-          "mode": "monitoring",
+          "mode": "shaping",
           "active": true,
           "name": "light",
           "conditions": "light-on-current-room",
