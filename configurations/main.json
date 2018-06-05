@@ -9,8 +9,8 @@
           "mode": "enforcing",
           "action_planner": "wait",
           "active": true,
-          "name": "water",
-          "violated_action": "Actions.forward",
+          "obj_to_avoid": "water",
+          "act_to_avoid": "Actions.forward",
           "rewards": {
             "near": -0.1,
             "immediate": -0.2,
@@ -22,8 +22,8 @@
           "mode": "shaping",
           "action_planner": "wait",
           "active": true,
-          "name": "vase",
-          "violated_action": "Actions.toggle",
+          "obj_to_avoid": "vase",
+          "act_to_avoid": "Actions.toggle",
           "rewards": {
             "near": 0,
             "immediate": 0,
