@@ -4,9 +4,11 @@
   "on_violation_reset": false,
   "rendering": false,
   "rewards": {
-    "death": -1.0,
-    "goal": 1.0,
-    "step": 0.0
+    "standard": {
+      "goal": 1,
+      "step": 0,
+      "death": -1
+    }
   },
   "num_steps": 5,
   "log_interval": 10,

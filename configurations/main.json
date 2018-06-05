@@ -10,6 +10,7 @@
           "action_planner": "wait",
           "active": true,
           "name": "water",
+          "violated_action": "Actions.forward",
           "rewards": {
             "near": -0.1,
             "immediate": -0.2,
@@ -18,14 +19,15 @@
         },
         "vase": {
           "type": "avoid",
-          "mode": "enforcing",
+          "mode": "shaping",
           "action_planner": "wait",
-          "active": false,
+          "active": true,
           "name": "vase",
+          "violated_action": "Actions.toggle",
           "rewards": {
-            "near": 0.0,
-            "immediate": 0.0,
-            "violated": -0.5
+            "near": 0,
+            "immediate": 0,
+            "violated":-1
           }
         }
       }
@@ -40,7 +42,7 @@
           "conditions": "deadend-in-front",
           "rewards": {
             "respected": 0,
-            "violated": -0.2
+            "violated": -0.3
           }
         }
       },
@@ -48,7 +50,7 @@
         "precedence_1": {
           "type": "precedence",
           "mode": "shaping",
-          "active": true,
+          "active": false,
           "name": "light-before-entering",
           "conditions": {
             "pre": "light-switch-turned-on",
@@ -64,7 +66,7 @@
         "response_1": {
           "type": "response",
           "mode": "shaping",
-          "active": true,
+          "active": false,
           "name": "light-before-entering",
           "conditions": {
             "pre": "light-switch-turned-on",
@@ -106,8 +108,8 @@
       "step": 0,
       "death": -1
     },
-    "cleaning_env": {
-      "clean": 0.5
+    "cleaningenv":{
+      "clean":0.5
     }
   }
 }

@@ -9,6 +9,7 @@
           "action_planner": "wait",
           "active": true,
           "name": "water",
+          "violated_action": "Actions.forward",
           "rewards": {
             "near": -0.1,
             "immediate": -0.2,
@@ -69,8 +70,10 @@
   "visdom": false,
   "debug_mode": false,
   "rewards": {
-    "goal": 1,
-    "step": -0.1,
-    "death":-1
+    "standard": {
+      "goal": 1,
+      "step": 0,
+      "death": -1
+    }
   }
 }
