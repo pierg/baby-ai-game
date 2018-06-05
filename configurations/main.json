@@ -5,6 +5,7 @@
     "properties": {
       "avoid": {
         "water": {
+          "type": "avoid",
           "mode": "enforcing",
           "action_planner": "wait",
           "active": true,
@@ -15,25 +16,53 @@
             "violated": -0.5
           }
         }
+      },
+      "avert": {
+        "vase": {
+          "type": "avert",
+          "mode": "enforcing",
+          "action_planner": "wait",
+          "active": true,
+          "name": "vase",
+          "rewards": -1
+        }
       }
     },
     "patterns": {
       "absence": {
         "absence_1": {
-          "active": false,
+          "type": "absence",
           "mode": "monitoring",
+          "active": true,
           "name": "deadend",
-          "condition": "deadend-in-front",
+          "conditions": "deadend-in-front",
           "rewards": {
             "respected": 0,
-            "violated": 0
+            "violated": -0.2
           }
         }
       },
       "precedence": {
         "precedence_1": {
-          "active": true,
+          "type": "precedence",
           "mode": "monitoring",
+          "active": true,
+          "name": "light-before-entering",
+          "conditions": {
+            "pre": "light-switch-turned-on",
+            "post": "entering-a-room"
+          },
+          "rewards": {
+            "respected": 0.3,
+            "violated": -0.3
+          }
+        }
+      },
+      "response": {
+        "response_1": {
+          "type": "response",
+          "mode": "monitoring",
+          "active": true,
           "name": "light-before-entering",
           "conditions": {
             "pre": "light-switch-turned-on",
@@ -47,29 +76,21 @@
       },
       "universality": {
         "universality_1": {
-          "active": false,
+          "type": "universality",
           "mode": "monitoring",
+          "active": true,
           "name": "light",
-          "condition": "light-on-current-room",
+          "conditions": "light-on-current-room",
           "rewards": {
             "respected": 0.2,
             "violated": -0.2
           }
         }
       }
-    },
-    "avoid": {
-      "monitored": {
-        "vase": {
-          "active": false,
-          "name": "vase",
-          "reward": -1
-        }
-      }
     }
   },
-  "env_name": "MiniGrid-CleaningEnv-8x8-v0",
-  "num_processes": 32,
+  "env_name": "MiniGrid-BigEnv-24x24-v0",
+  "num_processes": 48,
   "num_steps": 5,
   "log_interval": 10,
   "on_violation_reset": false,
@@ -79,7 +100,8 @@
   "debug_mode": false,
   "rewards": {
     "goal": 1,
-    "step": -0.1,
+    "step": 0,
     "death":-1
   }
 }
+
