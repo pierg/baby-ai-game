@@ -8,7 +8,7 @@
           "type": "avoid",
           "mode": "enforcing",
           "action_planner": "wait",
-          "active": true,
+          "active": false,
           "obj_to_avoid": "water",
           "act_to_avoid": "Actions.forward",
           "rewards": {
@@ -37,7 +37,7 @@
         "absence_1": {
           "type": "absence",
           "mode": "shaping",
-          "active": true,
+          "active": false,
           "name": "deadend",
           "conditions": "deadend-in-front",
           "rewards": {
@@ -82,7 +82,7 @@
         "universality_1": {
           "type": "universality",
           "mode": "shaping",
-          "active": true,
+          "active": false,
           "name": "light",
           "conditions": "light-on-current-room",
           "rewards": {
