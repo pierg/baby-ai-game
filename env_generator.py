@@ -120,10 +120,11 @@ register(
                     "avoid": {
                         "water": {
                             "type": "avoid",
-                            "mode": "enforcing",
-                            "action_planner": "wait",
+                            "mode": elements.monitors.properties.avoid.water.mode,
+                            "action_planner": elements.monitors.properties.avoid.water.action_planner,
                             "active": True,
-                            "name": "water",
+                            "obj_to_avoid": elements.monitors.properties.avoid.water.obj_to_avoid,
+                            "act_to_avoid": elements.monitors.properties.avoid.water.act_to_avoid,
                             "rewards": {
                                 "near": float("{0:.2f}".format(rewards.avoid['near'] if 'near' in rewards.avoid else 0)),
                                 "immediate": float(
@@ -145,9 +146,14 @@ register(
             "visdom": False,
             "debug_mode": False,
             "rewards": {
-                "goal": float("{0:.2f}".format(rewards['goal'] if 'goal' in rewards else 1)),
-                "step": float("{0:.2f}".format(rewards['step'] if 'step' in rewards else 0)),
-                'death': float("{0:.2f}".format(rewards['death'] if 'death' in rewards else -1))
+                "standard":{
+                    "goal": float("{0:.2f}".format(rewards.standard['goal'] if 'goal' in rewards.standard else 1)),
+                    "step": float("{0:.2f}".format(rewards.standard['step'] if 'step' in rewards.standard else 0)),
+                    'death': float("{0:.2f}".format(rewards.standard['death'] if 'death' in rewards.standard else -1))
+                },
+                "cleaningenv":{
+                    "clean":float("{0:.2f}".format(rewards.cleaningenv['goal'] if 'clean' in rewards.cleaningenv else 0.5))
+                }
             }
         }, indent=2))
         config.close()

@@ -1,36 +1,42 @@
 {
-  "algorithm": "a2c",
   "rewards": {
-    "goal": 1.0,
-    "step": 0.0,
-    "death": -1.0
+    "cleaningenv": {
+      "clean": 0.5
+    },
+    "standard": {
+      "death": -1.0,
+      "goal": 1.0,
+      "step": 0.0
+    }
   },
-  "rendering": false,
-  "config_name": "randomEnv-6x6-6724-v0",
+  "debug_mode": false,
   "on_violation_reset": false,
-  "visdom": false,
+  "algorithm": "a2c",
+  "num_processes": 48,
+  "rendering": false,
+  "log_interval": 10,
   "monitors": {
     "properties": {
       "avoid": {
         "water": {
-          "name": "water",
           "rewards": {
+            "immediate": 0.0,
             "near": 0.0,
-            "violated": -1.0,
-            "immediate": 0.0
+            "violated": -1.0
           },
-          "action_planner": "wait",
-          "active": true,
           "mode": "enforcing",
-          "type": "avoid"
+          "active": true,
+          "action_planner": "wait",
+          "obj_to_avoid": "water",
+          "type": "avoid",
+          "act_to_avoid": "Actions.forward"
         }
       }
     }
   },
-  "num_steps": 5,
   "evaluation_directory_name": "evaluations",
-  "num_processes": 48,
-  "log_interval": 10,
-  "debug_mode": false,
-  "env_name": "MiniGrid-RandomEnv-6x6-6724-v0"
+  "env_name": "MiniGrid-RandomEnv-6x6-8521-v0",
+  "num_steps": 5,
+  "config_name": "randomEnv-6x6-8521-v0",
+  "visdom": false
 }
