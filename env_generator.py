@@ -113,7 +113,7 @@ register(
     with open(configuration_path + "randoms/" + "randomEnv-{0}x{0}-{1}-v0.json".format(grid_size, random_token), 'w') as config:
         rewards = Configuration.grab("rewards/"+rewards)
         config.write(json.dumps({
-            "config_name": "evalRandoEnv-Water-{0}-{1}".format(n_water, random_token),
+            "config_name": "randomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token),
             "algorithm": "a2c",
             "monitors": {
                 "properties": {

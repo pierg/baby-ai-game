@@ -5,7 +5,7 @@
 configuration_file="main.json"
 start_training=0
 
-while getopts ":tr" opt; do
+while getopts ":tre:w:" opt; do
     case ${opt} in
         r)
             random=1
@@ -15,16 +15,41 @@ while getopts ":tr" opt; do
             configuration_file=${OPTARG}
             start_training=1
             ;;
+        e)
+            environment=${OPTARG}
+            start_training=1
+            ;;
+        w)
+            reward=${OPTARG}
+            start_training=1
+            ;;
     esac
 done
 shift $((OPTIND -1))
 
 if [ $random ]
     then
-        echo "...creating a random environment..."
-        echo "...creating environment with grid_size 6, number of water tiles 3, max block size 1, with default reward config"
-        configuration_file=`python3 env_generator.py --grid_size 6 --number_of_water_tiles 3 --max_block_size 1 --rewards_file "configurations/rewards/default.json"`
-    else
+        if [ $environment ]
+            then
+                if [ $reward ]
+                then
+                    echo "...creating a random environment... using $environment and $reward"
+                    configuration_file=`python3 env_generator.py --environment_file $environment --rewards_file $reward`
+                else
+                    echo "...creating a random environment... using $environment"
+                    configuration_file=`python3 env_generator.py --environment_file $environment --rewards_file "default"`
+                fi
+        elif [ $reward ]
+            then
+                echo "...creating a random environment... using $reward"
+                configuration_file=`python3 env_generator.py --environment_file "default" --rewards_file $reward`
+        else
+            echo "...creating a random environment..."
+            echo "...creating environment with grid_size 6, number of water tiles 3, max block size 1, with default reward config"
+            configuration_file=`python3 env_generator.py --environment_file "default" --rewards_file "default"`
+        fi
+        configuration_file="randoms/$configuration_file"
+else
         configuration_file=${1:-"main.json"}
 fi
 

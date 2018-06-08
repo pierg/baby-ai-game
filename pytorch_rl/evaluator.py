@@ -93,7 +93,7 @@ class Evaluator:
         self.n_catastrophes += n_catastrophes_mask
         self.N_goal_reached = 0
         for i in range(0, len(info)):
-            if info[i]:
+            if len(info[i])>0:
                 if info[i][0] == "died":
                     self.n_proccess_reached_goal[i]= 0
                     self.N_death += 1
