@@ -96,9 +96,9 @@ def get_config_from_name(file):
             for monitor in monitors:
                 if monitor.active:
                     title += monitor.type + "_" + monitor.name
-    rewards = "reward goal : {0} ".format(config.rewards.goal)
-    rewards += "/ step : {0} ".format(config.rewards.step)
-    rewards += "/ death : {0} ".format(config.rewards.death)
+    rewards = "reward goal : {0} ".format(config.rewards.standard.goal)
+    rewards += "/ step : {0} ".format(config.rewards.standard.step)
+    rewards += "/ death : {0} ".format(config.rewards.standard.death)
     return title + "\n" + rewards
 
 
