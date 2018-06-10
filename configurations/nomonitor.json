@@ -1,0 +1,115 @@
+{
+  "config_name": "AllMonitors_near,1_immediate,2_violated,5_respected,2_violated,2_process32_numstep5_goal1_death1_step,1",
+  "algorithm": "a2c",
+  "monitors": {
+    "properties": {
+      "avoid": {
+        "water": {
+          "type": "avoid",
+          "mode": "enforcing",
+          "action_planner": "wait",
+          "active": false,
+          "name": "water",
+          "violated_action": "Actions.forward",
+          "rewards": {
+            "near": -0.1,
+            "immediate": -0.2,
+            "violated": -0.5
+          }
+        },
+        "vase": {
+          "type": "avoid",
+          "mode": "shaping",
+          "action_planner": "wait",
+          "active": false,
+          "name": "vase",
+          "violated_action": "Actions.toggle",
+          "rewards": {
+            "near": 0,
+            "immediate": 0,
+            "violated":-1
+          }
+        }
+      }
+    },
+    "patterns": {
+      "absence": {
+        "absence_1": {
+          "type": "absence",
+          "mode": "shaping",
+          "active": false,
+          "name": "deadend",
+          "conditions": "deadend-in-front",
+          "rewards": {
+            "respected": 0,
+            "violated": -0.3
+          }
+        }
+      },
+      "precedence": {
+        "precedence_1": {
+          "type": "precedence",
+          "mode": "shaping",
+          "active": false,
+          "name": "light-before-entering",
+          "conditions": {
+            "pre": "light-switch-turned-on",
+            "post": "entering-a-room"
+          },
+          "rewards": {
+            "respected": 0.3,
+            "violated": -0.3
+          }
+        }
+      },
+      "response": {
+        "response_1": {
+          "type": "response",
+          "mode": "shaping",
+          "active": false,
+          "name": "light-before-entering",
+          "conditions": {
+            "pre": "light-switch-turned-on",
+            "post": "entering-a-room"
+          },
+          "rewards": {
+            "respected": 0.3,
+            "violated": -0.3
+          }
+        }
+      },
+      "universality": {
+        "universality_1": {
+          "type": "universality",
+          "mode": "shaping",
+          "active": false,
+          "name": "light",
+          "conditions": "light-on-current-room",
+          "rewards": {
+            "respected": 0.2,
+            "violated": -0.2
+          }
+        }
+      }
+    }
+  },
+  "env_name": "MiniGrid-CleaningEnv-8x8-v0",
+  "num_processes": 48,
+  "num_steps": 5,
+  "log_interval": 10,
+  "on_violation_reset": false,
+  "rendering": false,
+  "evaluation_directory_name": "evaluations",
+  "visdom": false,
+  "debug_mode": false,
+  "rewards": {
+    "standard": {
+      "goal": 1,
+      "step": 0,
+      "death": -1
+    },
+    "cleaningenv":{
+      "clean":0.5
+    }
+  }
+}

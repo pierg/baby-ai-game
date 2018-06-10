@@ -1,19 +1,21 @@
 import argparse
 import json
-from secrets import token_hex
+from random import randint
+from configurations.config_grabber import Configuration
 
 parser = argparse.ArgumentParser(description='Arguments for creating the environments and its configuration')
-parser.add_argument('--grid_size', type=int, required=True)
-parser.add_argument('--number_of_water_tiles', type=int, required=True)
-parser.add_argument('--max_block_size', type=int, required=True)
-parser.add_argument('--rewards_file', type=str, required=True, help="A json file containing the keys: "
+parser.add_argument('--environment_file', type=str, required=False, help="A json file containing the keys: "
+                                                                      "step, goal, near, immediate, violated. "
+                                                                      "The values should be the wanted rewards "
+                                                                      "of the actions")
+parser.add_argument('--rewards_file', type=str, required=False, help="A json file containing the keys: "
                                                                       "step, goal, near, immediate, violated. "
                                                                       "The values should be the wanted rewards "
                                                                       "of the actions")
 
 environment_path = "../gym-minigrid/gym_minigrid/envs/"
 configuration_path = "configurations/"
-random_token = token_hex(4)
+random_token = randint(0,9999)
 
 """ This script creates a random environment in the gym_minigrid/envs folder. It uses a token_hex(4) 
         as the ID and the random seed for placing tiles in the grid.
@@ -21,8 +23,13 @@ random_token = token_hex(4)
         in case the agent behaves strange in certain environments, in order to investigate why.        
 """
 
-def generate_environment(grid_size, nr_of_water_tiles, max_block_size, rewards=None):
-    with open(environment_path + "randomenv{0}{1}.py".format(nr_of_water_tiles, random_token), 'w') as env:
+def generate_environment(environment="default", rewards="default"):
+    elements = Configuration.grab("environments/"+environment)
+    grid_size = elements.grid_size
+    n_water = elements.n_water
+    n_deadend = elements.n_deadend
+    light_switch = elements.light_switch
+    with open(environment_path + "randoms/" + "randomenv{0}.py".format(random_token), 'w') as env:
         env.write("""
 from gym_minigrid.extendedminigrid import *
 from gym_minigrid.register import register
@@ -53,7 +60,7 @@ class RandomEnv(ExMiniGridEnv):
         self.grid.set(width - 2, height - 2, Goal())
 
         # Set the random seed to the random token, so we can reproduce the environment
-        random.seed("{2}")
+        random.seed("{4}")
 
         # Place water
         placed_water_tiles = 0
@@ -85,42 +92,49 @@ class RandomEnv(ExMiniGridEnv):
             placed_water_tiles += 1
         self.mission = ""
 
-class RandomEnv{0}x{0}_{2}(RandomEnv):
+class RandomEnv{0}x{0}_{4}(RandomEnv):
     def __init__(self):
         super().__init__(size={0})
 
 register(
-    id='MiniGrid-RandomEnv-{0}x{0}-{2}-v0',
-    entry_point='gym_minigrid.envs:RandomEnv{0}x{0}_{2}'
+    id='MiniGrid-RandomEnv-{0}x{0}-{4}-v0',
+    entry_point='gym_minigrid.envs:RandomEnv{0}x{0}_{4}'
 )
-""".format(grid_size, nr_of_water_tiles, random_token))
+""".format(grid_size, n_water, n_deadend, light_switch, random_token))
         env.close()
     # Adds the import statement to __init__.py in the envs folder in gym_minigrid,
     # otherwise the environment is unavailable to use.
     with open(environment_path + "__init__.py", 'a') as init_file:
         init_file.write("\n")
-        init_file.write("from gym_minigrid.envs.randomenv{0}{1} import *".format(nr_of_water_tiles, random_token))
+        init_file.write("from gym_minigrid.envs.randoms.randomenv{0} import *".format(random_token))
         init_file.close()
 
     # Creates a json config file for the random environment
-    with open(configuration_path + "randomEnv-{0}x{0}-{1}-v0.json".format(grid_size, random_token), 'w') as config:
+    with open(configuration_path + "randoms/" + "randomEnv-{0}x{0}-{1}-v0.json".format(grid_size, random_token), 'w') as config:
+        rewards = Configuration.grab("rewards/"+rewards)
         config.write(json.dumps({
-            "config_name": "evalRandomWaterEnv-Water-{0}-{1}".format(nr_of_water_tiles, random_token),
+            "config_name": "randomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token),
             "algorithm": "a2c",
             "monitors": {
-                "absence": {
-                    "monitored": {
+                "properties": {
+                    "avoid": {
                         "water": {
+                            "type": "avoid",
+                            "mode": elements.monitors.properties.avoid.water.mode,
+                            "action_planner": elements.monitors.properties.avoid.water.action_planner,
                             "active": True,
-                            "name": "water",
-                            "reward": {
-                                "near": float("{0:.2f}".format(rewards['near'] if 'near' in rewards else "0")),
-                                "immediate": float("{0:.2f}".format(rewards['immediate'] if 'immediate' in rewards else "0")),
-                                "violated": float("{0:.2f}".format(rewards['violated'] if 'violated' in rewards else "-1"))
+                            "obj_to_avoid": elements.monitors.properties.avoid.water.obj_to_avoid,
+                            "act_to_avoid": elements.monitors.properties.avoid.water.act_to_avoid,
+                            "rewards": {
+                                "near": float("{0:.2f}".format(rewards.avoid['near'] if 'near' in rewards.avoid else 0)),
+                                "immediate": float(
+                                    "{0:.2f}".format(rewards.avoid['immediate'] if 'immediate' in rewards.avoid else 0)),
+                                "violated": float(
+                                    "{0:.2f}".format(rewards.avoid['violated'] if 'violated' in rewards.avoid else -1))
                             }
                         }
                     },
-                },
+                }
             },
             "env_name": "MiniGrid-RandomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token),
             "num_processes": 48,
@@ -131,10 +145,15 @@ register(
             "evaluation_directory_name": "evaluations",
             "visdom": False,
             "debug_mode": False,
-            "reward": {
-                "goal": float("{0:.2f}".format(rewards['goal'] if 'goal' in rewards else "1")),
-                "step": float("{0:.2f}".format(rewards['step'] if 'step' in rewards else "-1")),
-                'death': float("{0:.2f}".format(rewards['death'] if 'death' in rewards else "-1"))
+            "rewards": {
+                "standard":{
+                    "goal": float("{0:.2f}".format(rewards.standard['goal'] if 'goal' in rewards.standard else 1)),
+                    "step": float("{0:.2f}".format(rewards.standard['step'] if 'step' in rewards.standard else 0)),
+                    'death': float("{0:.2f}".format(rewards.standard['death'] if 'death' in rewards.standard else -1))
+                },
+                "cleaningenv":{
+                    "clean":float("{0:.2f}".format(rewards.cleaningenv['goal'] if 'clean' in rewards.cleaningenv else 0.5))
+                }
             }
         }, indent=2))
         config.close()
@@ -144,10 +163,13 @@ register(
 
 def main():
     args = parser.parse_args()
-    rewards = {}
-    with open(args.rewards_file, 'r') as reward_config:
-        rewards = json.loads(reward_config.read())
-    file_name = generate_environment(args.grid_size, args.number_of_water_tiles, args.max_block_size, rewards)
+    environment = "default"
+    rewards = "default"
+    if args.rewards_file is not None:
+       rewards = args.rewards_file
+    if args.environment_file is not None:
+        environment = args.environment_file
+    file_name = generate_environment(environment, rewards)
     print(file_name)
 
 
