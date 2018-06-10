@@ -68,8 +68,8 @@ RUN mkdir -p $HOME
 WORKDIR $HOME
 
 # Cloning the repositories
-RUN git clone https://github.com/pierg/baby-ai-game.git -b dev --single-branch
-RUN git clone https://github.com/pierg/gym-minigrid.git -b dev --single-branch
+RUN git clone https://github.com/pierg/baby-ai-game.git -b action_planning --single-branch
+RUN git clone https://github.com/pierg/gym-minigrid.git -b action_planning --single-branch
 
 
 RUN pip3 install --upgrade pip
