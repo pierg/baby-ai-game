@@ -41,12 +41,16 @@ class Evaluator:
                                   'N_goal_reached',
                                   'N_step_per_episode',
                                   'N_violation',
+                                  'N_step_AVG',
+                                  'N_death',
+                                  'N_saved',
                                   'N_death_by_end',
                                   'Total_death',
                                   'Plan_created',
                                   'Plan_finished',
-                                  'Plan_followed %'
-                                  ]),
+                                  'Plan_followed %',
+                                  'Total_death',
+                                  'N_Total_episodes'])
 
         # Evaluation variables
         # self.shortest_path = config.shortest_path
@@ -64,6 +68,8 @@ class Evaluator:
         self.N_violation = 0
         self.N_death_by_end = 0
         self.Total_death = 0
+        self.N_saved = 0
+        self.N_Total_episodes = 0
         self.total_num_steps = 0
         self.N_plan_created = 0
         self.N_plan_finished = 0
@@ -74,7 +80,7 @@ class Evaluator:
         self.episode_rewards += reward
 
         plan_followed = []
-        
+
         # If done then clean the history of observations.
         masks = torch.FloatTensor([[0.0] if done_ else [1.0] for done_ in done])
         self.final_rewards *= masks
@@ -99,18 +105,25 @@ class Evaluator:
                 self.n_proccess_reached_goal[i]= 0
                 self.N_death += 1
                 self.Total_death += 1
+                self.N_Total_episodes += 1
             elif info[i] == "goal":
                 self.n_proccess_reached_goal[i] = 1
             elif info[i] == "goal+plan_finished":
                 self.n_proccess_reached_goal[i] = 1
                 self.N_plan_finished += 1
                 plan_followed.append(100)
+                self.n_proccess_reached_goal[i]= 1
+                self.N_Total_episodes += 1
             elif info[i] == "violation":
                 self.N_violation += 1
+                self.n_proccess_reached_goal[i] = 0
             elif info[i] == "end":
                 self.n_proccess_reached_goal[i] = 0
                 self.N_death_by_end += 1
                 self.Total_death += 1
+                self.N_Total_episodes += 1
+            elif info[i] == "saved":
+                self.N_saved += 1
             elif info[i] == "plan_created":
                 self.N_plan_created += 1
             elif info[i] == "plan_finished":
@@ -123,6 +136,7 @@ class Evaluator:
 
         for i in range(0,len(self.n_proccess_reached_goal)):
             self.N_goal_reached += self.n_proccess_reached_goal[i]
+        self.n_episodes = n_episodes_mask
 
         if len(plan_followed) > 0:
             self.avg_pcn_plan_followed = sum(plan_followed) / len(plan_followed)
