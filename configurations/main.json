@@ -56,7 +56,7 @@
   "log_interval": 10,
   "on_violation_reset": false,
   "rendering": false,
-  "evaluation_directory_name": "evaluations_UnsafeMazeEnv",
+  "evaluation_directory_name": "evaluations",
   "visdom": true,
   "action_planner": true,
   "debug_mode": false,

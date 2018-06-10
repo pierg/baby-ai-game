@@ -33,7 +33,7 @@ def visdom_plot(
     global followed_avg
 
     if vis is None:
-        vis = Visdom(use_incoming_socket=False, server="http://46.239.105.140")
+        vis = Visdom(use_incoming_socket=False, server="http://localhost")
         assert vis.check_connection()
         # Close all existing plots
         vis.close()
