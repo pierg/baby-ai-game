@@ -39,7 +39,7 @@
   "random_unsafe_obj": 4,
   "num_steps": 5,
   "config_name": "randomEnv-6x6-8521-v0",
-  "visdom": true,
+  "visdom": false,
   "action_planner": true,
   "reward": {
     "goal": 100,
