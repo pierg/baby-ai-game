@@ -35,8 +35,8 @@
     }
   },
   "evaluation_directory_name": "evaluations",
-  "env_name": "MiniGrid-UnsafeMazeEnv-8x8-v0",
-  "random_unsafe_obj": 0,
+  "env_name": "MiniGrid-UnsafeEnv-8x8-v0",
+  "random_unsafe_obj": 4,
   "num_steps": 5,
   "config_name": "randomEnv-6x6-8521-v0",
   "visdom": true,
