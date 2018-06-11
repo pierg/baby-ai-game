@@ -84,5 +84,9 @@ RUN pip3 install -r ./baby-ai-game/requirements.txt
 
 WORKDIR $HOME/baby-ai-game
 
-ENTRYPOINT ["./entrypoint.sh"]
-CMD [""]
+RUN cd ..
+RUN gym-minigrid
+RUN python3 -m pip install -e .
+RUN cd python3 ../baby-ai-game/pytorch/main.py
+
+#ENTRYPOINT ["./entrypoint.sh"]
