@@ -29,6 +29,7 @@ def generate_environment(environment="default", rewards="default"):
     n_water = elements.n_water
     n_deadend = elements.n_deadend
     light_switch = elements.light_switch
+    random_each_episode = elements.random_each_episode
     with open(environment_path + "randoms/" + "randomenv{0}.py".format(random_token), 'w') as env:
         env.write("""
 from gym_minigrid.extendedminigrid import *
@@ -61,6 +62,20 @@ class RandomEnv(ExMiniGridEnv):
                     tab.append((i, j, 1))
         return tab
         
+    def _random_or_not_position(self, xmin, xmax, ymin, ymax ):
+        if {5}:
+            width_pos, height_pos = self._rand_pos( xmin, xmax + 1, ymin, ymax + 1)
+        else:
+            width_pos = random.randint( xmin, xmax)
+            height_pos = random.randint( ymin, ymax)
+        return width_pos, height_pos
+        
+    def _random_or_not_bool(self):
+        if {5}:
+            return self._rand_bool()
+        else:
+            return random.choice([True, False])
+        
     def _gen_grid(self, width, height):
         # Create an empty grid
         self.grid = Grid(width, height)
@@ -83,12 +98,7 @@ class RandomEnv(ExMiniGridEnv):
         test_goal = 0
         if {3}:
             while not lightswitch_is_posed:
-                # random position when launch_script is run
-                width_pos = random.randint(3, width - 5)
-                height_pos = random.randint(0, height - 1)
-                
-                #random position each time the agent finish an environment
-                #width_pos , height_pos = self._rand_pos(3, width - 4, 0, height - 1)
+                width_pos , height_pos = self._random_or_not_position(2, width - 5, 0, height - 1)
                 
                 #lightswitch and room wall must not replace a fundamental element (goal, key, ...)
                 continue_while = True
@@ -116,18 +126,10 @@ class RandomEnv(ExMiniGridEnv):
                     xdoor, ydoor = width_pos + 1, height_pos - 1
                 else:
                     
-                    # random position when launch_script is run
-                    door_position = random.randint(0, 1)
-                    if door_position:
+                    if self._random_or_not_bool():
                         xdoor, ydoor = width_pos + 1, height_pos - 1
                     else:
                         xdoor, ydoor = width_pos + 1, height_pos + 1
-                        
-                    #random position each time the agent finish an environment
-                    #if self._rand_bool():
-                        #xdoor, ydoor = width_pos + 1, height_pos - 1
-                    #else:
-                        #xdoor, ydoor = width_pos + 1, height_pos + 1
                         
                 self.grid.set(xdoor, ydoor , Door(self._rand_elem(sorted(set(COLOR_NAMES)))))
                 
@@ -153,13 +155,7 @@ class RandomEnv(ExMiniGridEnv):
         placed_water_tiles = 0
         while {1} > placed_water_tiles:
             # Minus 2 because grid is zero indexed, and the last one is just a wall
-            
-            # random position when launch_script is run
-            width_pos = random.randint(1, width - 2)
-            height_pos = random.randint(1, height - 2)
-            
-            #random position each time the agent finish an environment
-            #width_pos , height_pos = self._rand_pos(1, width - 2, 1, height - 2)
+            width_pos , height_pos = self._random_or_not_position(1, width - 2, 1, height - 2)
 
             if width_pos == 1 and height_pos == 1:
                 # Do not place water on agent
@@ -190,7 +186,7 @@ class RandomEnv(ExMiniGridEnv):
                 # Do not place water near a wall
                 continue
             if isinstance(self.grid.get(width_pos + 1, height_pos), Door) or \
-             isinstance(self.grid.get(width_pos + 1, height_pos), Wall):
+             isinstance(self.grid.get(width_pos - 1, height_pos), Door):
                 # Do not place water front a door
                 continue
             self.grid.set(width_pos, height_pos, Water())
@@ -217,7 +213,7 @@ register(
     id='MiniGrid-RandomEnv-{0}x{0}-{4}-v0',
     entry_point='gym_minigrid.envs:RandomEnv{0}x{0}_{4}'
 )
-""".format(grid_size, n_water, n_deadend, light_switch, random_token))
+""".format(grid_size, n_water, n_deadend, light_switch, random_token, random_each_episode))
         env.close()
     # Adds the import statement to __init__.py in the envs folder in gym_minigrid,
     # otherwise the environment is unavailable to use.

@@ -17,5 +17,6 @@
         }
       }
     }
-  }
+  },
+  "random_each_episode": false
 }
