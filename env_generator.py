@@ -43,7 +43,7 @@ class RandomEnv(ExMiniGridEnv):
             grid_size=size,
             max_steps=4*size*size,
             # Set this to True for maximum speed
-            see_through_walls=False
+            see_through_walls= not {3}
         )
         
     def getRooms(self):
@@ -70,6 +70,12 @@ class RandomEnv(ExMiniGridEnv):
             height_pos = random.randint( ymin, ymax)
         return width_pos, height_pos
         
+    def _random_number(self, min, max):
+        if {5}:
+            return self._rand_int(min,max+1)
+        else:
+            return random.randint(min,max)
+    
     def _random_or_not_bool(self):
         if {5}:
             return self._rand_bool()
@@ -98,7 +104,7 @@ class RandomEnv(ExMiniGridEnv):
         test_goal = 0
         if {3}:
             while not lightswitch_is_posed:
-                width_pos , height_pos = self._random_or_not_position(2, width - 5, 0, height - 1)
+                width_pos , height_pos = self._random_or_not_position(5, width - 6, 0, height - 1)
                 
                 #lightswitch and room wall must not replace a fundamental element (goal, key, ...)
                 continue_while = True
@@ -151,13 +157,14 @@ class RandomEnv(ExMiniGridEnv):
                 
                 lightswitch_is_posed = True
 
+
         # Place dead ends
         placed_dead_ends = 0
-        tmp = random.randint(0,3)
+        tmp = self._random_number(0,3)
         while {2} > placed_dead_ends:
             if self.grid_size < 10:
                 # Limit to one dead end if the grid is too small
-                if random.randint(1,2) == 1:
+                if self._random_or_not_bool():
                     self.grid.vert_wall(width//2-1,height//2,height//2)
                 else:
                     self.grid.horz_wall(width//2,height//2-1,width//2)
@@ -238,36 +245,25 @@ class RandomEnv(ExMiniGridEnv):
             if isinstance(self.grid.get(width_pos, height_pos), LightSwitch):
                 # Do not place water on lightswitch
                 continue
-            if isinstance(self.grid.get(width_pos + 1, height_pos), Wall) or \
-             isinstance(self.grid.get(width_pos, height_pos + 1), Wall) or \
-             isinstance(self.grid.get(width_pos - 1, height_pos), Wall) or \
-             isinstance(self.grid.get(width_pos, height_pos - 1), Wall):
-                # Do not place water near a wall
-                continue
-            if isinstance(self.grid.get(width_pos + 1, height_pos), Door) or \
-             isinstance(self.grid.get(width_pos - 1, height_pos), Door):
+            if isinstance(self.grid.get(width_pos + 1, height_pos), Door) or isinstance(self.grid.get(width_pos - 1, height_pos), Door):
                 # Do not place water front a door
                 continue
+            if isinstance(self.grid.get(width_pos,height_pos),Door):
+                # Do not place water on Door
+                continue
             self.grid.set(width_pos, height_pos, Water())
-            placed_water_tiles += 1
-        
-        # transfert the position of the objects in the room in tha dark for visual  
-        tab = self.saveElements(self.roomList[1])
-        switchRoom.elements_in_room(tab)
         
             if self.grid_size < 10 and {2} > 0:
                 placed_water_tiles = {1}
             else:
                 placed_water_tiles += 1
+        
+        if {3}:
+            # transfert the position of the objects in the room in tha dark for visual  
+            tab = self.saveElements(self.roomList[1])
+            switchRoom.elements_in_room(tab)
                 
         self.mission = ""
-        
-    def step(self,action):
-        # Reset if agent step on water without knowing it
-        if action == self.actions.forward and self.worldobj_in_agent(1,0) == "water" :
-            return self.gen_obs(), 0, True, "died"
-        else:
-            return super().step(action)
 
     def step(self,action):
         # Reset if agent step on water without knowing it

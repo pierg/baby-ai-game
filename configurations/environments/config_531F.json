@@ -3,6 +3,7 @@
   "n_water": 5,
   "n_deadend": 4,
   "light_switch": true,
+  "random_each_episode": false,
   "monitors": {
     "properties": {
       "avoid": {
@@ -61,6 +62,5 @@
         }
       }
     }
-  },
-  "random_each_episode": false
+  }
 }
