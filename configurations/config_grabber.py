@@ -12,7 +12,7 @@ class Configuration():
         :return: Specific configuration file as a python object
         """
         # Assumption: baby-ai-game repo folder is located in the same folder containing gym-minigrid repo folder
-        config_file_path = os.path.abspath(__file__ + "/../../../" + "/baby-ai-game-dev/configurations/" + filename + ".json")
+        config_file_path = os.path.abspath(__file__ + "/../../../" + "/baby-ai-game/configurations/" + filename + ".json")
         config = None
         with open(config_file_path, 'r') as jsondata:
             configdata = jsondata.read()
