@@ -5,13 +5,25 @@
     "death": -1
   },
   "avoid":{
+    "name":"avoid",
     "near": 0,
     "immediate": 0,
     "violated": -1
   },
   "precedence":{
-    "precedenceRespected": 0.5,
-    "precedenceViolated": -0.5
+    "name":"precedence",
+    "respected": 0.1,
+    "violated": -0.1
+  },
+  "universality":{
+    "name":"universality",
+    "respected": 0.1,
+    "violated": -0.1
+  },
+  "response":{
+    "name":"response",
+    "respected": 0.1,
+    "violated": -0.1
   },
   "cleaningenv":{
     "clean":0.5

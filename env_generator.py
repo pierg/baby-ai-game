@@ -62,9 +62,41 @@ class RandomEnv(ExMiniGridEnv):
         # Set the random seed to the random token, so we can reproduce the environment
         random.seed("{4}")
 
+        # Place dead ends
+        placed_dead_ends = 0
+        tmp = random.randint(0,3)
+        while {2} > placed_dead_ends:
+            if self.grid_size < 10:
+                # Limit to one dead end if the grid is too small
+                if random.randint(1,2) == 1:
+                    self.grid.vert_wall(width//2-1,height//2,height//2)
+                else:
+                    self.grid.horz_wall(width//2,height//2-1,width//2)
+                placed_dead_ends = {2}
+            else:
+                if tmp == 0:
+                    self.grid.vert_wall(2,height-6,3)
+                    self.grid.horz_wall(1,height-3,1)
+                elif tmp == 1:
+                    self.grid.horz_wall(1,height-3,3)
+                elif tmp == 2:
+                    self.grid.vert_wall(width-3,3,3)
+                    self.grid.horz_wall(width-2,6,2)
+                elif tmp == 3:
+                    self.grid.vert_wall(6,0,2)
+                    self.grid.horz_wall(3,2,3)
+                tmp = (tmp+1)%4
+                placed_dead_ends += 1
+
         # Place water
         placed_water_tiles = 0
+        anti_loop = 0
         while {1} > placed_water_tiles:
+        
+            # Added to avoid a number of water tiles that is impossible (infinite loop)
+            anti_loop +=1
+            if anti_loop > 1000:
+                placed_water_tiles = {1}
             # Minus 2 because grid is zero indexed, and the last one is just a wall
             width_pos = random.randint(1, width - 2)
             height_pos = random.randint(1, height - 2)
@@ -88,9 +120,47 @@ class RandomEnv(ExMiniGridEnv):
                 #                                                                - A W
                 #                                                                - W G
                 continue
+            if isinstance(self.grid.get(width_pos-1, height_pos), Wall):
+                # Do not place water preventing the agent from going into a tunnel
+                continue
+            if isinstance(self.grid.get(width_pos+1, height_pos), Wall):
+                # Do not place water preventing the agent from going into a tunnel
+                continue
+            if isinstance(self.grid.get(width_pos, height_pos-1), Wall):
+                # Do not place water preventing the agent from going into a tunnel
+                continue
+            if isinstance(self.grid.get(width_pos, height_pos+1), Wall):
+                # Do not place water preventing the agent from going into a tunnel
+                continue
+            if isinstance(self.grid.get(width_pos-1, height_pos-1), Wall):
+                # Do not place water preventing the agent from going into a tunnel
+                continue
+            if isinstance(self.grid.get(width_pos-1, height_pos+1), Wall):
+                # Do not place water preventing the agent from going into a tunnel
+                continue
+            if isinstance(self.grid.get(width_pos+1, height_pos-1), Wall):
+                # Do not place water preventing the agent from going into a tunnel
+                continue
+            if isinstance(self.grid.get(width_pos+1, height_pos+1), Wall):
+                # Do not place water preventing the agent from going into a tunnel
+                continue
+            if isinstance(self.grid.get(width_pos, height_pos), Wall):
+                # Do not place water preventing the agent from going into a tunnel
+                continue
             self.grid.set(width_pos, height_pos, Water())
-            placed_water_tiles += 1
+            if self.grid_size < 10 and {2} > 0:
+                placed_water_tiles = {1}
+            else:
+                placed_water_tiles += 1
+                
         self.mission = ""
+
+    def step(self,action):
+        # Reset if agent step on water without knowing it
+        if action == self.actions.forward and self.worldobj_in_agent(1,0) == "water" :
+            return self.gen_obs(), 0, True, "died"
+        else:
+            return super().step(action)
 
 class RandomEnv{0}x{0}_{4}(RandomEnv):
     def __init__(self):
@@ -112,30 +182,86 @@ register(
     # Creates a json config file for the random environment
     with open(configuration_path + "randoms/" + "randomEnv-{0}x{0}-{1}-v0.json".format(grid_size, random_token), 'w') as config:
         rewards = Configuration.grab("rewards/"+rewards)
-        config.write(json.dumps({
+        list_of_json_properties = {}
+        list_of_json_patterns = {}
+        properties_map = {}
+        patterns_map = {}
+        if hasattr(elements,"monitors"):
+            if hasattr(elements.monitors,"properties"):
+                for type in elements.monitors.properties:
+                    for monitor in type:
+                        type_of_monitor = monitor.type
+                        near = 0
+                        immediate = 0
+                        violated = -1
+                        for current_monitor in rewards:
+                            if hasattr(current_monitor, "name"):
+                                if current_monitor.name == type_of_monitor:
+                                    near = current_monitor.near
+                                    immediate = current_monitor.immediate
+                                    violated = current_monitor.violated
+                        list_of_json_properties[monitor.name] = {
+                                "{0}".format(monitor.name): {
+                                    "type": "{0}".format(monitor.type),
+                                    "mode": "{0}".format(monitor.mode),
+                                    "action_planner": "{0}".format(monitor.action_planner),
+                                    "active": True if monitor.active else False,
+                                    "name": "{0}".format(monitor.name),
+                                    "obj_to_avoid": "{0}".format(monitor.obj_to_avoid),
+                                    "act_to_avoid": "{0}".format(monitor.act_to_avoid),
+                                    "rewards": {
+                                        "near": float(
+                                            "{0:.2f}".format(near)),
+                                        "immediate": float(
+                                            "{0:.2f}".format(immediate)),
+                                        "violated": float(
+                                            "{0:.2f}".format(violated)),
+                                    }
+                                }
+                            }
+                        if monitor.type in properties_map:
+                            properties_map[monitor.type].append(monitor.name)
+                        else:
+                            properties_map[monitor.type] = [monitor.name]
+
+        if hasattr(elements,"monitors"):
+            if hasattr(elements.monitors,"patterns"):
+                for type in elements.monitors.patterns:
+                    for monitor in type:
+                        type_of_monitor = monitor.type
+                        respected = 1
+                        violated = -1
+                        for current_monitor in rewards:
+                            if hasattr(current_monitor,"name"):
+                                if current_monitor.name == type_of_monitor:
+                                    respected = current_monitor.respected
+                                    violated = current_monitor.violated
+                        list_of_json_patterns[monitor.name] = {
+                                "{0}".format(monitor.name): {
+                                    "type": "{0}".format(monitor.type),
+                                    "mode": "{0}".format(monitor.mode),
+                                    "active": True if monitor.active else False,
+                                    "name": "{0}".format(monitor.name),
+                                    "conditions":"{0}".format(monitor.conditions) if not hasattr(monitor.conditions,"pre") else {
+                                        "pre":"{0}".format(monitor.conditions.pre),
+                                        "post":"{0}".format(monitor.conditions.post)
+                                    },
+                                    "rewards": {
+                                        "respected": float(
+                                             "{0:.2f}".format(respected)),
+                                        "violated": float(
+                                             "{0:.2f}".format(violated))
+                                    }
+                                }
+                        }
+                        if monitor.type in patterns_map:
+                            patterns_map[monitor.type].append(monitor.name)
+                        else:
+                            patterns_map[monitor.type] = [monitor.name]
+
+        json_object = json.dumps({
             "config_name": "randomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token),
             "algorithm": "a2c",
-            "monitors": {
-                "properties": {
-                    "avoid": {
-                        "water": {
-                            "type": "avoid",
-                            "mode": elements.monitors.properties.avoid.water.mode,
-                            "action_planner": elements.monitors.properties.avoid.water.action_planner,
-                            "active": True,
-                            "obj_to_avoid": elements.monitors.properties.avoid.water.obj_to_avoid,
-                            "act_to_avoid": elements.monitors.properties.avoid.water.act_to_avoid,
-                            "rewards": {
-                                "near": float("{0:.2f}".format(rewards.avoid['near'] if 'near' in rewards.avoid else 0)),
-                                "immediate": float(
-                                    "{0:.2f}".format(rewards.avoid['immediate'] if 'immediate' in rewards.avoid else 0)),
-                                "violated": float(
-                                    "{0:.2f}".format(rewards.avoid['violated'] if 'violated' in rewards.avoid else -1))
-                            }
-                        }
-                    },
-                }
-            },
             "env_name": "MiniGrid-RandomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token),
             "num_processes": 48,
             "num_steps": 5,
@@ -145,17 +271,58 @@ register(
             "evaluation_directory_name": "evaluations",
             "visdom": False,
             "debug_mode": False,
+            "monitors": {
+                "properties": {
+
+                },
+                "patterns":{
+
+                }
+            },
             "rewards": {
                 "standard":{
-                    "goal": float("{0:.2f}".format(rewards.standard['goal'] if 'goal' in rewards.standard else 1)),
-                    "step": float("{0:.2f}".format(rewards.standard['step'] if 'step' in rewards.standard else 0)),
-                    'death': float("{0:.2f}".format(rewards.standard['death'] if 'death' in rewards.standard else -1))
+                    "goal": float("{0:.2f}".format(rewards.standard.goal if hasattr(rewards.standard,'goal') else 1)),
+                    "step": float("{0:.2f}".format(rewards.standard.step if hasattr(rewards.standard,'step')else 0)),
+                    'death': float("{0:.2f}".format(rewards.standard.death if hasattr(rewards.standard,'death') else -1))
                 },
                 "cleaningenv":{
-                    "clean":float("{0:.2f}".format(rewards.cleaningenv['goal'] if 'clean' in rewards.cleaningenv else 0.5))
+                    "clean":float("{0:.2f}".format(rewards.cleaningenv.clean if hasattr(rewards.cleaningenv,'clean') else 0.5))
                 }
             }
-        }, indent=2))
+        }, indent=2)
+
+        d = {}
+        dProperties = {}
+        dPatterns = {}
+
+        for p in properties_map:
+            if isinstance(properties_map[p],str):
+                if p in dProperties:
+                    dProperties[p].update(list_of_json_properties[properties_map[p]])
+                else:
+                    dProperties[p] = list_of_json_properties[properties_map[p]]
+            for value in properties_map[p]:
+                if p in dProperties:
+                    dProperties[p].update(list_of_json_properties[value])
+                else:
+                    dProperties[p] = list_of_json_properties[value]
+        for p in patterns_map:
+            if isinstance(patterns_map[p],str):
+                if p in dPatterns:
+                    dPatterns[p].update(list_of_json_patterns[patterns_map[p]])
+                else:
+                    dPatterns[p] = list_of_json_patterns[patterns_map[p]]
+            else:
+                for value in patterns_map[p]:
+                    if p in dPatterns:
+                        dPatterns[p].update(list_of_json_patterns[value])
+                    else:
+                        dPatterns[p] = list_of_json_patterns[value]
+
+        d = json.loads(json_object)
+        d['monitors']['properties'].update(dProperties)
+        d['monitors']['patterns'].update(dPatterns)
+        config.write(json.dumps(d,sort_keys=True,indent=2))
         config.close()
 
     return "randomEnv-{0}x{0}-{1}-v0.json".format(grid_size, random_token)
