@@ -1,8 +1,9 @@
 {
   "grid_size": 10,
   "n_water": 5,
-  "n_deadend": 0,
-  "light_switch": false,
+  "n_deadend": 4,
+  "light_switch": true,
+  "random_each_episode": false,
   "monitors": {
     "properties": {
       "avoid": {
@@ -14,6 +15,50 @@
           "name": "water",
           "obj_to_avoid": "water",
           "act_to_avoid": "Actions.forward"
+        },
+        "vase": {
+          "type": "avoid",
+          "mode": "enforcing",
+          "action_planner": "wait",
+          "active": false,
+          "name": "vase",
+          "obj_to_avoid": "vase",
+          "act_to_avoid": "Actions.toggle"
+        }
+      }
+    },
+    "patterns": {
+      "precedence": {
+        "precedence_1": {
+          "type": "precedence",
+          "mode": "shaping",
+          "active": false,
+          "name": "lightPrecedence",
+          "conditions": {
+            "pre": "light-switch-turned-on",
+            "post": "entering-a-room"
+          }
+        }
+      },
+      "response": {
+        "response_1": {
+          "type": "response",
+          "mode": "shaping",
+          "active": false,
+          "name": "lightResponse",
+          "conditions": {
+            "pre": "light-switch-turned-on",
+            "post": "entering-a-room"
+          }
+        }
+      },
+      "universality": {
+        "universality_1": {
+          "type": "universality",
+          "mode": "shaping",
+          "active": false,
+          "name": "lightUniversality",
+          "conditions": "light-on-current-room"
         }
       }
     }

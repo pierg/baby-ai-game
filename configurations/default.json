@@ -50,6 +50,7 @@
       }
     }
   },
+  "action_planner": true,
   "env_name": "MiniGrid-Safety-10x10-v0",
   "num_processes": 48,
   "num_steps": 5,

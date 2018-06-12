@@ -16,7 +16,6 @@ try:
     import gym_minigrid
     from gym_minigrid.wrappers import *
     from gym_minigrid.envelopes import *
-
 except:
     pass
 
