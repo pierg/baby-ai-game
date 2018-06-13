@@ -259,10 +259,11 @@ class RandomEnv(ExMiniGridEnv):
             else:
                 placed_water_tiles += 1
         
-        if {3}:
-            # transfert the position of the objects in the room in tha dark for visual  
-            tab = self.saveElements(self.roomList[1])
-            switchRoom.elements_in_room(tab)
+        if lightswitch_is_posed:
+            if {3}:
+                # transfert the position of the objects in the room in tha dark for visual  
+                tab = self.saveElements(self.roomList[1])
+                switchRoom.elements_in_room(tab)
                 
         self.mission = ""
 
