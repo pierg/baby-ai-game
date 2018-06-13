@@ -9,19 +9,19 @@ while getopts ":tre:w:" opt; do
     case ${opt} in
         r)
             random=1
-            start_training=0
+            start_training=1
             ;;
         t)
             configuration_file=${OPTARG}
-            start_training=0
+            start_training=1
             ;;
         e)
             environment=${OPTARG}
-            start_training=0
+            start_training=1
             ;;
         w)
             reward=${OPTARG}
-            start_training=0
+            start_training=1
             ;;
     esac
 done
