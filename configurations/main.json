@@ -1,8 +1,8 @@
 {
   "algorithm": "a2c",
-  "config_name": "Unsafe-Random-10-GOAP-1",
+  "config_name": "Unsafe-RandomLevels-GOAP-1",
   "debug_mode": false,
-  "env_name": "MiniGrid-UnsafeLava-9x7-v0",
+  "env_name": "MiniGrid-UnsafeRandomLevels-8x8-v0",
   "evaluation_directory_name": "evaluations",
   "log_interval": 10,
   "action_planning":{
