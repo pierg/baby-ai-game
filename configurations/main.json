@@ -2,7 +2,7 @@
   "algorithm": "a2c",
   "config_name": "randomEnv-20x20-2133-v0",
   "debug_mode": false,
-  "env_name": "MiniGrid-RandomEnv-20x20-2133-v0",
+  "env_name": "MiniGrid-BigEnv-24x24-v0",
   "evaluation_directory_name": "evaluations",
   "log_interval": 10,
   "monitors": {
