@@ -46,18 +46,20 @@ def plot_result(scale,tab,fileName,resultFileName):
         plt.figure()
         color = 'g'
         i += 1
-        ymax = max(array[i])
-        xpos = array[i].index(ymax)
-        xmax = array[0][xpos]
-        plt.plot(array[0], array[i],color,label=x)
-        plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax-1 if ymax < 5 else ymax+5))
+        if len(array[i])>0:
+            ymax = max(array[i])
+            xpos = array[i].index(ymax)
+            xmax = array[0][xpos]
+            plt.plot(array[0], array[i],color,label=x)
+            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax-1 if ymax < 5 else ymax+5))
         i += 1
-        color = 'b'
-        ymax = max(array[i])
-        xpos = array[i].index(ymax)
-        xmax = array[0][xpos]
-        plt.plot(array[0], array[i],color,label=y)
-        plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax-1 if ymax < 5 else ymax+5))
+        if len(array[i])>0:
+            color = 'b'
+            ymax = max(array[i])
+            xpos = array[i].index(ymax)
+            xmax = array[0][xpos]
+            plt.plot(array[0], array[i],color,label=y)
+            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax-1 if ymax < 5 else ymax+5))
         if z:
             area_top = []
             area_bot = []
@@ -65,7 +67,6 @@ def plot_result(scale,tab,fileName,resultFileName):
                 area_top.append(array[i-1][j] + array[i][j])
                 area_bot.append(array[i-1][j] - array[i][j])
             plt.fill_between(array[0], area_bot, area_top, color="skyblue", alpha=0.4)
-        plt.legend()
         plt.title(title)
         plt.xlabel('N Updates')
         plt.savefig(pp,format='pdf')
@@ -75,7 +76,6 @@ def plot_result(scale,tab,fileName,resultFileName):
     if img is not None:
         if "main" in img:
             screenHelper.main()
-        print("found ", img)
         img = plt.imread(img)
         plt.imshow(img)
         plt.savefig(pp, format='pdf')
@@ -121,10 +121,8 @@ def get_image_from_name(path,my_file):
                     return "results/screens/crafted/"+config.env_name+".png"
                 return "results/screens/"+config.env_name+".png"
     if "crafted" not in path and "randoms" not in path:
-        print("go to crafted",my_file)
         return get_image_from_name("configurations/crafted/*",my_file)
     elif "randoms" not in path:
-        print("go to randoms", my_file)
         return get_image_from_name("configurations/randoms/*",my_file)
     else:
         return None

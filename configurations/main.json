@@ -1,8 +1,8 @@
 {
   "algorithm": "a2c",
-  "config_name": "randomEnv-20x20-2133-v0",
+  "config_name": "MiniGrid-Unsafe-6x6-v0",
   "debug_mode": false,
-  "env_name": "MiniGrid-BigEnv-24x24-v0",
+  "env_name": "MiniGrid-Unsafe-6x6-v0",
   "evaluation_directory_name": "evaluations",
   "log_interval": 10,
   "monitors": {
@@ -72,7 +72,7 @@
         "water": {
           "act_to_avoid": "Actions.forward",
           "action_planner": "wait",
-          "active": false,
+          "active": true,
           "mode": "enforcing",
           "name": "water",
           "obj_to_avoid": "water",
