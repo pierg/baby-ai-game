@@ -31,6 +31,10 @@ if args.recurrent_policy:
     assert args.algo in ['a2c', 'ppo'], 'Recurrent policy is not implemented for ACKTR'
 
 num_updates = int(args.num_frames) // args.num_steps // args.num_processes
+
+if args.stop:
+    num_updates = int(args.stop)
+
 torch.manual_seed(args.seed)
 if args.cuda:
     torch.cuda.manual_seed(args.seed)
@@ -43,7 +47,6 @@ except OSError:
         os.remove(f)
 
 def main():
-
     # Getting configuration from file
     config = cg.Configuration.grab()
 
@@ -53,7 +56,7 @@ def main():
     args.env_name = config.env_name
     args.algo = config.algorithm
     args.vis = config.visdom
-
+    print(num_updates)
     # Initializing evaluation
     evaluator = Evaluator()
 

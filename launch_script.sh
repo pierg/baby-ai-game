@@ -5,7 +5,7 @@
 configuration_file="main.json"
 start_training=0
 
-while getopts ":tre:w:" opt; do
+while getopts ":tre:w:s:" opt; do
     case ${opt} in
         r)
             random=1
@@ -23,41 +23,40 @@ while getopts ":tre:w:" opt; do
             reward=${OPTARG}
             start_training=1
             ;;
+        s)
+            stop=${OPTARG}
+            start_training=1
+            ;;
     esac
 done
 shift $((OPTIND -1))
 
-if [ $random ]
-    then
-        if [ $environment ]
-            then
-                if [ $reward ]
-                then
-                    echo "...creating a random environment... using $environment and $reward"
-                    configuration_file=`python3 env_generator.py --environment_file $environment --rewards_file $reward`
-                else
-                    echo "...creating a random environment... using $environment"
-                    configuration_file=`python3 env_generator.py --environment_file $environment --rewards_file "default"`
-                fi
-        elif [ $reward ]
-            then
-                echo "...creating a random environment... using $reward"
-                configuration_file=`python3 env_generator.py --environment_file "default" --rewards_file $reward`
+if [ $random ]; then
+    if [ $environment ]; then
+        if [ $reward ]; then
+            echo "...creating a random environment... using $environment and $reward"
+            configuration_file=`python3 env_generator.py --environment_file $environment --rewards_file $reward`
         else
-            echo "...creating a random environment..."
-            echo "...creating environment with grid_size 6, number of water tiles 3, max block size 1, with default reward config"
-            configuration_file=`python3 env_generator.py --environment_file "default" --rewards_file "default"`
+            echo "...creating a random environment... using $environment"
+            configuration_file=`python3 env_generator.py --environment_file $environment --rewards_file "default"`
         fi
-        configuration_file="randoms/$configuration_file"
+    elif [ $reward ]; then
+        echo "...creating a random environment... using $reward"
+        configuration_file=`python3 env_generator.py --environment_file "default" --rewards_file $reward`
+    else
+        echo "...creating a random environment..."
+        echo "...creating environment with grid_size 6, number of water tiles 3, max block size 1, with default reward config"
+        configuration_file=`python3 env_generator.py --environment_file "default" --rewards_file "default"`
+    fi
+    configuration_file="randoms/$configuration_file"
 else
-        configuration_file=${1:-"main.json"}
+    configuration_file=${1:-"main.json"}
 fi
 
 echo "...environment name is..."
 echo $configuration_file
 
-if [ $configuration_file -eq "main.json" ]
-  then
+if [ $configuration_file -eq "main.json" ]; then
     echo "using default configuration file: $configuration_file"
 else
     echo "...updating selected configuration file..."
@@ -78,11 +77,13 @@ echo "...setting up python environment..."
 PYTHONPATH=../gym-minigrid/:../gym-minigrid/gym_minigrid/:./configurations:./:$PYTHONPATH
 export PYTHONPATH
 
+if ! [ $stop ]; then
+    stop=0
+fi
 
-if [ $start_training -eq 1 ]
-  then
+if [ $start_training -eq 1 ]; then
     echo "...launching the training..."
-    python3 ./pytorch_rl/main.py
+    python3 ./pytorch_rl/main.py --stop $stop
 else
     echo "environment ready!"
     /bin/bash
