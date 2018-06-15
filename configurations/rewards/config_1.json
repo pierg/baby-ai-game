@@ -17,7 +17,7 @@
   },
   "universality":{
     "name":"universality",
-    "respected": 0.2,
+    "respected": 0,
     "violated": -0.2
   },
   "response":{

@@ -30,10 +30,12 @@ def generate_environment(environment="default", rewards="default"):
     n_deadend = elements.n_deadend
     light_switch = elements.light_switch
     random_each_episode = elements.random_each_episode
+    rewards = Configuration.grab("rewards/" + rewards)
     with open(environment_path + "randoms/" + "randomenv{0}.py".format(random_token), 'w') as env:
         env.write("""
 from gym_minigrid.extendedminigrid import *
 from gym_minigrid.register import register
+
 import random
 
 class RandomEnv(ExMiniGridEnv):
@@ -270,7 +272,7 @@ class RandomEnv(ExMiniGridEnv):
     def step(self,action):
         # Reset if agent step on water without knowing it
         if action == self.actions.forward and self.worldobj_in_agent(1,0) == "water" :
-            return self.gen_obs(), 0, True, "died"
+            return self.gen_obs(), {6}, True, "died"
         else:
             return super().step(action)
 
@@ -282,7 +284,7 @@ register(
     id='MiniGrid-RandomEnv-{0}x{0}-{4}-v0',
     entry_point='gym_minigrid.envs:RandomEnv{0}x{0}_{4}'
 )
-""".format(grid_size, n_water, n_deadend, light_switch, random_token, random_each_episode))
+""".format(grid_size, n_water, n_deadend, light_switch, random_token, random_each_episode, rewards.standard.death))
         env.close()
     # Adds the import statement to __init__.py in the envs folder in gym_minigrid,
     # otherwise the environment is unavailable to use.
@@ -293,7 +295,6 @@ register(
 
     # Creates a json config file for the random environment
     with open(configuration_path + "randoms/" + "randomEnv-{0}x{0}-{1}-v0.json".format(grid_size, random_token), 'w') as config:
-        rewards = Configuration.grab("rewards/"+rewards)
         list_of_json_properties = {}
         list_of_json_patterns = {}
         properties_map = {}
