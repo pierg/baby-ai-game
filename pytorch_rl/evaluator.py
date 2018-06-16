@@ -106,19 +106,19 @@ class Evaluator:
         for i in range(0, len(info)):
             if len(info[i])>0:
                 if info[i][0] == "died":
-                    self.n_proccess_reached_goal[i]= 0
+                    self.n_proccess_reached_goal[i] = 0
                     self.N_death += 1
                     self.Total_death += 1
                     self.N_Total_episodes += 1
                 elif info[i][0] == "goal":
-                    self.n_proccess_reached_goal[i]= 1
+                    self.n_proccess_reached_goal[i] = 1
                     self.N_Total_episodes += 1
                 elif info[i] == "goal+plan_finished":
                     self.n_proccess_reached_goal[i] = 1
                     self.N_plan_finished += 1
-                elif info[i][0] == "violation":
+                    self.N_Total_episodes += 1
+                elif info[i] == "violation":
                     self.N_violation += 1
-                    self.n_proccess_reached_goal[i] = 0
                 elif info[i][0] == "end":
                     self.n_proccess_reached_goal[i] = 0
                     self.N_death_by_end += 1
