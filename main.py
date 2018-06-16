@@ -261,7 +261,7 @@ class AIGameWindow(QMainWindow):
 
             obs = env2.gen_obs()
             img = obs['image'] if isinstance(obs, dict) else obs
-            obsGrid = minigrid.Grid.decode(img)
+            obsGrid = ExGrid.Grid.decode(img)
 
             datum = {
                 'desc': desc,
@@ -380,7 +380,8 @@ def main(argv):
     # Load the gym environment
     env = gym.make(options.env_name)
 
-    #if (config.monitors): env = SafetyEnvelope(env)
+    if config.monitors:
+        env = SafetyEnvelope(env)
 
     # Create the application window
     app = QApplication(sys.argv)
