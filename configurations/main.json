@@ -8,6 +8,7 @@
   "action_planning":{
     "active": true,
     "random_unsafe_obj": 60,
+    "secondary_goals": [],
     "reward": {
       "goal": 1,
       "step": -0.005,
