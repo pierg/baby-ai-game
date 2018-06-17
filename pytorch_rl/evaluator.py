@@ -51,7 +51,8 @@ class Evaluator:
                                   'N_break',
                                   'Plan_created',
                                   'Plan_finished',
-                                  'Plan_followed %'
+                                  'Plan_followed %',
+                                  'N_violations_diff'
                                   ]),
 
         # Evaluation variables
@@ -77,6 +78,7 @@ class Evaluator:
         self.N_saved = 0
         self.N_Total_episodes = 0
         self.N_break = 0
+        self.N_violation_diff = 0
 
     def update(self, reward, done, info, numberOfStepPerEpisode):
         reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
@@ -118,6 +120,7 @@ class Evaluator:
                     self.N_plan_finished += 1
                     self.N_Total_episodes += 1
                 elif info[i] == "violation":
+                    self.N_violation_diff += 1
                     self.N_violation += 1
                 elif info[i][0] == "end":
                     self.n_proccess_reached_goal[i] = 0
@@ -173,15 +176,16 @@ class Evaluator:
                                  self.N_break,
                                  self.N_plan_created,
                                  self.N_plan_finished,
-                                 self.avg_pcn_plan_followed
+                                 self.avg_pcn_plan_followed,
+                                 self.N_violation_diff
                                  ]),
+        self.N_violation_diff = 0
 
-    def visdom(self):
+    def visdom(self, n_updates):
         visdom_plot(
-            self.total_num_steps,
+            (n_updates + 1) * self.config.num_processes * self.config.num_steps,
             self.final_rewards.mean(),
-            self.N_violation,
-            self.N_plan_created,
-            self.N_plan_finished,
-            self.avg_pcn_plan_followed
+            self.N_violation_diff,
+            self.N_goal_reached,
+            self.numberOfStepAverage
         )

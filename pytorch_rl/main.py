@@ -263,6 +263,9 @@ def main():
 
             torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
 
+        if args.vis and j % args.vis_interval == 0:
+            evaluator.visdom(j)
+
         if j % args.log_interval == 0:
             end = time.time()
             total_num_steps = (j + 1) * args.num_processes * args.num_steps
@@ -285,8 +288,7 @@ def main():
                 )
             )
 
-        if args.vis and j % args.vis_interval == 0:
-            evaluator.visdom()
+
 
 if __name__ == "__main__":
     main()

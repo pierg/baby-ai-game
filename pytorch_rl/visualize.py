@@ -7,6 +7,8 @@ win2 = None
 X = []
 Y = []
 Y2 = []
+Y3 = []
+Y4 = []
 
 X_followed = []
 
@@ -18,9 +20,8 @@ def visdom_plot(
         total_num_steps,
         mean_reward,
         n_violation,
-        created,
-        finished,
-        followed
+        goal_reached,
+        average_steps
 ):
     # Lazily import visdom so that people don't need to install visdom
     # if they're not actually using it
@@ -33,23 +34,16 @@ def visdom_plot(
     global followed_avg
 
     if vis is None:
-        vis = Visdom(use_incoming_socket=False, server="http://localhost")
+        vis = Visdom(use_incoming_socket=False, server="http://129.192.68.229")
         assert vis.check_connection()
         # Close all existing plots
         vis.close()
 
-    violation_change = n_violation - last_violations
-    last_violations = n_violation
-
     X.append(total_num_steps)
     Y.append(mean_reward)
-    Y2.append(violation_change)
-
-    if followed > 0:
-        X_followed.append(followed)
-
-    if len(X_followed) > 0:
-        followed_avg = sum(X_followed) / len(X_followed)
+    Y2.append(n_violation)
+    Y3.append(goal_reached)
+    Y4.append(average_steps)
 
     # The plot with the handle 'win' is updated each time this is called
     win = vis.line(
@@ -57,7 +51,7 @@ def visdom_plot(
         Y=np.array(Y),
         name='reward mean',
         opts=dict(
-            title='Mantas',
+            title='Random Scenario with GOAP',
             xlabel='Total time steps',
             ytickmin=0,
             width=900,
@@ -71,6 +65,20 @@ def visdom_plot(
         win=win,
         name='violations',
         update='append'
+    ),
+    vis.line(
+        X=np.array(X),
+        Y=np.array(Y3),
+        name='goal',
+        update='append',
+        win=win
+    ),
+    vis.line(
+        X=np.array(X),
+        Y=np.array(Y4),
+        name='average_n_steps',
+        update='append',
+        win=win
     )
 
     # win2 = vis.bar(
