@@ -12,7 +12,7 @@
     "reward": {
       "goal": 100,
       "step": -0.5,
-      "unsafe":-50,
+      "unsafe":-30,
       "on_plan": 5,
       "off_plan": -4.9
     }
