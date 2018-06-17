@@ -1,4 +1,5 @@
 import numpy as np
+from configurations import config_grabber as cg
 
 vis = None
 win = None
@@ -33,6 +34,8 @@ def visdom_plot(
     global last_violations
     global followed_avg
 
+    config = cg.Configuration.grab()
+
     if vis is None:
         vis = Visdom(use_incoming_socket=False, server="http://129.192.68.229")
         assert vis.check_connection()
@@ -45,13 +48,21 @@ def visdom_plot(
     Y3.append(goal_reached)
     Y4.append(average_steps)
 
+    title = ""
+    if config.env_name == "MiniGrid-UnsafeEnv-12x12-v0":
+        title += "Random Scenario"
+    if config.action_planning.active:
+        title += " with GOAP"
+    else:
+        title += " without GOAP"
+
     # The plot with the handle 'win' is updated each time this is called
     win = vis.line(
         X=np.array(X),
         Y=np.array(Y),
         name='reward mean',
         opts=dict(
-            title='Random Scenario with GOAP',
+            title=title,
             xlabel='Total time steps',
             ytickmin=0,
             width=900,
