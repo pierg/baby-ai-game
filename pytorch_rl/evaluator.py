@@ -112,10 +112,10 @@ class Evaluator:
                     self.N_death += 1
                     self.Total_death += 1
                     self.N_Total_episodes += 1
-                elif info[i][0] == "goal":
+                elif info[i][0] == "goal+end":
                     self.n_proccess_reached_goal[i] = 1
                     self.N_Total_episodes += 1
-                elif info[i] == "goal+plan_finished":
+                elif info[i] == "goal+plan_finished+end":
                     self.n_proccess_reached_goal[i] = 1
                     self.N_plan_finished += 1
                     self.N_Total_episodes += 1
