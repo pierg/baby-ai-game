@@ -136,7 +136,7 @@ def main():
                 if done[x]:
                     numberOfStepBeforeDone[x] = (j*args.num_steps+step+1) - stepOnLastGoal[x]
                     stepOnLastGoal[x] = (j*args.num_steps+step+1)
-            evaluator.update(reward, done, info,numberOfStepBeforeDone)
+            evaluator.update(reward, done, info, numberOfStepBeforeDone)
 
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
             episode_rewards += reward
