@@ -355,6 +355,7 @@ class AIGameWindow(QMainWindow):
             action = random.randint(0, self.env.action_space.n - 1)
 
         obs, reward, done, info = self.env.step(action)
+        print("Reward: " + str(reward) + " Info: " + str(info))
 
         self.showEnv(obs)
         self.lastObs = obs
