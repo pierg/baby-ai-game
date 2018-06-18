@@ -49,12 +49,15 @@ def visdom_plot(
     Y4.append(average_steps)
 
     title = ""
+    punishment = config.action_planning.reward.unsafe
     if config.env_name == "MiniGrid-UnsafeEnv-12x12-v0":
         title += "Random Scenario"
     if config.action_planning.active:
         title += " with GOAP"
     else:
-        title += " without GOAP"
+        title += " without GOAP "
+
+    title += str(punishment) + " Reward"
 
     # The plot with the handle 'win' is updated each time this is called
     win = vis.line(
