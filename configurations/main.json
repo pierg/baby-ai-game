@@ -13,8 +13,8 @@
       "goal": 100,
       "step": -0.5,
       "unsafe":-30,
-      "on_plan": 10,
-      "off_plan": -5
+      "on_plan": 5,
+      "off_plan": -4.9
     }
   },
   "monitors": {
