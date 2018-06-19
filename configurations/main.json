@@ -7,7 +7,7 @@
   "log_interval": 10,
   "action_planning":{
     "active": true,
-    "random_unsafe_obj": 60,
+    "random_unsafe_obj": 27,
     "secondary_goals": [],
     "reward": {
       "goal": 100,
