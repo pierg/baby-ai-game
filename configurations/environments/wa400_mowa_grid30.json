@@ -1,9 +1,9 @@
 {
-  "grid_size": 16,
-  "n_water": 10,
+  "grid_size": 30,
+  "n_water": 400,
   "n_deadend": 0,
-  "light_switch": false,
-  "random_each_episode": true,
+  "light_switch": true,
+  "random_each_episode": false,
   "stop_learning":960,
   "monitors": {
     "properties": {
