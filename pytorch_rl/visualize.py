@@ -51,7 +51,9 @@ def visdom_plot(
     title = ""
     punishment = config.action_planning.reward.unsafe
     if config.env_name == "MiniGrid-UnsafeEnv-12x12-v0":
-        title += "Random Scenario"
+        title += "Random Scenario 12X12"
+    elif config.env_name == "Minigrid-UnsafeEnv-8x8-v0":
+        title += "Random Scenario 8X8"
     if config.action_planning.active:
         title += " with GOAP"
     else:
