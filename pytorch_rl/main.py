@@ -56,6 +56,7 @@ def main():
     args.env_name = config.env_name
     args.algo = config.algorithm
     args.vis = config.visdom
+    stop_learning = config.stop_learning
     print(num_updates)
     # Initializing evaluation
     evaluator = Evaluator()
@@ -119,12 +120,18 @@ def main():
     # These variables are used to compute average rewards for all processes.
     episode_rewards = torch.zeros([args.num_processes, 1])
     final_rewards = torch.zeros([args.num_processes, 1])
-
+    last_reward_mean = 0
+    current_reward_mean = 0
+    identical_rewards = 0
+    first_time = True
     if args.cuda:
         current_obs = current_obs.cuda()
         rollouts.cuda()
     start = time.time()
     for j in range(num_updates):
+        if identical_rewards == stop_learning:
+            print("stop learning")
+            break
         for step in range(args.num_steps):
             # Sample actions
             value, action, action_log_prob, states = actor_critic.act(
@@ -142,6 +149,19 @@ def main():
                     stepOnLastGoal[x] = (j*args.num_steps+step+1)
             evaluator.update(reward, done, info,numberOfStepBeforeDone)
 
+            if stop_learning:
+                if first_time:
+                    first_time = False
+                    last_reward_mean = evaluator.get_reward_mean()
+                else:
+                    current_reward_mean = evaluator.get_reward_mean()
+                    if current_reward_mean == last_reward_mean:
+                        identical_rewards += 1
+                    else:
+                        identical_rewards = 0
+                    last_reward_mean = current_reward_mean
+            if identical_rewards == stop_learning:
+                break
             reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
             episode_rewards += reward
 
