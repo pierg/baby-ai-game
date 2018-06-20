@@ -1,12 +1,12 @@
 {
   "algorithm": "a2c",
-  "config_name": "Unsafe-Random8x8-GOAP-1",
+  "config_name": "Unsafe-Random8x8-NOGOAP-1",
   "debug_mode": false,
   "env_name": "MiniGrid-UnsafeEnv-8x8-v0",
   "evaluation_directory_name": "evaluations",
   "log_interval": 10,
   "action_planning":{
-    "active": true,
+    "active": false,
     "random_unsafe_obj": 27,
     "secondary_goals": [],
     "reward": {
