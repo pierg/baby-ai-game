@@ -1,36 +1,34 @@
 {
   "algorithm": "a2c",
-  "config_name": "randomEnv-20x20-1847-v0",
+  "config_name": "randomEnv-6x6-626-v0",
   "debug_mode": false,
-  "env_name": "MiniGrid-RandomEnv-20x20-1847-v0",
+  "env_name": "MiniGrid-RandomEnv-6x6-626-v0",
   "evaluation_directory_name": "evaluations",
   "log_interval": 10,
   "monitors": {
     "patterns": {
       "absence": {
         "waterAbsence": {
-          "active": false,
+          "active": true,
           "conditions": "stepping-on-water",
           "mode": "enforcing",
-          "action_planner" : "wait",
           "name": "waterAbsence",
           "rewards": {
-            "respected": 1.0,
-            "violated": -1.0
+            "respected": 0.1,
+            "violated": -0.1
           },
           "type": "absence"
         }
       },
       "precedence": {
         "lightPrecedence": {
-          "active": true,
+          "active": false,
           "conditions": {
             "post": "entering-a-room",
             "pre": "light-switch-turned-on"
           },
-          "mode": "enforcing",
-          "action_planner" : "turn_right",
-          "name": "doorPrecedence",
+          "mode": "shaping",
+          "name": "lightPrecedence",
           "rewards": {
             "respected": 0.1,
             "violated": -0.1
@@ -42,11 +40,10 @@
         "lightResponse": {
           "active": false,
           "conditions": {
-            "post": "light-switch-turned-on",
-            "pre": "light-switch-in-front-off"
+            "post": "entering-a-room",
+            "pre": "light-switch-turned-on"
           },
-          "mode": "enforcing",
-          "action_planner" : "toggle_light",
+          "mode": "shaping",
           "name": "lightResponse",
           "rewards": {
             "respected": 0.3,
@@ -73,7 +70,7 @@
   },
   "num_processes": 48,
   "num_steps": 4,
-  "number_of_iteration": 3,
+  "number_of_iteration": 20,
   "on_violation_reset": false,
   "rendering": false,
   "rewards": {

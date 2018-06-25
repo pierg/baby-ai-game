@@ -44,9 +44,20 @@ def plot_result(scale,tab,fileName,resultFileName):
                 else:
                     for i in range(0,len(tab)*2 + 1):
                         array[t][i].append((float(row[column_number[i]])))
-        mean_array = mean_array + array[t]
+            for i in range(0, len(tab) * 2 + 1):
+                for j in range(0,len(array[t][i])):
+                    if j < len(mean_array[i]) and len(mean_array[i]) != 0:
+                        mean_array[i][j][0] = (mean_array[i][j][0]*mean_array[i][j][1] + array[t][i][j])/(mean_array[i][j][1] + 1)
+                        mean_array[i][j][1] += 1
+                    else:
+                        mean_array[i].append([array[t][i][j],1])
 
-    print(mean_array[0])
+    for t in range(0, len(mean_array[0])):
+        for j in range(len(mean_array)):
+            mean_array[j][t] = mean_array[j][t][0]
+
+
+
 
     i = 1
     for x, y, z in tab:
@@ -57,15 +68,22 @@ def plot_result(scale,tab,fileName,resultFileName):
                 ymax = max(array[t][i])
                 xpos = array[t][i].index(ymax)
                 xmax = array[t][0][xpos]
-                plt.plot(array[t][0], array[t][i],color,label=x)
+                if t == 0 :
+                    plt.plot(array[t][0], array[t][i],color,label=x)
+                else:
+                    plt.plot(array[t][0], array[t][i], color)
                 plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax-1 if ymax < 5 else ymax+5))
             if len(array[t][i + 1])>0:
                 color = 'b'
                 ymax = max(array[t][i + 1])
                 xpos = array[t][i + 1].index(ymax)
                 xmax = array[t][0][xpos]
-                plt.plot(array[t][0], array[t][i + 1],color,label=y)
+                if t == 0:
+                    plt.plot(array[t][0], array[t][i + 1],color,label=y)
+                else:
+                    plt.plot(array[t][0], array[t][i + 1], color)
                 plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax-1 if ymax < 5 else ymax+5))
+
             if z:
                 area_top = []
                 area_bot = []
@@ -73,6 +91,31 @@ def plot_result(scale,tab,fileName,resultFileName):
                     area_top.append(array[t][i][k] + array[t][i + 1][k])
                     area_bot.append(array[t][i][k] - array[t][i + 1][k])
                 plt.fill_between(array[t][0], area_bot, area_top, color="skyblue", alpha=0.4)
+
+        color = 'r'
+        if len(mean_array[i]) > 0:
+            ymax = max(mean_array[i])
+            xpos = mean_array[i].index(ymax)
+            xmax = mean_array[0][xpos]
+            plt.plot(mean_array[0], mean_array[i], color, linewidth = 2.5, label=x + "_mean")
+            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax - 1 if ymax < 5 else ymax + 5))
+        if len(mean_array[i + 1]) > 0:
+            color = 'y'
+            ymax = max(mean_array[i + 1])
+            xpos = mean_array[i + 1].index(ymax)
+            xmax = mean_array[0][xpos]
+            ymax = ymax
+            plt.plot(mean_array[0], mean_array[i + 1], color, linewidth = 2.5,label=y + "_mean")
+            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax - 1 if ymax < 5 else ymax + 5))
+
+        if z:
+            area_top = []
+            area_bot = []
+            for k in range(0, len(mean_array[i + 1])):
+                area_top.append(mean_array[i][k] + mean_array[i + 1][k])
+                area_bot.append(mean_array[i][k] - mean_array[i + 1][k])
+            plt.fill_between(mean_array[0], area_bot, area_top, color="skyblue", alpha=0.4)
+
 
         i += 2
 

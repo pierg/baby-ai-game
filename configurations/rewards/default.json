@@ -4,11 +4,10 @@
     "step": 0,
     "death": -1
   },
-  "avoid":{
-    "name":"avoid",
-    "near": 0,
-    "immediate": 0,
-    "violated": -1
+  "absence":{
+    "name":"absence",
+    "respected": 0.1,
+    "violated": -0.1
   },
   "precedence":{
     "name":"precedence",

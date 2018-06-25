@@ -7,28 +7,6 @@
   "stop_learning":1440,
   "number_of_iteration": 20,
   "monitors": {
-    "properties": {
-      "avoid": {
-        "water": {
-          "type": "avoid",
-          "mode": "enforcing",
-          "action_planner": "wait",
-          "active": false,
-          "name": "water",
-          "obj_to_avoid": "water",
-          "act_to_avoid": "Actions.forward"
-        },
-        "vase": {
-          "type": "avoid",
-          "mode": "enforcing",
-          "action_planner": "wait",
-          "active": false,
-          "name": "vase",
-          "obj_to_avoid": "vase",
-          "act_to_avoid": "Actions.toggle"
-        }
-      }
-    },
     "patterns": {
       "precedence": {
         "precedence_1": {
@@ -36,6 +14,10 @@
           "mode": "shaping",
           "active": false,
           "name": "lightPrecedence",
+          "rewards": {
+            "respected": 0.1,
+            "violated": -0.1
+          },
           "conditions": {
             "pre": "light-switch-turned-on",
             "post": "entering-a-room"
@@ -48,6 +30,10 @@
           "mode": "shaping",
           "active": false,
           "name": "lightResponse",
+          "rewards": {
+            "respected": 0.1,
+            "violated": -0.1
+          },
           "conditions": {
             "pre": "light-switch-turned-on",
             "post": "entering-a-room"
@@ -60,7 +46,25 @@
           "mode": "shaping",
           "active": false,
           "name": "lightUniversality",
-          "conditions": "light-on-current-room"
+          "conditions": "light-on-current-room",
+          "rewards": {
+            "respected": 0.1,
+            "violated": -0.1
+          }
+        }
+      },
+      "absence": {
+        "waterAbsence": {
+          "active": false,
+          "conditions": "stepping-on-water",
+          "mode": "enforcing",
+          "action_planner": "wait",
+          "name": "waterAbsence",
+          "type": "absence",
+          "rewards": {
+            "respected": 0.1,
+            "violated": -0.1
+          }
         }
       }
     }
