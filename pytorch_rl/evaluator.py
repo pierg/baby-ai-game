@@ -11,13 +11,15 @@ import os
 
 class Evaluator:
     
-    def __init__(self):
+    def __init__(self, number = 0):
         # Getting configuration from file
         self.config = cg.Configuration.grab()
 
         config_file_path = os.path.abspath(__file__ + "/../../"
                                            + self.config.evaluation_directory_name + "/"
                                            + self.config.config_name
+                                           +"_" 
+                                           + str(number)
                                            + ".csv")
 
         dirname = os.path.dirname(config_file_path)

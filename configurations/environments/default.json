@@ -4,7 +4,8 @@
   "n_deadend": 2,
   "light_switch": true,
   "random_each_episode": true,
-  "stop_learning":480,
+  "stop_learning":1440,
+  "number_of_iteration": 20,
   "monitors": {
     "properties": {
       "avoid": {

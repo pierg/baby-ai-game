@@ -382,6 +382,7 @@ register(
             "on_violation_reset": False,
             "rendering": False,
             "stop_learning": int("{0}".format(elements.stop_learning)),
+            "number_of_iteration": int("{0}".format(elements.number_of_iteration)),
             "evaluation_directory_name": "evaluations",
             "visdom": False,
             "debug_mode": False,
