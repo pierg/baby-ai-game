@@ -51,8 +51,8 @@ def main():
     config = cg.Configuration.grab()
 
     # Getting the number of iteration with configuration file
-    if hasattr(cg.Configuration.grab(), "number_of_iteration"):
-        number_of_iteration = cg.Configuration.grab().number_of_iteration
+    if hasattr(config, "number_of_iteration"):
+        number_of_iteration = config.number_of_iteration
     else:
         number_of_iteration = 1
 
@@ -191,7 +191,8 @@ def main():
                     current_obs *= masks
 
                 update_current_obs(obs)
-                rollouts.insert(step, current_obs, states.data, action.data, action_log_prob.data, value.data, reward, masks)
+                rollouts.insert(step, current_obs, states.data, action.data, action_log_prob.data, value.data, reward,
+                            masks)
 
             next_value = actor_critic(
                 Variable(rollouts.observations[-1], volatile=True),
@@ -282,7 +283,7 @@ def main():
             if j % args.save_interval == 0 and args.save_dir != "":
                 save_path = os.path.join(args.save_dir, args.algo)
                 try:
-                    os.makedirs(save_path + '_' + str(k))
+                    os.makedirs(save_path)
                 except OSError:
                     pass
 
@@ -293,7 +294,6 @@ def main():
 
                 save_model = [save_model,
                                 hasattr(envs, 'ob_rms') and envs.ob_rms or None]
-
                 torch.save(save_model, os.path.join(save_path, args.env_name + ".pt"))
 
             if j % args.log_interval == 0:

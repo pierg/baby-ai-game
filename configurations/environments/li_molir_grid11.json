@@ -11,7 +11,8 @@
       "precedence": {
         "precedence_1": {
           "type": "precedence",
-          "mode": "shaping",
+          "mode": "enforcing",
+          "action_planner":"turn_right",
           "active": true,
           "name": "lightPrecedence",
           "conditions": {
