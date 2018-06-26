@@ -9,7 +9,6 @@
     "patterns": {
       "absence": {
         "waterAbsence": {
-          "action_planner": "wait",
           "active": true,
           "conditions": "stepping-on-water",
           "mode": "enforcing",
@@ -23,7 +22,6 @@
       },
       "precedence": {
         "lightPrecedence": {
-          "action_planner": "wait",
           "active": false,
           "conditions": {
             "post": "entering-a-room",
@@ -40,7 +38,6 @@
       },
       "response": {
         "lightResponse": {
-          "action_planner": "wait",
           "active": false,
           "conditions": {
             "post": "entering-a-room",
@@ -57,7 +54,6 @@
       },
       "universality": {
         "lightUniversality": {
-          "action_planner": "wait",
           "active": false,
           "conditions": "light-on-current-room",
           "mode": "shaping",
