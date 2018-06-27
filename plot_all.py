@@ -57,10 +57,67 @@ def plot_result(scale,tab,fileName,resultFileName):
             mean_array[j][t] = mean_array[j][t][0]
 
 
+    plt.figure()
+    for t in range(0, len(fileName)):
+        if len(array[t][1]) > 0:
+            ymax = max(array[t][1])
+            xpos = array[t][1].index(ymax)
+            xmax = array[t][0][xpos]
+            if t == 0:
+                plt.plot(array[t][0], array[t][1], 'g', label=list_of_name[1])
+            else:
+                plt.plot(array[t][0], array[t][1], 'g')
+            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax - 1 if ymax < 5 else ymax + 5))
+    plt.legend()
+    plt.title(title)
+    plt.xlabel('N Updates')
+    plt.savefig(pp, format='pdf')
+
+    plt.figure()
+    for t in range(0, len(fileName)):
+        if len(array[t][2]) > 0:
+            ymax = max(array[t][2])
+            xpos = array[t][2].index(ymax)
+            xmax = array[t][0][xpos]
+            if t == 0:
+                plt.plot(array[t][0], array[t][2], 'b', label=list_of_name[2])
+            else:
+                plt.plot(array[t][0], array[t][2], 'b')
+            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax - 1 if ymax < 5 else ymax + 5))
+
+    plt.legend()
+    plt.title(title)
+    plt.xlabel('N Updates')
+    plt.savefig(pp, format='pdf')
+
+
+    plt.figure()
+    if len(mean_array[2]) > 0:
+        ymax = max(mean_array[2])
+        xpos = mean_array[2].index(ymax)
+        xmax = mean_array[0][xpos]
+        plt.plot(mean_array[0], mean_array[2], 'y', linewidth=2.5, label=list_of_name[2] + "_mean")
+        plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax - 1 if ymax < 5 else ymax + 5))
+
+    if len(mean_array[1]) > 0:
+        ymax = max(mean_array[1])
+        xpos = mean_array[1].index(ymax)
+        xmax = mean_array[0][xpos]
+        plt.plot(mean_array[0], mean_array[1], 'r', linewidth=2.5, label=list_of_name[1] + "_mean")
+        plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax - 1 if ymax < 5 else ymax + 5))
+
+    plt.legend()
+    plt.title(title)
+    plt.xlabel('N Updates')
+    plt.savefig(pp, format='pdf')
+
 
 
     i = 1
     for x, y, z in tab:
+        if x == list_of_name[1]:
+            i += 2
+            continue
         plt.figure()
         for t in range(0, len(fileName)):
             color = 'g'
