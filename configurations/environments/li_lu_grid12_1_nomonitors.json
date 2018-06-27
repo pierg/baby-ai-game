@@ -3,7 +3,7 @@
   "n_water": 0,
   "n_deadend": 0,
   "light_switch": true,
-  "random_each_episode": true,
+  "random_each_episode": false,
   "stop_learning": 1440,
   "number_of_iteration": 10,
   "monitors": {
@@ -37,7 +37,7 @@
         "universality_1": {
           "type": "universality",
           "mode": "shaping",
-          "active": true,
+          "active": false,
           "name": "lightUniversality",
           "conditions": "light-on-current-room"
         }

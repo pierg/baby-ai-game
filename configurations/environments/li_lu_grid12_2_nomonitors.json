@@ -13,7 +13,7 @@
           "type": "precedence",
           "mode": "enforcing",
           "action_planner":"turn_right",
-          "active": true,
+          "active": false,
           "name": "lightPrecedence",
           "conditions": {
             "pre": "light-switch-turned-on",

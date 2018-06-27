@@ -1,6 +1,6 @@
 {
   "algorithm": "a2c",
-  "config_name": "LightTest-6x6-v0",
+  "config_name": "LightTestEnv-6x6-v0",
   "debug_mode": false,
   "env_name": "MiniGrid-LightTest-6x6-v0",
   "evaluation_directory_name": "evaluations",
@@ -10,7 +10,7 @@
       "absence": {
         "waterAbsence": {
           "action_planner": "wait",
-          "active": true,
+          "active": false,
           "conditions": "stepping-on-water",
           "mode": "enforcing",
           "name": "waterAbsence",
@@ -23,13 +23,13 @@
       },
       "precedence": {
         "lightPrecedence": {
-          "action_planner": "wait",
+          "action_planner": "turn_right",
           "active": false,
           "conditions": {
             "post": "entering-a-room",
             "pre": "light-switch-turned-on"
           },
-          "mode": "shaping",
+          "mode": "enforcing",
           "name": "lightPrecedence",
           "rewards": {
             "respected": 0.1,
@@ -49,8 +49,8 @@
           "mode": "shaping",
           "name": "lightResponse",
           "rewards": {
-            "respected": 0.3,
-            "violated": -0.3
+            "respected": 0.1,
+            "violated": -0.1
           },
           "type": "response"
         }
@@ -58,13 +58,13 @@
       "universality": {
         "lightUniversality": {
           "action_planner": "wait",
-          "active": false,
+          "active": true,
           "conditions": "light-on-current-room",
           "mode": "shaping",
           "name": "lightUniversality",
           "rewards": {
             "respected": 0.0,
-            "violated": -0.2
+            "violated": -0.1
           },
           "type": "universality"
         }
@@ -74,12 +74,12 @@
   },
   "num_processes": 48,
   "num_steps": 4,
-  "number_of_iteration": 20,
+  "number_of_iteration": 10,
   "on_violation_reset": false,
   "rendering": false,
   "rewards": {
     "cleaningenv": {
-      "clean": 0.4
+      "clean": 0.1
     },
     "standard": {
       "death": -1.0,

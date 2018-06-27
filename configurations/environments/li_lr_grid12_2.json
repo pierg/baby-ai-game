@@ -3,7 +3,7 @@
   "n_water": 0,
   "n_deadend": 0,
   "light_switch": true,
-  "random_each_episode": false,
+  "random_each_episode": true,
   "stop_learning": 1440,
   "number_of_iteration": 10,
   "monitors": {
@@ -25,7 +25,7 @@
         "response_1": {
           "type": "response",
           "mode": "shaping",
-          "active": false,
+          "active": true,
           "name": "lightResponse",
           "conditions": {
             "pre": "light-switch-turned-on",

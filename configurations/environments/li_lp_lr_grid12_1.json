@@ -1,9 +1,9 @@
 {
-  "grid_size": 6,
-  "n_water": 4,
+  "grid_size": 12,
+  "n_water": 0,
   "n_deadend": 0,
-  "light_switch": false,
-  "random_each_episode": true,
+  "light_switch": true,
+  "random_each_episode": false,
   "stop_learning": 1440,
   "number_of_iteration": 10,
   "monitors": {
@@ -13,7 +13,7 @@
           "type": "precedence",
           "mode": "enforcing",
           "action_planner":"turn_right",
-          "active": false,
+          "active": true,
           "name": "lightPrecedence",
           "conditions": {
             "pre": "light-switch-turned-on",
@@ -25,7 +25,7 @@
         "response_1": {
           "type": "response",
           "mode": "shaping",
-          "active": false,
+          "active": true,
           "name": "lightResponse",
           "conditions": {
             "pre": "light-switch-turned-on",
@@ -44,7 +44,7 @@
       },
       "absence": {
         "waterAbsence": {
-          "active": true,
+          "active": false,
           "conditions": "stepping-on-water",
           "mode": "enforcing",
           "action_planner": "wait",

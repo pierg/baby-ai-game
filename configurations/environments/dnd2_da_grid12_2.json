@@ -3,7 +3,7 @@
   "n_water": 0,
   "n_deadend": 2,
   "light_switch": false,
-  "random_each_episode": false,
+  "random_each_episode": true,
   "stop_learning": 1440,
   "number_of_iteration": 10,
   "monitors": {
@@ -53,7 +53,7 @@
       },
       "absence": {
         "deadendAbsence": {
-          "active": false,
+          "active": true,
           "conditions": "deadend-in-front",
           "mode": "enforcing",
           "action_planner": "wait",

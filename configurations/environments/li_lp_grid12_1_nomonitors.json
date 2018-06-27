@@ -1,9 +1,9 @@
 {
   "grid_size": 12,
   "n_water": 0,
-  "n_deadend": 2,
-  "light_switch": false,
-  "random_each_episode": true,
+  "n_deadend": 0,
+  "light_switch": true,
+  "random_each_episode": false,
   "stop_learning": 1440,
   "number_of_iteration": 10,
   "monitors": {
@@ -11,7 +11,8 @@
       "precedence": {
         "precedence_1": {
           "type": "precedence",
-          "mode": "shaping",
+          "mode": "enforcing",
+          "action_planner":"turn_right",
           "active": false,
           "name": "lightPrecedence",
           "conditions": {
@@ -48,16 +49,6 @@
           "mode": "enforcing",
           "action_planner": "wait",
           "name": "waterAbsence",
-          "type": "absence"
-        }
-      },
-      "absence": {
-        "deadendAbsence": {
-          "active": true,
-          "conditions": "deadend-in-front",
-          "mode": "enforcing",
-          "action_planner": "wait",
-          "name": "deadendAbsence",
           "type": "absence"
         }
       }
