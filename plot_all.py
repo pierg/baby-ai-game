@@ -23,13 +23,13 @@ def plot_result(scale,tab,fileName,resultFileName):
     list_of_name = ["" for i in range(0, len(tab)*2+1)]
     list_of_name[0] = scale
     cpt = 1
+    last_mean = [float(0) for i in range ( 0, 22)]
 
     for x,y,z in tab:
         list_of_name[cpt] = x
         cpt += 1
         list_of_name[cpt] = y
         cpt += 1
-
     for t in range(0, len(fileName)):
         with open(fileName[t], 'r') as csvfile:
             plots = csv.reader(csvfile, delimiter=',')
@@ -44,6 +44,8 @@ def plot_result(scale,tab,fileName,resultFileName):
                 else:
                     for i in range(0,len(tab)*2 + 1):
                         array[t][i].append((float(row[column_number[i]])))
+            for k in range (len(last_mean)):
+                last_mean[k] += float(row[k])
             for i in range(0, len(tab) * 2 + 1):
                 for j in range(0,len(array[t][i])):
                     if j < len(mean_array[i]) and len(mean_array[i]) != 0:
@@ -51,10 +53,17 @@ def plot_result(scale,tab,fileName,resultFileName):
                         mean_array[i][j][1] += 1
                     else:
                         mean_array[i].append([array[t][i][j],1])
+    print(len(fileName))
+    for k in range (len(last_mean)):
+        last_mean[k] = last_mean[k] / len(fileName)
+    print(last_mean)
 
     for t in range(0, len(mean_array[0])):
         for j in range(len(mean_array)):
             mean_array[j][t] = mean_array[j][t][0]
+
+    #for j in range(len(mean_array)):
+     #       print(mean_array[j][len(mean_array[j]) - 1])
 
 
     plt.figure()
