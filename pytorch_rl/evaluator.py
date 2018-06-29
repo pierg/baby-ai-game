@@ -49,7 +49,8 @@ class Evaluator:
                                   'N_death_by_end',
                                   'Total_death',
                                   'N_Total_episodes',
-                                  'N_break'])
+                                  'N_break',
+                                  'Info_saved'])
 
         # Evaluation variables
         # self.shortest_path = config.shortest_path
@@ -70,6 +71,8 @@ class Evaluator:
         self.N_saved = 0
         self.N_Total_episodes = 0
         self.N_break = 0
+        self.dic_saved = {}
+        self.Info_saved = ""
 
     def update(self, reward, done, info, numberOfStepPerEpisode):
         reward = torch.from_numpy(np.expand_dims(np.stack(reward), 1)).float()
@@ -114,11 +117,19 @@ class Evaluator:
                     self.N_Total_episodes += 1
                 elif info[i][0] == "saved":
                     self.N_saved += 1
+                    for element in info[i][1].values():
+                        if element in self.dic_saved:
+                            self.dic_saved[element] = self.dic_saved[element] + 1
+                        else:
+                            self.dic_saved[element] = 1
                 elif info[i][0] == "break":
                     self.N_break += 1
         for i in range(0, len(self.n_proccess_reached_goal)):
             self.N_goal_reached += self.n_proccess_reached_goal[i]
         self.n_episodes = n_episodes_mask
+        self.Info_saved = ""
+        for i in self.dic_saved:
+            self.Info_saved += "{}_{}_".format(i,self.dic_saved[i])
 
     def get_reward_mean(self):
         return self.final_rewards.mean()
@@ -146,4 +157,5 @@ class Evaluator:
                                  self.N_death_by_end,
                                  self.Total_death,
                                  self.N_Total_episodes,
-                                 self.N_break])
+                                 self.N_break,
+                                 self.Info_saved])
