@@ -52,7 +52,10 @@ def main():
 
     # Getting the number of iteration with configuration file
     if hasattr(config, "number_of_iteration"):
-        number_of_iteration = config.number_of_iteration
+        if config.number_of_iteration == "inf":
+            number_of_iteration = 9999
+        else:
+            number_of_iteration = config.number_of_iteration
     else:
         number_of_iteration = 1
 

@@ -5,7 +5,7 @@
   "light_switch": false,
   "random_each_episode": false,
   "stop_learning": 1200,
-  "number_of_iteration": 10,
+  "number_of_iteration": "inf",
   "monitors": {
     "patterns": {
       "precedence": {
