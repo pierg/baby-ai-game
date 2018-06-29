@@ -57,10 +57,67 @@ def plot_result(scale,tab,fileName,resultFileName):
             mean_array[j][t] = mean_array[j][t][0]
 
 
+    plt.figure()
+    for t in range(0, len(fileName)):
+        if len(array[t][1]) > 0:
+            color = 0
+            ymax = max(array[t][1])
+            xpos = array[t][1].index(ymax)
+            xmax = array[t][0][xpos]
+            ymax = float("{0:.1f}".format(ymax))
+            plt.plot(array[t][0], array[t][1], color + t * 5)
+            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+    plt.ylabel(str(list_of_name[1]))
+    plt.title(title)
+    plt.xlabel('N Updates')
+    plt.savefig(pp, format='pdf')
+
+    plt.figure()
+    for t in range(0, len(fileName)):
+        if len(array[t][2]) > 0:
+            color = 0
+            ymax = max(array[t][2])
+            xpos = array[t][2].index(ymax)
+            xmax = array[t][0][xpos]
+            ymax = float("{0:.1f}".format(ymax))
+            plt.plot(array[t][0], array[t][2], color + t * 5)
+            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+
+    plt.ylabel(str(list_of_name[2]))
+    plt.title(title)
+    plt.xlabel('N Updates')
+    plt.savefig(pp, format='pdf')
+
+
+    plt.figure()
+    if len(mean_array[2]) > 0:
+        ymax = max(mean_array[2])
+        xpos = mean_array[2].index(ymax)
+        xmax = mean_array[0][xpos]
+        ymax = float("{0:.1f}".format(ymax))
+        plt.plot(mean_array[0], mean_array[2], 'y', linewidth=2.5, label=list_of_name[2] + "_mean")
+        plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+
+    if len(mean_array[1]) > 0:
+        ymax = max(mean_array[1])
+        xpos = mean_array[1].index(ymax)
+        xmax = mean_array[0][xpos]
+        ymax = float("{0:.1f}".format(ymax))
+        plt.plot(mean_array[0], mean_array[1], 'r', linewidth=2.5, label=list_of_name[1] + "_mean")
+        plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+
+    plt.legend()
+    plt.title(title)
+    plt.xlabel('N Updates')
+    plt.savefig(pp, format='pdf')
+
 
 
     i = 1
     for x, y, z in tab:
+        if x == list_of_name[1]:
+            i += 2
+            continue
         plt.figure()
         for t in range(0, len(fileName)):
             color = 'g'
@@ -68,21 +125,23 @@ def plot_result(scale,tab,fileName,resultFileName):
                 ymax = max(array[t][i])
                 xpos = array[t][i].index(ymax)
                 xmax = array[t][0][xpos]
+                ymax = float("{0:.1f}".format(ymax))
                 if t == 0 :
                     plt.plot(array[t][0], array[t][i],color,label=x)
                 else:
                     plt.plot(array[t][0], array[t][i], color)
-                plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax-1 if ymax < 5 else ymax+5))
+                plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax))
             if len(array[t][i + 1])>0:
                 color = 'b'
                 ymax = max(array[t][i + 1])
                 xpos = array[t][i + 1].index(ymax)
                 xmax = array[t][0][xpos]
+                ymax = float("{0:.1f}".format(ymax))
                 if t == 0:
                     plt.plot(array[t][0], array[t][i + 1],color,label=y)
                 else:
                     plt.plot(array[t][0], array[t][i + 1], color)
-                plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax-1 if ymax < 5 else ymax+5))
+                plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax))
 
             if z:
                 area_top = []
@@ -97,16 +156,17 @@ def plot_result(scale,tab,fileName,resultFileName):
             ymax = max(mean_array[i])
             xpos = mean_array[i].index(ymax)
             xmax = mean_array[0][xpos]
+            ymax = float("{0:.1f}".format(ymax))
             plt.plot(mean_array[0], mean_array[i], color, linewidth = 2.5, label=x + "_mean")
-            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax - 1 if ymax < 5 else ymax + 5))
+            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
         if len(mean_array[i + 1]) > 0:
             color = 'y'
             ymax = max(mean_array[i + 1])
             xpos = mean_array[i + 1].index(ymax)
             xmax = mean_array[0][xpos]
-            ymax = ymax
+            ymax = float("{0:.1f}".format(ymax))
             plt.plot(mean_array[0], mean_array[i + 1], color, linewidth = 2.5,label=y + "_mean")
-            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax - 1 if ymax < 5 else ymax + 5))
+            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
 
         if z:
             area_top = []

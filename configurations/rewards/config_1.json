@@ -17,14 +17,14 @@
   "universality":{
     "name":"universality",
     "respected": 0,
-    "violated": -0.2
+    "violated": -0.1
   },
   "response":{
     "name":"response",
-    "respected": 0.3,
-    "violated": -0.3
+    "respected": 0.1,
+    "violated": -0.1
   },
   "cleaningenv":{
-    "clean":0.4
+    "clean":0.1
   }
 }
