@@ -53,7 +53,7 @@ def plot_result(scale,tab,fileName,resultFileName):
                         mean_array[i][j][1] += 1
                     else:
                         mean_array[i].append([array[t][i][j],1])
-    print(len(fileName))
+
     for k in range (len(last_mean)):
         last_mean[k] = last_mean[k] / len(fileName)
     print(last_mean)
@@ -61,9 +61,6 @@ def plot_result(scale,tab,fileName,resultFileName):
     for t in range(0, len(mean_array[0])):
         for j in range(len(mean_array)):
             mean_array[j][t] = mean_array[j][t][0]
-
-    #for j in range(len(mean_array)):
-     #       print(mean_array[j][len(mean_array[j]) - 1])
 
 
     plt.figure()
