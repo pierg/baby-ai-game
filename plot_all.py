@@ -26,6 +26,7 @@ def plot_result(scale,tab,fileName,resultFileName):
     last_mean = [float(0) for i in range ( 0, 22)]
     one_process_max = 0
     all_process_max = 0
+    test = False
 
     for x,y,z in tab:
         list_of_name[cpt] = x
@@ -46,6 +47,10 @@ def plot_result(scale,tab,fileName,resultFileName):
                 else:
                     for i in range(0,len(tab)*2 + 1):
                         array[t][i].append((float(row[column_number[i]])))
+                if test is not True:
+                    if row[6] == "1.0":
+                        one_process_max += float(row[0])
+                        test = True
             for k in range (len(last_mean)):
                 last_mean[k] += float(row[k])
             for i in range(0, len(tab) * 2 + 1):
@@ -55,6 +60,10 @@ def plot_result(scale,tab,fileName,resultFileName):
                         mean_array[i][j][1] += 1
                     else:
                         mean_array[i].append([array[t][i][j],1])
+        test = False
+
+    one_process_max = one_process_max/len(fileName)
+    print("one_process_max : ", one_process_max)
 
     for t in range (0, len(array)):
         pmax = max(array[t][-2])
@@ -199,7 +208,10 @@ def plot_result(scale,tab,fileName,resultFileName):
         plt.savefig(pp,format='pdf')
 
     plt.figure()
-    img = get_image_from_name("configurations/*",fileName[0])
+    print(fileName[0])
+    Name =fileName[0]
+    Name.replace("_0","")
+    img = get_image_from_name("configurations/*",Name)
     if img is not None:
         if "main" in img:
             screenHelper.main()
@@ -289,7 +301,6 @@ def create_all_images(path):
 
 
 def check_if_image_already_exist(path):
-    print(path)
     config = cg.Configuration.grab(path)
     folder = ""
     if "crafted" in path:
