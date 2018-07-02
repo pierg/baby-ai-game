@@ -4,8 +4,8 @@
   "n_deadend": 0,
   "light_switch": false,
   "random_each_episode": false,
-  "stop_learning": 1200,
-  "number_of_iteration": 100,
+  "stop_learning": 960,
+  "number_of_iteration": 10,
   "monitors": {
     "patterns": {
       "precedence": {

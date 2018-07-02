@@ -24,6 +24,8 @@ def plot_result(scale,tab,fileName,resultFileName):
     list_of_name[0] = scale
     cpt = 1
     last_mean = [float(0) for i in range ( 0, 22)]
+    one_process_max = 0
+    all_process_max = 0
 
     for x,y,z in tab:
         list_of_name[cpt] = x
@@ -54,6 +56,12 @@ def plot_result(scale,tab,fileName,resultFileName):
                     else:
                         mean_array[i].append([array[t][i][j],1])
 
+    for t in range (0, len(array)):
+        pmax = max(array[t][-2])
+        pos = array[t][-2].index(pmax)
+        all_process_max += array[t][0][pos]
+    all_process_max = all_process_max/len(array)
+    print ("all_process_max : ",all_process_max)
     for k in range (len(last_mean)):
         last_mean[k] = last_mean[k] / len(fileName)
     print(last_mean)
@@ -281,6 +289,7 @@ def create_all_images(path):
 
 
 def check_if_image_already_exist(path):
+    print(path)
     config = cg.Configuration.grab(path)
     folder = ""
     if "crafted" in path:
