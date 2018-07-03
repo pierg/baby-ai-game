@@ -4,7 +4,7 @@
   "n_deadend": 1,
   "light_switch": false,
   "random_each_episode": false,
-  "stop_learning": 960,
+  "stop_learning": 192,
   "number_of_iteration": 10,
   "monitors": {
     "patterns": {
