@@ -208,9 +208,8 @@ def plot_result(scale,tab,fileName,resultFileName):
         plt.savefig(pp,format='pdf')
 
     plt.figure()
-    print(fileName[0])
-    Name =fileName[0]
-    Name.replace("_0","")
+    Name = fileName[0]
+    Name = Name.replace("_0","")
     img = get_image_from_name("configurations/*",Name)
     if img is not None:
         if "main" in img:
