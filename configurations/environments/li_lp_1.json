@@ -4,8 +4,6 @@
   "n_deadend": 0,
   "light_switch": true,
   "random_each_episode": false,
-  "stop_learning": 1920,
-  "number_of_iteration": 100,
   "monitors": {
     "patterns": {
       "precedence": {
@@ -13,7 +11,7 @@
           "type": "precedence",
           "mode": "enforcing",
           "action_planner":"turn_right",
-          "active": false,
+          "active": true,
           "name": "lightPrecedence",
           "conditions": {
             "pre": "light-switch-turned-on",
@@ -37,7 +35,7 @@
         "universality_1": {
           "type": "universality",
           "mode": "shaping",
-          "active": true,
+          "active": false,
           "name": "lightUniversality",
           "conditions": "light-on-current-room"
         }
