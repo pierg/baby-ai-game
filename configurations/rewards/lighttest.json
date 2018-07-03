@@ -11,7 +11,7 @@
   },
   "precedence":{
     "name":"precedence",
-    "respected": 0.1,
+    "respected": 0,
     "violated": -0.1
   },
   "universality":{
@@ -21,7 +21,7 @@
   },
   "response":{
     "name":"response",
-    "respected": 0.1,
+    "respected": 0,
     "violated": -0.1
   },
   "cleaningenv":{
