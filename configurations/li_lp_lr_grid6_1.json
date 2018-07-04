@@ -32,7 +32,7 @@
           "mode": "enforcing",
           "name": "lightPrecedence",
           "rewards": {
-            "respected": 0.1,
+            "respected": 0,
             "violated": -0.1
           },
           "type": "precedence"
@@ -40,19 +40,19 @@
       },
       "response": {
         "lightResponse": {
-          "action_planner": "wait",
+          "type": "response",
+          "mode": "enforcing",
+          "action_planner": "toggle_light",
           "active": true,
-          "conditions": {
-            "post": "entering-a-room",
-            "pre": "light-switch-turned-on"
-          },
-          "mode": "shaping",
           "name": "lightResponse",
-          "rewards": {
-            "respected": 0.1,
-            "violated": -0.1
+          "conditions": {
+            "post": "light-switch-turned-on",
+            "pre": "light-switch-in-front-off"
           },
-          "type": "response"
+          "rewards": {
+            "respected": 0,
+            "violated": -0.1
+          }
         }
       },
       "universality": {
