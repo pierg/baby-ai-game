@@ -6,22 +6,22 @@
   },
   "absence":{
     "name":"absence",
-    "respected": 0.1,
+    "respected": 0,
     "violated": -0.1
   },
   "precedence":{
     "name":"precedence",
-    "respected": 0.1,
+    "respected": 0,
     "violated": -0.1
   },
   "universality":{
     "name":"universality",
-    "respected": 0.1,
+    "respected": 0,
     "violated": -0.1
   },
   "response":{
     "name":"response",
-    "respected": 0.1,
+    "respected": 0,
     "violated": -0.1
   },
   "cleaningenv":{
