@@ -35,13 +35,13 @@
       },
       "precedence": {
         "lightPrecedence": {
-          "action_planner": "wait",
+          "action_planner": "turn_right",
           "active": false,
           "conditions": {
             "post": "entering-a-room",
             "pre": "light-switch-turned-on"
           },
-          "mode": "shaping",
+          "mode": "enforcing",
           "name": "lightPrecedence",
           "rewards": {
             "respected": 0,
@@ -52,19 +52,19 @@
       },
       "response": {
         "lightResponse": {
-          "action_planner": "wait",
+          "type": "response",
+          "mode": "enforcing",
+          "action_planner": "toggle_light",
           "active": false,
-          "conditions": {
-            "post": "entering-a-room",
-            "pre": "light-switch-turned-on"
-          },
-          "mode": "shaping",
           "name": "lightResponse",
+          "conditions": {
+            "post": "light-switch-turned-on",
+            "pre": "light-switch-in-front-off"
+          },
           "rewards": {
             "respected": 0,
             "violated": -0.1
-          },
-          "type": "response"
+          }
         }
       },
       "universality": {

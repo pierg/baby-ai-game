@@ -1,8 +1,8 @@
 {
   "algorithm": "a2c",
-  "config_name": "safetyEnv-10x10-v0",
+  "config_name": "lighttestEnv-10x10-v0",
   "debug_mode": false,
-  "env_name": "MiniGrid-Safety-10x10-v0",
+  "env_name": "MiniGrid-LightTestExp-9x9-v0",
   "evaluation_directory_name": "evaluations",
   "log_interval": 10,
   "monitors": {
@@ -10,7 +10,7 @@
       "absence": {
         "waterAbsence": {
           "action_planner": "wait",
-          "active": true,
+          "active": false,
           "conditions": "stepping-on-water",
           "mode": "enforcing",
           "name": "waterAbsence",
@@ -22,7 +22,7 @@
         },
         "deadendAbsence": {
           "action_planner": "wait",
-          "active": true,
+          "active": false,
           "conditions": "deadend-in-front",
           "mode": "enforcing",
           "name": "deadendAbsence",
@@ -41,7 +41,7 @@
             "post": "entering-a-room",
             "pre": "light-switch-turned-on"
           },
-          "mode": "enforcing",
+          "mode": "shaping",
           "name": "lightPrecedence",
           "rewards": {
             "respected": 0,
@@ -55,7 +55,7 @@
           "type": "response",
           "mode": "enforcing",
           "action_planner": "toggle_light",
-          "active": true,
+          "active": false,
           "name": "lightResponse",
           "conditions": {
             "post": "light-switch-turned-on",
@@ -70,7 +70,7 @@
       "universality": {
         "lightUniversality": {
           "action_planner": "wait",
-          "active": false,
+          "active": true,
           "conditions": "light-on-current-room",
           "mode": "shaping",
           "name": "lightUniversality",
@@ -84,7 +84,7 @@
     },
     "properties": {}
   },
-  "num_processes": 48,
+  "num_processes": 32,
   "num_steps": 4,
   "number_of_iteration": 50,
   "on_violation_reset": false,

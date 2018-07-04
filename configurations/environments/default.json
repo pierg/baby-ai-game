@@ -1,23 +1,19 @@
 {
-  "grid_size": 20,
-  "n_water": 4,
-  "n_deadend": 2,
+  "grid_size": 10,
+  "n_water": 5,
+  "n_deadend": 4,
   "light_switch": true,
-  "random_each_episode": true,
-  "stop_learning":1440,
-  "number_of_iteration": 20,
+  "random_each_episode": false,
+  "stop_learning":480,
   "monitors": {
     "patterns": {
       "precedence": {
-        "precedence_1": {
+        "lightPrecedence": {
           "type": "precedence",
-          "mode": "shaping",
+          "mode": "enforcing",
+          "action_planner": "turn_right",
           "active": false,
           "name": "lightPrecedence",
-          "rewards": {
-            "respected": 0.1,
-            "violated": -0.1
-          },
           "conditions": {
             "pre": "light-switch-turned-on",
             "post": "entering-a-room"
@@ -25,18 +21,15 @@
         }
       },
       "response": {
-        "response_1": {
+        "lightResponse": {
           "type": "response",
-          "mode": "shaping",
+          "mode": "enforcing",
+          "action_planner": "toggle_light",
           "active": false,
           "name": "lightResponse",
-          "rewards": {
-            "respected": 0.1,
-            "violated": -0.1
-          },
           "conditions": {
-            "pre": "light-switch-turned-on",
-            "post": "entering-a-room"
+            "post": "light-switch-turned-on",
+            "pre": "light-switch-in-front-off"
           }
         }
       },
@@ -46,11 +39,7 @@
           "mode": "shaping",
           "active": false,
           "name": "lightUniversality",
-          "conditions": "light-on-current-room",
-          "rewards": {
-            "respected": 0.1,
-            "violated": -0.1
-          }
+          "conditions": "light-on-current-room"
         }
       },
       "absence": {
@@ -60,11 +49,7 @@
           "mode": "enforcing",
           "action_planner": "wait",
           "name": "waterAbsence",
-          "type": "absence",
-          "rewards": {
-            "respected": 0.1,
-            "violated": -0.1
-          }
+          "type": "absence"
         }
       }
     }

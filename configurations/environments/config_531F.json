@@ -8,9 +8,10 @@
   "monitors": {
     "patterns": {
       "precedence": {
-        "precedence_1": {
+        "lightPrecedence": {
           "type": "precedence",
-          "mode": "shaping",
+          "mode": "enforcing",
+          "action_planner": "turn_right",
           "active": false,
           "name": "lightPrecedence",
           "conditions": {
@@ -20,14 +21,15 @@
         }
       },
       "response": {
-        "response_1": {
+        "lightResponse": {
           "type": "response",
-          "mode": "shaping",
+          "mode": "enforcing",
+          "action_planner": "toggle_light",
           "active": false,
           "name": "lightResponse",
           "conditions": {
-            "pre": "light-switch-turned-on",
-            "post": "entering-a-room"
+            "post": "light-switch-turned-on",
+            "pre": "light-switch-in-front-off"
           }
         }
       },
