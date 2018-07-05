@@ -5,7 +5,7 @@
 configuration_file="main.json"
 start_training=0
 
-while getopts ":tre:w:s:" opt; do
+while getopts ":tre:w:s:i:" opt; do
     case ${opt} in
         r)
             random=1
@@ -25,6 +25,10 @@ while getopts ":tre:w:s:" opt; do
             ;;
         s)
             stop=${OPTARG}
+            start_training=1
+            ;;
+        i)
+            iterations=${OPTARG}
             start_training=1
             ;;
     esac
@@ -81,12 +85,17 @@ if ! [ $stop ]; then
     stop=0
 fi
 
+if ! [ $iterations ]; then
+    iterations=1
+fi
+echo "iterations :$iterations"
+i=0
 if [ $start_training -eq 1 ]; then
     echo "...launching the training..."
-    python3 ./pytorch_rl/main.py --stop $stop
-else
-    echo "environment ready!"
-    /bin/bash
+    while [ $iterations -ne $i ]; do
+        python3 ./pytorch_rl/main.py --stop $stop --iterations $i
+        let "i+=1"
+    done
 fi
 
 

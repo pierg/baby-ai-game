@@ -65,6 +65,8 @@ def get_args():
                         help="reset the agent when it performs a catastrophic action, default is False")
     parser.add_argument('--stop', type=int, default=0,
                         help='number of updates before stopping the evaluation')
+    parser.add_argument('--iterations', type=int, default=0,
+                        help='number of iterations to do before stopping the evaluation')
     args = parser.parse_args()
 
     args.cuda = not args.no_cuda and torch.cuda.is_available()
