@@ -87,6 +87,6 @@
       "step": 0.0
     }
   },
-  "stop_learning": 1200,
+  "stop_learning": 2000,
   "visdom": false
 }
