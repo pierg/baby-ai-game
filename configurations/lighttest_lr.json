@@ -63,7 +63,7 @@
           },
           "rewards": {
             "respected": 0,
-            "violated": -0.1
+            "violated": -0.3
           }
         }
       },
@@ -99,6 +99,6 @@
       "step": 0.0
     }
   },
-  "stop_learning": 1200,
+  "stop_learning": 3600,
   "visdom": false
 }

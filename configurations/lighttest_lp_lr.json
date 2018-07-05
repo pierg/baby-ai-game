@@ -41,7 +41,7 @@
             "post": "entering-a-room",
             "pre": "light-switch-turned-on"
           },
-          "mode": "shaping",
+          "mode": "enforcing",
           "name": "lightPrecedence",
           "rewards": {
             "respected": 0,
@@ -99,6 +99,6 @@
       "step": 0.0
     }
   },
-  "stop_learning": 1200,
+  "stop_learning": 3600,
   "visdom": false
 }

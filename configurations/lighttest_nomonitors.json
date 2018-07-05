@@ -86,7 +86,7 @@
   },
   "num_processes": 48,
   "num_steps": 4,
-  "number_of_iteration": 50,
+  "number_of_iteration": 100,
   "on_violation_reset": false,
   "rendering": false,
   "rewards": {
@@ -99,6 +99,6 @@
       "step": 0.0
     }
   },
-  "stop_learning": 1200,
+  "stop_learning": 3600,
   "visdom": false
 }

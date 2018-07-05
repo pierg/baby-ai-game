@@ -35,13 +35,13 @@
       },
       "precedence": {
         "lightPrecedence": {
-          "action_planner": "turn_right",
-          "active": false,
+          "action_planner": "wait",
+          "active": true,
           "conditions": {
             "post": "entering-a-room",
             "pre": "light-switch-turned-on"
           },
-          "mode": "shaping",
+          "mode": "enforcing",
           "name": "lightPrecedence",
           "rewards": {
             "respected": 0,
@@ -54,7 +54,7 @@
         "lightResponse": {
           "type": "response",
           "mode": "enforcing",
-          "action_planner": "toggle_light",
+          "action_planner": "wait",
           "active": false,
           "name": "lightResponse",
           "conditions": {
@@ -70,7 +70,7 @@
       "universality": {
         "lightUniversality": {
           "action_planner": "wait",
-          "active": true,
+          "active": false,
           "conditions": "light-on-current-room",
           "mode": "shaping",
           "name": "lightUniversality",
