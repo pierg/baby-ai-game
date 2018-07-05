@@ -15,20 +15,19 @@ class Evaluator:
         # Getting configuration from file
         self.config = cg.Configuration.grab()
 
-        config_file_path = os.path.abspath(__file__ + "/../../"
-                                           + self.config.evaluation_directory_name + "/"
-                                           + self.config.config_name
-                                           +"_" 
-                                           + str(number)
-                                           + ".csv")
-        while os.path.isfile(config_file_path):
-            number += 1
-            config_file_path = os.path.abspath(__file__ + "/../../"
-                                           + self.config.evaluation_directory_name + "/"
+        while os.path.isfile(self.config.evaluation_directory_name + "/"
                                            + self.config.config_name
                                            +"_"
                                            + str(number)
-                                           + ".csv")
+                                           + ".csv"):
+            number += 1
+        config_file_path = os.path.abspath(__file__ + "/../../"
+                                    + self.config.evaluation_directory_name + "/"
+                                    + self.config.config_name
+                                    + "_"
+                                    + str(number)
+                                    + ".csv")
+
         dirname = os.path.dirname(config_file_path)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
