@@ -2,8 +2,8 @@
   "grid_size": 16,
   "n_water": 10,
   "n_deadend": 0,
-  "light_switch": false,
-  "random_each_episode": true,
+  "light_switch": true,
+  "random_each_episode": false,
   "stop_learning":1200,
   "number_of_iteration": 100,
   "monitors": {
@@ -21,14 +21,15 @@
         }
       },
       "response": {
-        "response_1": {
+        "lightResponse": {
           "type": "response",
-          "mode": "shaping",
+          "mode": "enforcing",
+          "action_planner": "toggle_light",
           "active": false,
           "name": "lightResponse",
           "conditions": {
-            "pre": "light-switch-turned-on",
-            "post": "entering-a-room"
+            "post": "action-is-toggle",
+            "pre": "light-switch-in-front-off"
           }
         }
       },
@@ -43,7 +44,7 @@
       },
       "absence": {
         "waterAbsence": {
-          "active": true,
+          "active": false,
           "conditions": "stepping-on-water",
           "mode": "enforcing",
           "action_planner": "wait",

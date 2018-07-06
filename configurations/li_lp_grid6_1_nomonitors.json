@@ -46,7 +46,7 @@
           "active": false,
           "name": "lightResponse",
           "conditions": {
-            "post": "light-switch-turned-on",
+            "post": "action-is-toggle",
             "pre": "light-switch-in-front-off"
           },
           "rewards": {

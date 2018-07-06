@@ -21,14 +21,15 @@
         }
       },
       "response": {
-        "response_1": {
+        "lightResponse": {
           "type": "response",
-          "mode": "shaping",
+          "mode": "enforcing",
+          "action_planner": "toggle_light",
           "active": false,
           "name": "lightResponse",
           "conditions": {
-            "pre": "light-switch-turned-on",
-            "post": "entering-a-room"
+            "post": "action-is-toggle",
+            "pre": "light-switch-in-front-off"
           }
         }
       },
