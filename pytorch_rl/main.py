@@ -62,7 +62,7 @@ def main():
     stop_learning = config.stop_learning
 
     # Quick change @Todo find a better way to stop the learning
-    stop_learning = 5
+    stop_learning = 240
     # Initializing evaluation
     evaluator = Evaluator()
 
