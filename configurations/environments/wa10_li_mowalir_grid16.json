@@ -12,7 +12,7 @@
         "precedence_1": {
           "type": "precedence",
           "mode": "shaping",
-          "active": true,
+          "active": false,
           "name": "lightPrecedence",
           "conditions": {
             "pre": "light-switch-turned-on",
@@ -25,7 +25,7 @@
           "type": "response",
           "mode": "enforcing",
           "action_planner": "toggle_light",
-          "active": true,
+          "active": false,
           "name": "lightResponse",
           "conditions": {
             "post": "action-is-toggle",
