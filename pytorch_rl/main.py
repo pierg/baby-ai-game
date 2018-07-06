@@ -61,6 +61,8 @@ def main():
     args.vis = config.visdom
     stop_learning = config.stop_learning
 
+    # Quick change @Todo find a better way to stop the learning
+    stop_learning = 5
     # Initializing evaluation
     evaluator = Evaluator()
 
@@ -132,7 +134,7 @@ def main():
         rollouts.cuda()
     start = time.time()
     for j in range(num_updates):
-        if identical_rewards == stop_learning:
+        if identical_rewards == stop_learning and last_reward_mean == 1:
             print("stop learning")
             break
         for step in range(args.num_steps):
