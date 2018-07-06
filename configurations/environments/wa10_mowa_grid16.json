@@ -8,11 +8,12 @@
   "number_of_iteration": 100,
   "monitors": {
     "patterns": {
-      "precedence": {
+ "precedence": {
         "precedence_1": {
           "type": "precedence",
-          "mode": "shaping",
-          "active": false,
+          "mode": "enforcing",
+          "action_planner":"turn_right",
+          "active": true,
           "name": "lightPrecedence",
           "conditions": {
             "pre": "light-switch-turned-on",
@@ -22,15 +23,15 @@
       },
       "response": {
         "lightResponse": {
-          "type": "response",
-          "mode": "enforcing",
           "action_planner": "toggle_light",
-          "active": false,
-          "name": "lightResponse",
+          "active": true,
           "conditions": {
             "post": "action-is-toggle",
             "pre": "light-switch-in-front-off"
-          }
+          },
+          "mode": "enforcing",
+          "name": "lightResponse",
+          "type": "response"
         }
       },
       "universality": {
