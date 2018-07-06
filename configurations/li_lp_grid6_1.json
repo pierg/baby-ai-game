@@ -72,7 +72,7 @@
     },
     "properties": {}
   },
-  "num_processes": 32,
+  "num_processes": 48,
   "num_steps": 4,
   "number_of_iteration": "inf",
   "on_violation_reset": false,
@@ -87,6 +87,6 @@
       "step": 0.0
     }
   },
-  "stop_learning": 640,
+  "stop_learning": 2000,
   "visdom": false
 }
