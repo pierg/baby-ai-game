@@ -5,11 +5,11 @@
 configuration_file="main.json"
 start_training=0
 
-while getopts ":tre:w:s:i:" opt; do
+while getopts ":tlre:w:s:i:" opt; do
     case ${opt} in
         r)
             random=1
-            start_training=1
+            start_training=0
             ;;
         t)
             configuration_file=${OPTARG}
@@ -17,7 +17,7 @@ while getopts ":tre:w:s:i:" opt; do
             ;;
         e)
             environment=${OPTARG}
-            start_training=1
+            start_training=0
             ;;
         w)
             reward=${OPTARG}
@@ -29,7 +29,11 @@ while getopts ":tre:w:s:i:" opt; do
             ;;
         i)
             iterations=${OPTARG}
-            start_training=1
+            start_training=0
+            ;;
+        l)
+            light=1
+            start_training=0
             ;;
     esac
 done
@@ -42,12 +46,22 @@ fi
 while [ $iterations -ne $i ]; do
     if [ $random ]; then
         if [ $environment ]; then
-            if [ $reward ]; then
-                echo "...creating a random environment... using $environment and $reward"
-                configuration_file=`python3 env_generator.py --environment_file $environment --rewards_file $reward`
+            if [ $light ]; then
+                if [ $reward ]; then
+                    echo "...creating a random light environment... using $environment and $reward"
+                    configuration_file=`python3 env_gen_light.py --environment_file $environment --rewards_file $reward`
+                else
+                    echo "...creating a  light environment... using $environment"
+                    configuration_file=`python3 env_gen_light.py --environment_file $environment --rewards_file "default"`
+                fi
             else
-                echo "...creating a random environment... using $environment"
-                configuration_file=`python3 env_generator.py --environment_file $environment --rewards_file "default"`
+                if [ $reward ]; then
+                    echo "...creating a random environment... using $environment and $reward"
+                    configuration_file=`python3 env_generator.py --environment_file $environment --rewards_file $reward`
+                else
+                    echo "...creating a random environment... using $environment"
+                    configuration_file=`python3 env_generator.py --environment_file $environment --rewards_file "default"`
+                fi
             fi
         elif [ $reward ]; then
             echo "...creating a random environment... using $reward"
@@ -93,8 +107,8 @@ while [ $iterations -ne $i ]; do
     if [ $start_training -eq 1 ]; then
         echo "...launching the training..."
             python3 ./pytorch_rl/main.py --stop $stop --iterations $i
-            let "i+=1"
     fi
+    let "i+=1"
 done
 
 

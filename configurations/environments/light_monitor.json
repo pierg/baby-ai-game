@@ -1,6 +1,6 @@
 {
-  "grid_size": 16,
-  "n_water": 10,
+  "grid_size": 7,
+  "n_water": 2,
   "n_deadend": 0,
   "light_switch": true,
   "random_each_episode": false,
@@ -11,7 +11,8 @@
       "precedence": {
         "precedence_1": {
           "type": "precedence",
-          "mode": "shaping",
+          "mode": "enforcing",
+          "action_planner": "turn_right",
           "active": true,
           "name": "lightPrecedence",
           "conditions": {
