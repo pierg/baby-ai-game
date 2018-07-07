@@ -107,6 +107,13 @@ while [ $iterations -ne $i ]; do
     if [ $start_training -eq 1 ]; then
         echo "...launching the training..."
             python3 ./pytorch_rl/main.py --stop $stop --iterations $i
+            name=`grep -e '"config_name"' configurations/main.json`
+            replace="v0_2\","
+            replace=${name/v0\",/$replace}
+            sed -i 's/"active": true,/"active": false,/g' configurations/main.json
+            sed -i "s/$name/$replace/" configurations/main.json
+            python3 ./pytorch_rl/main.py --stop $stop --iterations $i
+
     fi
     let "i+=1"
 done
