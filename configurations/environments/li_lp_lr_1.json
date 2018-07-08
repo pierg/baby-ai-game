@@ -3,7 +3,7 @@
   "n_water": 0,
   "n_deadend": 0,
   "light_switch": true,
-  "random_each_episode": true,
+  "random_each_episode": false,
   "stop_learning":10000000,
   "number_of_iteration": 1,
   "monitors": {

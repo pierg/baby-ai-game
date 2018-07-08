@@ -377,7 +377,7 @@ register(
             "config_name": "randomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token),
             "algorithm": "a2c",
             "env_name": "MiniGrid-RandomEnv-{0}x{0}-{1}-v0".format(grid_size, random_token),
-            "num_processes": 48,
+            "num_processes": 32,
             "num_steps": 4,
             "log_interval": 10,
             "on_violation_reset": False,

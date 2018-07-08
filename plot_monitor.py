@@ -38,8 +38,8 @@ def plot_result(scale,tab,fileNameMon,fileNameNoMon,resultFileName):
     all_process_max = 0
     test = False
 
-    step_mon = len(fileNameMon)//4
-    step_nomon = len(fileNameNoMon)//4
+    step_mon = len(fileNameMon)//5
+    step_nomon = len(fileNameNoMon)//5
 
     for x,y,z in tab:
         list_of_name[cpt] = x
@@ -132,7 +132,7 @@ def plot_result(scale,tab,fileNameMon,fileNameNoMon,resultFileName):
     for x, y, z in tab:
         if x == "N_step_AVG" or x == "N_death" or x == "Reward_mean":
             plt.figure()
-            for t in range(5):
+            for t in range(0,5):
                 if len(array_mon[t*step_mon][i]) > 0:
                     color = 'r'
                     plt.plot(array_mon[t*step_mon][0], array_mon[t*step_mon][i], color, linewidth=1, label=x + "_monitor")
@@ -141,7 +141,7 @@ def plot_result(scale,tab,fileNameMon,fileNameNoMon,resultFileName):
                     color = 'b'
                     plt.plot(array_nomon[t * step_mon][0], array_nomon[t * step_mon][i], color, linewidth=1,
                              label=x + "no_monitor")
-
+                """
                 if z:
                     area_top = []
                     area_bot = []
@@ -153,25 +153,24 @@ def plot_result(scale,tab,fileNameMon,fileNameNoMon,resultFileName):
                     area_top = []
                     area_bot = []
                     for k in range(len(array_nomon[t*step_nomon][i + 1])):
-                        area_top.append(array_nomon[t*step_nomon][i + 1][k] + array_nomon[t*step_nomon][i + 1][k])
-                        area_bot.append(array_nomon[t*step_nomon][i + 1][k] - array_nomon[t*step_nomon][i + 1][k])
+                        area_top.append(array_nomon[t*step_nomon][i][k] + array_nomon[t*step_nomon][i + 1][k])
+                        area_bot.append(array_nomon[t*step_nomon][i][k] - array_nomon[t*step_nomon][i + 1][k])
                     plt.fill_between(array_nomon[t*step_nomon][0], area_bot, area_top, color="skyblue", alpha=0.4)
-
+                    """
                 #plt.legend()
                 #plt.xlabel('N Updates')
                 #plt.title(title)
             plt.savefig(pp, format='pdf')
 
-
         if y =="N_goal_reached":
-            for t in range(5):
-                plt.figure()
+            plt.figure()
+            for t in range(0,5):
                 if len(array_mon[t*step_mon][i + 1]) > 0:
                     color = 'r'
                     plt.plot(array_mon[t*step_mon][0], array_mon[t*step_mon][i + 1], color, linewidth=1, label=x + "_monitor")
                 if len(array_nomon[t*step_nomon][i +1]) > 0:
                     color = 'b'
-                    plt.plot(array_nomon[t * step_mon][0], array_nomon[t * step_mon][i + 1], color, linewidth=1,
+                    plt.plot(array_nomon[t * step_nomon][0], array_nomon[t * step_nomon][i + 1], color, linewidth=1,
                              label=x + "no_monitor")
                 #plt.legend()
                 #plt.xlabel('N Updates')
