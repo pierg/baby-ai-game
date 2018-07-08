@@ -8,9 +8,15 @@ from random import randint
 import configurations.config_grabber as cg
 from pathlib import Path
 import screenHelper
+
+plt.savefig("foo.pdf", bbox_inches="tight", pad_inches=0)
 """
 File used to create a graph from a csv file and the name of the columns that need to be used
 """
+
+
+plt.rcParams["font.family"] = "Times New Roman"
+
 
 
 def plot_result(scale,tab,fileNameMon,fileNameNoMon,resultFileName):
@@ -30,13 +36,14 @@ def plot_result(scale,tab,fileNameMon,fileNameNoMon,resultFileName):
     last_mean_nomon = [float(0) for i in range(0, 22)]
     one_process_max = 0
     all_process_max = 0
-    test = False
+    is_first_max = False
 
     for x,y,z in tab:
         list_of_name[cpt] = x
         cpt += 1
         list_of_name[cpt] = y
         cpt += 1
+
     for t in range(0, len(fileNameMon)):
         with open(fileNameMon[t], 'r') as csvfile:
             plots = csv.reader(csvfile, delimiter=',')
@@ -51,20 +58,40 @@ def plot_result(scale,tab,fileNameMon,fileNameNoMon,resultFileName):
                 else:
                     for i in range(0,len(tab)*2 + 1):
                         array_mon[t][i].append((float(row[column_number[i]])))
-                if test is not True:
+                if is_first_max is not True:
                     if row[6] == "1.0":
                         one_process_max += float(row[0])
-                        test = True
+                        is_first_max = True
             for k in range (len(last_mean_mon)):
                 last_mean_mon[k] += float(row[k])
-            for i in range(0, len(tab) * 2 + 1):
-                for j in range(0,len(array_mon[t][i])):
-                    if j < len(mean_array_mon[i]) and len(mean_array_mon[i]) != 0:
-                        mean_array_mon[i][j][0] = (mean_array_mon[i][j][0]*mean_array_mon[i][j][1] + array_mon[t][i][j])/(mean_array_mon[i][j][1] + 1)
+        is_first_max = False
+
+    longer_file = len(array_mon[0][0])
+    for t in range(1,len(array_mon)):
+        if len(array_mon[t][0])> longer_file:
+            longer_file = len(array_mon[t][0])
+
+    for t in range(len(array_mon)):
+        for i in range(len(array_mon[t])):
+            for j in range(len(array_mon[t][i]), longer_file):
+                if i == 0:
+                    array_mon[t][i].append(array_mon[t][i][j - 1] + 10)
+                else:
+                    array_mon[t][i].append(array_mon[t][i][j - 1])
+            for j in range(0, len(array_mon[t][i])):
+                if j < len(mean_array_mon[i]) and len(mean_array_mon[i]) != 0:
+                    if i != 0:
+                        mean_array_mon[i][j][0] = (mean_array_mon[i][j][0] + array_mon[t][i][j])
                         mean_array_mon[i][j][1] += 1
+                else:
+                    if t == 0 or i == 0:
+                        mean_array_mon[i].append([array_mon[t][i][j], 1])
                     else:
-                        mean_array_mon[i].append([array_mon[t][i][j],1])
-        test = False
+                        mean_array_mon[i].append([array_mon[t][i][j] + mean_array_mon[i][j - 1][0], 1])
+
+    for k in range(1, len(mean_array_mon)):
+        for j in range(len(mean_array_mon[k])):
+            mean_array_mon[k][j][0] /= len(fileNameMon)
 
     one_process_max = one_process_max/len(fileNameMon)
     print("Monitor: one_process_max : ", one_process_max)
@@ -85,7 +112,6 @@ def plot_result(scale,tab,fileNameMon,fileNameNoMon,resultFileName):
 
     one_process_max = 0
     all_process_max = 0
-
     for t in range(0, len(fileNameNoMon)):
         with open(fileNameNoMon[t], 'r') as csvfile:
             plots = csv.reader(csvfile, delimiter=',')
@@ -100,33 +126,52 @@ def plot_result(scale,tab,fileNameMon,fileNameNoMon,resultFileName):
                 else:
                     for i in range(0,len(tab)*2 + 1):
                         array_nomon[t][i].append((float(row[column_number[i]])))
-                if test is not True:
+                if is_first_max is not True:
                     if row[6] == "1.0":
                         one_process_max += float(row[0])
-                        test = True
+                        is_first_max = True
             for k in range (len(last_mean_nomon)):
                 last_mean_nomon[k] += float(row[k])
-            for i in range(0, len(tab) * 2 + 1):
-                for j in range(0,len(array_nomon[t][i])):
-                    if j < len(mean_array_nomon[i]) and len(mean_array_nomon[i]) != 0:
-                        mean_array_nomon[i][j][0] = (mean_array_nomon[i][j][0]*mean_array_nomon[i][j][1] + array_nomon[t][i][j])/(mean_array_nomon[i][j][1] + 1)
+        is_first_max = False
+    longer_file = len(array_nomon[0][0])
+    for t in range(1,len(array_nomon)):
+        if len(array_nomon[t][0])> longer_file:
+            longer_file = len(array_nomon[t][0])
+
+    for t in range(len(array_nomon)):
+        for i in range(len(array_nomon[t])):
+            for j in range(len(array_nomon[t][i]), longer_file):
+                if i == 0:
+                    array_nomon[t][i].append(array_nomon[t][i][j - 1] + 10)
+                else:
+                    array_nomon[t][i].append(array_nomon[t][i][j - 1])
+            for j in range(0, len(array_nomon[t][i])):
+                if j < len(mean_array_nomon[i]) and len(mean_array_nomon[i]) != 0:
+                    if i != 0:
+                        mean_array_nomon[i][j][0] = (mean_array_nomon[i][j][0] + array_nomon[t][i][j])
                         mean_array_nomon[i][j][1] += 1
+                else:
+                    if t == 0 or i == 0:
+                        mean_array_nomon[i].append([array_nomon[t][i][j], 1])
                     else:
-                        mean_array_nomon[i].append([array_nomon[t][i][j],1])
-        test = False
+                        mean_array_nomon[i].append([array_nomon[t][i][j] + mean_array_nomon[i][j - 1][0], 1])
+
+    for k in range(1, len(mean_array_nomon)):
+        for j in range(len(mean_array_nomon[k])):
+            mean_array_nomon[k][j][0] /= len(fileNameNoMon)
 
     one_process_max = one_process_max/len(fileNameNoMon)
-    print("No Monitor: one_process_max : ", one_process_max)
+    print("Monitor: one_process_max : ", one_process_max)
 
     for t in range (0, len(array_nomon)):
         pmax = max(array_nomon[t][-2])
         pos = array_nomon[t][-2].index(pmax)
         all_process_max += array_nomon[t][0][pos]
     all_process_max = all_process_max/len(array_nomon)
-    print ("No Monitor: all_process_max : ",all_process_max)
+    print ("Monitor: all_process_max : ",all_process_max)
     for k in range (len(last_mean_nomon)):
         last_mean_nomon[k] = last_mean_nomon[k] / len(fileNameNoMon)
-    print("No Monitor: ", last_mean_nomon)
+    print("Monitor: ", last_mean_nomon)
 
     for t in range(0, len(mean_array_nomon[0])):
         for j in range(len(mean_array_nomon)):
@@ -142,14 +187,14 @@ def plot_result(scale,tab,fileNameMon,fileNameNoMon,resultFileName):
             j += 1
             color = 'r'
             if len(mean_array_mon[i]) > 0:
-                plt.plot(mean_array_mon[0], mean_array_mon[i], color, linewidth=1, label=x + "_monitor")
+                plt.plot(mean_array_mon[0], mean_array_mon[i], color, linewidth=1)
             color = 'b'
             if len(mean_array_nomon[i]) > 0:
-                plt.plot(mean_array_nomon[0], mean_array_nomon[i], color, linewidth=1, label=x + "_no_monitor")
+                plt.plot(mean_array_nomon[0], mean_array_nomon[i], color, linewidth=1)
 
-            plt.legend()
-            plt.xlabel('N Updates')
-            plt.title(title)
+            #plt.legend()
+            #plt.xlabel('N Updates')
+            #plt.title(title)
             plt.savefig(pp, format='pdf')
 
         if x == "N_death" or x == "Reward_mean":
@@ -178,9 +223,9 @@ def plot_result(scale,tab,fileNameMon,fileNameNoMon,resultFileName):
                     area_bot.append(mean_array_nomon[i][k] - mean_array_nomon[i + 1][k])
                 plt.fill_between(mean_array_nomon[0], area_bot, area_top, color="skyblue", alpha=0.4)
 
-            plt.legend()
-            plt.xlabel('N Updates')
-            plt.title(title)
+            #plt.legend()
+            #plt.xlabel('N Updates')
+            #plt.title(title)
             plt.savefig(pp, format='pdf')
 
 
@@ -193,9 +238,9 @@ def plot_result(scale,tab,fileNameMon,fileNameNoMon,resultFileName):
             color = 'b'
             if len(mean_array_nomon[i + 1]) > 0:
                 plt.plot(mean_array_nomon[0], mean_array_nomon[i + 1], color, linewidth=1, label=y + "_no_monitor")
-            plt.legend()
-            plt.xlabel('N Updates')
-            plt.title(title)
+            #plt.legend()
+            #plt.xlabel('N Updates')
+            #plt.title(title)
             plt.savefig(pp, format='pdf')
 
 
@@ -223,7 +268,6 @@ def get_config_from_name(file):
         file = file.split(".csv")[0]
         file = file.replace("evaluations/","randoms/")
         file = file[:-2]
-        print("TEST",file)
         config = cg.Configuration.grab(file)
         
 
@@ -275,22 +319,22 @@ def get_image_from_name(path,my_file):
         return None
 
 def autoPlot(scale,tab):
-    for csvFile in glob.glob("evaluations/*_nomonitors/"):
+    for csvFile in glob.glob("evaluations/*/"):
         monitor = csvFile
         csvFileMon = []
         csvFileNoMon = []
-        for csvFile in glob.glob(monitor+"*.csv"):
-            csvFileNoMon.append(csvFile)
-            if len(csvFileNoMon) == 1:
-                name = csvFile
-                random_number = randint(0,999999)
-                name = name.replace("_0.csv","")
-                name = name + (str(random_number))
-                name += str(".pdf")
-                name = name.replace("evaluations/","results/")
-        monitor = monitor.replace("nomonitors","monitors")
-        for csvFile in glob.glob(monitor+"*.csv"):
-            csvFileMon.append(csvFile)
+        for csvFile in glob.glob(monitor+"*_0.csv"):
+            if csvFile[-8:]=="_2_0.csv":
+                csvFileNoMon.append(csvFile)
+            else:
+                csvFileMon.append(csvFile)
+                if len(csvFileMon) == 1:
+                    name = csvFile
+                    random_number = randint(0,999999)
+                    name = name.replace("_0.csv","")
+                    name = name + (str(random_number))
+                    name += str(".pdf")
+                    name = name.replace("evaluations/","results/")
         plot_result(scale,tab,csvFileMon,csvFileNoMon,name)
 
 
