@@ -104,10 +104,10 @@ class RandomEnv(ExMiniGridEnv):
         #Place lightswitch
         lightswitch_is_posed = False
         test_goal = 0
-        if width > 10:
+        if width > 6:
             if {3}:
                 while not lightswitch_is_posed:
-                    width_pos , height_pos = self._random_or_not_position(5, width - 6, 0, height - 1)
+                    width_pos , height_pos = self._random_or_not_position(2, width - 3, 2, height - 1)
                     
                     #lightswitch and room wall must not replace a fundamental element (goal, key, ...)
                     continue_while = True
@@ -120,7 +120,6 @@ class RandomEnv(ExMiniGridEnv):
                             continue_while = False
                             break
                     if not continue_while:
-                        print("true")
                         continue
                             
                     switchRoom = LightSwitch()
@@ -128,17 +127,18 @@ class RandomEnv(ExMiniGridEnv):
                     #Place the wall
                     self.grid.vert_wall(width_pos+1, 1, height-2)
                     
+                    xdoor, ydoor = width_pos + 1, height_pos - 1
                     #Place the door
-                    if height_pos == 0 or height_pos == 1:
-                        xdoor, ydoor = width_pos + 1, height_pos + 1
-                    elif height_pos == height - 2 or height_pos == height - 1:
-                        xdoor, ydoor = width_pos + 1, height_pos - 1
-                    else:
+                    #if height_pos == 0 or height_pos == 1:
+                        #xdoor, ydoor = width_pos + 1, height_pos + 1
+                    #elif height_pos == height - 2 or height_pos == height - 1:
+                        #xdoor, ydoor = width_pos + 1, height_pos - 1
+                    #else:
                         
-                        if self._random_or_not_bool():
-                            xdoor, ydoor = width_pos + 1, height_pos - 1
-                        else:
-                            xdoor, ydoor = width_pos + 1, height_pos + 1
+                        #if self._random_or_not_bool():
+                            #xdoor, ydoor = width_pos + 1, height_pos - 1
+                        #else:
+                            #xdoor, ydoor = width_pos + 1, height_pos + 1
                             
                     self.grid.set(xdoor, ydoor , Door(self._rand_elem(sorted(set(COLOR_NAMES)))))
                     
