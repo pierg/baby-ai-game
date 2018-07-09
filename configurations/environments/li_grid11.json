@@ -1,5 +1,5 @@
 {
-  "grid_size": 11,
+  "grid_size": 7,
   "n_water": 0,
   "n_deadend": 0,
   "light_switch": true,
