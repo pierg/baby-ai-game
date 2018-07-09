@@ -152,7 +152,7 @@ class RandomEnv(ExMiniGridEnv):
                     
                     #Place the lightswitch
                     switchRoom.affectRoom(self.roomList[1])
-                    switchRoom.setSwitchPos((width_pos,height_pos))
+                    #switchRoom.setSwitchPos((width_pos,height_pos))
                     
                     self.grid.set(width_pos, height_pos, switchRoom)
                     self.switchPosition = []
@@ -261,11 +261,11 @@ class RandomEnv(ExMiniGridEnv):
             else:
                 placed_water_tiles += 1
         
-        if lightswitch_is_posed:
-            if {3}:
+        #if lightswitch_is_posed:
+            #if {3}:
                 # transfert the position of the objects in the room in tha dark for visual  
-                tab = self.saveElements(self.roomList[1])
-                switchRoom.elements_in_room(tab)
+                #tab = self.saveElements(self.roomList[1])
+                #switchRoom.elements_in_room(tab)
                 
         self.mission = ""
 

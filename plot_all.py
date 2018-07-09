@@ -10,6 +10,7 @@ from pathlib import Path
 import screenHelper
 
 plt.savefig("foo.pdf", bbox_inches="tight", pad_inches=0)
+plt.rcParams["font.family"] = "Times New Roman"
 
 """
 File used to create a graph from a csv file and the name of the columns that need to be used
@@ -97,11 +98,11 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
             xpos = array_mo[t][1].index(ymax)
             xmax = array_mo[t][0][xpos]
             ymax = float("{0:.1f}".format(ymax))
-            plt.plot(array_mo[t][0], array_mo[t][1], color + t * 5)
-            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+            plt.plot(array_mo[t][0], array_mo[t][1],color + t * 5,label=list_of_name[1])
+            #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
     plt.ylabel(str(list_of_name[1]))
-    plt.title(title)
-    plt.xlabel('N Updates')
+    #plt.title(title)
+    #plt.xlabel('N Updates')
     plt.savefig(pp_mo, format='pdf')
 
     plt.figure()
@@ -112,12 +113,12 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
             xpos = array_mo[t][2].index(ymax)
             xmax = array_mo[t][0][xpos]
             ymax = float("{0:.1f}".format(ymax))
-            plt.plot(array_mo[t][0], array_mo[t][2], color + t * 5)
-            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+            plt.plot(array_mo[t][0], array_mo[t][2], color + t * 5,label=list_of_name[2])
+            #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
 
     plt.ylabel(str(list_of_name[2]))
-    plt.title(title)
-    plt.xlabel('N Updates')
+    #plt.title(title)
+    #plt.xlabel('N Updates')
     plt.savefig(pp_mo, format='pdf')
 
 
@@ -128,7 +129,7 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
         xmax = mean_array_mo[0][xpos]
         ymax = float("{0:.1f}".format(ymax))
         plt.plot(mean_array_mo[0], mean_array_mo[2], 'y', linewidth=2.5, label=list_of_name[2] + "_mean")
-        plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+        #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
 
     if len(mean_array_mo[1]) > 0:
         ymax = max(mean_array_mo[1])
@@ -136,11 +137,11 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
         xmax = mean_array_mo[0][xpos]
         ymax = float("{0:.1f}".format(ymax))
         plt.plot(mean_array_mo[0], mean_array_mo[1], 'r', linewidth=2.5, label=list_of_name[1] + "_mean")
-        plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+        #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
 
     plt.legend()
-    plt.title(title)
-    plt.xlabel('N Updates')
+    #plt.title(title)
+    #plt.xlabel('N Updates')
     plt.savefig(pp_mo, format='pdf')
 
 
@@ -162,7 +163,7 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
                     plt.plot(array_mo[t][0], array_mo[t][i],color,label=x)
                 else:
                     plt.plot(array_mo[t][0], array_mo[t][i], color)
-                plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax))
+                #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax))
             if len(array_mo[t][i + 1])>0:
                 color = 'b'
                 ymax = max(array_mo[t][i + 1])
@@ -173,7 +174,7 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
                     plt.plot(array_mo[t][0], array_mo[t][i + 1],color,label=y)
                 else:
                     plt.plot(array_mo[t][0], array_mo[t][i + 1], color)
-                plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax))
+                #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax))
 
             if z:
                 area_top = []
@@ -190,7 +191,7 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
             xmax = mean_array_mo[0][xpos]
             ymax = float("{0:.1f}".format(ymax))
             plt.plot(mean_array_mo[0], mean_array_mo[i], color, linewidth = 2.5, label=x + "_mean")
-            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+            #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
         if len(mean_array_mo[i + 1]) > 0:
             color = 'y'
             ymax = max(mean_array_mo[i + 1])
@@ -198,7 +199,7 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
             xmax = mean_array_mo[0][xpos]
             ymax = float("{0:.1f}".format(ymax))
             plt.plot(mean_array_mo[0], mean_array_mo[i + 1], color, linewidth = 2.5,label=y + "_mean")
-            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+            #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
 
         if z:
             area_top = []
@@ -212,8 +213,8 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
         i += 2
 
         plt.legend()
-        plt.title(title)
-        plt.xlabel('N Updates')
+        #plt.title(title)
+        #plt.xlabel('N Updates')
         plt.savefig(pp_mo,format='pdf')
 
     plt.figure()
@@ -286,11 +287,11 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
             xpos = array_nomo[t][1].index(ymax)
             xmax = array_nomo[t][0][xpos]
             ymax = float("{0:.1f}".format(ymax))
-            plt.plot(array_nomo[t][0], array_nomo[t][1], color + t * 5)
-            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
-    plt.ylabel(str(list_of_name[1]))
-    plt.title(title)
-    plt.xlabel('N Updates')
+            plt.plot(array_nomo[t][0], array_nomo[t][1], color + t * 5,label=list_of_name[1])
+            #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+    #plt.ylabel(str(list_of_name[1]))
+    #plt.title(title)
+    #plt.xlabel('N Updates')
     plt.savefig(pp_nomo, format='pdf')
 
     plt.figure()
@@ -301,12 +302,12 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
             xpos = array_nomo[t][2].index(ymax)
             xmax = array_nomo[t][0][xpos]
             ymax = float("{0:.1f}".format(ymax))
-            plt.plot(array_nomo[t][0], array_nomo[t][2], color + t * 5)
-            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+            plt.plot(array_nomo[t][0], array_nomo[t][2], color + t * 5,label=list_of_name[2])
+            #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
 
-    plt.ylabel(str(list_of_name[2]))
-    plt.title(title)
-    plt.xlabel('N Updates')
+    #plt.ylabel(str(list_of_name[2]))
+    #plt.title(title)
+    #plt.xlabel('N Updates')
     plt.savefig(pp_nomo, format='pdf')
 
 
@@ -317,7 +318,7 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
         xmax = mean_array_nomo[0][xpos]
         ymax = float("{0:.1f}".format(ymax))
         plt.plot(mean_array_nomo[0], mean_array_nomo[2], 'y', linewidth=2.5, label=list_of_name[2] + "_mean")
-        plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+        #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
 
     if len(mean_array_nomo[1]) > 0:
         ymax = max(mean_array_nomo[1])
@@ -325,11 +326,11 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
         xmax = mean_array_nomo[0][xpos]
         ymax = float("{0:.1f}".format(ymax))
         plt.plot(mean_array_nomo[0], mean_array_nomo[1], 'r', linewidth=2.5, label=list_of_name[1] + "_mean")
-        plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+        #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
 
-    plt.legend()
-    plt.title(title)
-    plt.xlabel('N Updates')
+    #plt.legend()
+    #plt.title(title)
+    #plt.xlabel('N Updates')
     plt.savefig(pp_nomo, format='pdf')
 
 
@@ -351,7 +352,7 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
                     plt.plot(array_nomo[t][0], array_nomo[t][i],color,label=x)
                 else:
                     plt.plot(array_nomo[t][0], array_nomo[t][i], color)
-                plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax))
+                #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax))
             if len(array_nomo[t][i + 1])>0:
                 color = 'b'
                 ymax = max(array_nomo[t][i + 1])
@@ -362,7 +363,7 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
                     plt.plot(array_nomo[t][0], array_nomo[t][i + 1],color,label=y)
                 else:
                     plt.plot(array_nomo[t][0], array_nomo[t][i + 1], color)
-                plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax))
+                #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax,ymax))
 
             if z:
                 area_top = []
@@ -379,7 +380,7 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
             xmax = mean_array_nomo[0][xpos]
             ymax = float("{0:.1f}".format(ymax))
             plt.plot(mean_array_nomo[0], mean_array_nomo[i], color, linewidth = 2.5, label=x + "_mean")
-            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+            #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
         if len(mean_array_nomo[i + 1]) > 0:
             color = 'y'
             ymax = max(mean_array_nomo[i + 1])
@@ -387,7 +388,7 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
             xmax = mean_array_nomo[0][xpos]
             ymax = float("{0:.1f}".format(ymax))
             plt.plot(mean_array_nomo[0], mean_array_nomo[i + 1], color, linewidth = 2.5,label=y + "_mean")
-            plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
+            #plt.annotate(ymax, xy=(xmax, ymax), xytext=(xmax, ymax))
 
         if z:
             area_top = []
@@ -400,9 +401,9 @@ def plot_result(scale,tab,fileNameMo,fileNameNoMo,resultFileName):
 
         i += 2
 
-        plt.legend()
-        plt.title(title)
-        plt.xlabel('N Updates')
+        #plt.legend()
+        #plt.title(title)
+        #plt.xlabel('N Updates')
         plt.savefig(pp_nomo,format='pdf')
 
     plt.figure()
@@ -424,7 +425,6 @@ def get_config_from_name(file):
         file = file.split(".csv")[0]
         file = file.replace("evaluations/", "randoms/")
         file = file[:-2]
-        print("TEST", file)
         config = cg.Configuration.grab(file)
 
 
